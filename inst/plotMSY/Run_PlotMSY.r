@@ -33,7 +33,7 @@ blim <- 150
 
 index <- NA                   # Don't use Lowestoft format files to find pf and pm
 pfpm <- c(0,0)                # Proportions of f and m occuring before spawning (pf and pm) specified manually)
-nits <- 1000                   # Number of MCMC fits calculated and used for confidence interval, typically 100 for
+nits <- 2000                   # Number of MCMC fits calculated and used for confidence interval, typically 100 for
                               #   investigatory analysis, 1,000 for final run to produce plots
 nhair <- 100                  # Number of MCMC fits to plot as individual lines
 varybiodata  <- TRUE          # Assume uncertainty on stock weights, maturity and natural mortality
