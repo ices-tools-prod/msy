@@ -2,7 +2,8 @@
 \alias{Eqplot}
 \title{stock recruitment function}
 \usage{
-  Eqplot(sim, fit, Blim, Bpa = 1.4 * Blim)
+  Eqplot(sim, fit, Blim, Bpa = 1.4 * Blim,
+    ymax = c(NA, NA, NA), plot = TRUE)
 }
 \arguments{
   \item{ab}{the model parameters}

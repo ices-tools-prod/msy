@@ -1,38 +1,10 @@
-# convertSumSen.r: R code to convert sen and sum files to out.dat and srmsy.dat used for
-#                  input to srmsy.exe
-# developed by Tim Earl at Cefas, UK, April 2010,
-# in collaboration with Chris Darby and José De Oliveira, also at Cefas.
-#
-# Requires the following file in the same directory:
-# - readLow.r if pf anf pm are to be extracted from Lowestoft format files
-#   
-# plotMSY will often be used as a wrapper to this function
-#
 
-
-#call convertfiles(senfilename=NA,indexfilename=NA,pfpm=NA) for interactive version
-#     senfilename    is the name of the senfile, with a corresponding sumfile sharing the 
-#                    same name except replacing ".sen" with ".sum".
-#                    Produces an interactive window if not specified
-#     pfpm           is a vector of two values; pm and pf (proportion of m and f before spawning
-#     indexfilename  is the name of an index file in the Lowestoft format pointing to the pf and pm files.
-#                    If pfpm is specified, this is ignored, if neither specified an interactive window appears to choose index file 
-#     nits           Number of iterations of bootstrapping - if 0, does only the deterministic fit
-#     sr             Stock recruit relationship, 1 = Ricker, 2= BevHolt, 3=Hockeystick
-#     varybiodata    If TRUE, bootstraps the biological data (weight, maturity, mortality) 
-#                    if FALSE, varies SR relationship only 
-#     stockname      Display title for stock
-#     silent         If TRUE output to screen then routine output to screen is supressed
-#     srconstrain    If TRUE, SR parameters must be greater than zero (and breakpoint within data for hockeystick), otherwise parameters may take any value
-
-##Version 2 - reads comma separated sen and sum files
-
-###Only tested on windows - uses 'choose.files' which may not work on other operating systems
-
-
-
-
-
+#' plotMSY
+#'
+#' @param  thing
+#' @return something
+#' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
+#' @export
 convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2, varybiodata=FALSE,stockname="",silent=FALSE,srconstrain=TRUE)
 {
 
@@ -204,7 +176,12 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
 #tmp = convertfiles()
                                            
  
-                                           
+#' plotMSY
+#'
+#' @param  thing
+#' @return something
+#' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
+#' @export                                           
 convertDat = function(datfilename, srtype)                                           
 {
 ##

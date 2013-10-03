@@ -1,53 +1,27 @@
-# plotMSY.r: R code to read in data, run ADMB code and output plots
-# developed by Tim Earl at Cefas, UK, April 2010,
-# in collaboration with Chris Darby and José De Oliveira, also at Cefas.
-#
-# Please report any bugs to timothy.earl@cefas.co.uk to see whether these 
-# can be removed in future versions. 
-#
-# Requires the following files in the same directory:
-#   srmsymc.exe compiled from José De Oliveira's ADMB code
-#   srmsymc2.exe ----------------------"------------------
-#   readLow.r if pf and pm are to be extracted from Lowestoft format files
-#   convertSumSen.r to produce input files for the ADMB executable
-#
-#
 
-
-
-#call convertfiles(senfilename=NA,indexfilename=NA,pfpm=NA) to interactively select files
-#     senfilename    is the name of the senfile, with a corresponding sumfile sharing the 
-#                    same name except replacing ".sen" with ".sum".
-#                    Produces an interactive window if not specified
-#     indexfilename  is the name of an index file in the Lowestoft format pointing to the pf and pm files.
-#                    If pfpm is specified, this is ignored, if neither specified an interactive window appears to choose index file 
-#     pfpm           is a vector of two values; pm and pf (proportion of m and f before spawning
-#     srweights
-#     trimming
-#     nits           Number of iterations of bootstrapping - if 0, does only the deterministic fit
-#     nhair          number of lines to plot on 'hair' plots
-#     varybiodata    If TRUE, bootstraps the biological & fleet data (weight, maturity, mortality, selectivity) 
-#                    if FALSE, varies SR relationship only 
-#     stockname      Display title for stock used in titles and output path
-#     fpa            Value of Fpa to be plotted on output (NA for no value to plot)
-#     flim           Value of Flim to be plotted on output (NA for no value to plot)
-#     outputfolder   Location for output files. Defaults to ".\\output\\[stockname]\\"
-#     datfilename    A pre-calculated dat file - if provided, senfilename, indexfilename, varybiodata, srconstrain 
-#                    and pfpm are ignored in preference to values in the dat file. 
-#                    Data from the sum file will be added to the plots if it can be found
-#     silent         Supresses the majority of the output to screen. Default is TRUE
-#     onlyYPR        Calculate only the yield per recruit reference points, for stocks where the SRR is 
-#                    unknown or uncertain. Default is FALSE
-
-
-
-
-
-plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(NA,NA,NA), trimming = NA, nits = 100, nhair = 100, varybiodata = TRUE, stockname = "",
-                   fpa=NA, flim=NA, bpa=NA, blim=NA, outputfolder="", datfilename=NA, silent=TRUE, onlyYPR=FALSE)
+#' plotMSY
+#'
+#'
+#' @param    senfilename    is the name of the senfile, with a corresponding sumfile sharing the same name except replacing ".sen" with ".sum". Produces an interactive window if not specified
+#' @param    indexfilename  is the name of an index file in the Lowestoft format pointing to the pf and pm files. If pfpm is specified, this is ignored, if neither specified an interactive window appears to choose index file 
+#' @param    pfpm           is a vector of two values; pm and pf (proportion of m and f before spawning
+#' @param    srweights
+#' @param    trimming
+#' @param    nits           Number of iterations of bootstrapping - if 0, does only the deterministic fit
+#' @param    nhair          number of lines to plot on 'hair' plots
+#' @param    varybiodata    If TRUE, bootstraps the biological & fleet data (weight, maturity, mortality, selectivity) if FALSE, varies SR relationship only 
+#' @param    stockname      Display title for stock used in titles and output path
+#' @param    fpa            Value of Fpa to be plotted on output (NA for no value to plot)
+#' @param    flim           Value of Flim to be plotted on output (NA for no value to plot)
+#' @param    outputfolder   Location for output files. Defaults to ".\\output\\[stockname]\\"
+#' @param    datfilename    A pre-calculated dat file - if provided, senfilename, indexfilename, varybiodata, srconstrain and pfpm are ignored in preference to values in the dat file.  Data from the sum file will be added to the plots if it can be found
+#' @param    silent         Supresses the majority of the output to screen. Default is TRUE
+#' @param  onlyYPR        Calculate only the yield per recruit reference points, for stocks where the SRR is unknown or uncertain. Default is FALSE
+#' @return something
+#' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
+#' @export
+plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(NA, NA, NA), trimming = NA, nits = 100, nhair = 100, varybiodata = TRUE, stockname = "", fpa=NA, flim=NA, bpa=NA, blim=NA, outputfolder="", datfilename=NA, silent=TRUE, onlyYPR=FALSE)
 {
-  ## Subfunctions
-  source("convertSumSen.r") #for convertSumSen() or convertDat()
   
   boxplot2 <- function(x,...) 
   { 
@@ -731,11 +705,4 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
      output$simYpr = simypr     
      invisible(output)
 }
-cat("plotMSY successfully loaded\n") 
-
-#
-#To run example data files:
-#         
-#cod = plotMSY (".\\cod data\\cod.sen", pfpm=c(0,0), nits=10)
-#
 

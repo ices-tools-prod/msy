@@ -1,0 +1,73 @@
+\name{plotMSY}
+\alias{plotMSY}
+\title{plotMSY}
+\usage{
+  plotMSY(senfilename = NA, indexfilename = NA, pfpm = NA,
+    srweights = c(NA, NA, NA), trimming = NA, nits = 100,
+    nhair = 100, varybiodata = TRUE, stockname = "",
+    fpa = NA, flim = NA, bpa = NA, blim = NA,
+    outputfolder = "", datfilename = NA, silent = TRUE,
+    onlyYPR = FALSE)
+}
+\arguments{
+  \item{senfilename}{is the name of the senfile, with a
+  corresponding sumfile sharing the same name except
+  replacing ".sen" with ".sum". Produces an interactive
+  window if not specified}
+
+  \item{indexfilename}{is the name of an index file in the
+  Lowestoft format pointing to the pf and pm files. If pfpm
+  is specified, this is ignored, if neither specified an
+  interactive window appears to choose index file}
+
+  \item{pfpm}{is a vector of two values; pm and pf
+  (proportion of m and f before spawning}
+
+  \item{srweights}{}
+
+  \item{trimming}{}
+
+  \item{nits}{Number of iterations of bootstrapping - if 0,
+  does only the deterministic fit}
+
+  \item{nhair}{number of lines to plot on 'hair' plots}
+
+  \item{varybiodata}{If TRUE, bootstraps the biological &
+  fleet data (weight, maturity, mortality, selectivity) if
+  FALSE, varies SR relationship only}
+
+  \item{stockname}{Display title for stock used in titles
+  and output path}
+
+  \item{fpa}{Value of Fpa to be plotted on output (NA for
+  no value to plot)}
+
+  \item{flim}{Value of Flim to be plotted on output (NA for
+  no value to plot)}
+
+  \item{outputfolder}{Location for output files. Defaults
+  to ".\\output\\[stockname]\\"}
+
+  \item{datfilename}{A pre-calculated dat file - if
+  provided, senfilename, indexfilename, varybiodata,
+  srconstrain and pfpm are ignored in preference to values
+  in the dat file.  Data from the sum file will be added to
+  the plots if it can be found}
+
+  \item{silent}{Supresses the majority of the output to
+  screen. Default is TRUE}
+
+  \item{onlyYPR}{Calculate only the yield per recruit
+  reference points, for stocks where the SRR is unknown or
+  uncertain. Default is FALSE}
+}
+\value{
+  something
+}
+\description{
+  plotMSY
+}
+\author{
+  Tim Earl \email{timothy.earl@cefas.co.uk}
+}
+

@@ -1,19 +1,25 @@
-Package: SimEq
+Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
 Version: 0.1.1
 Date: 2013-01-24
-Author: Colin Millar, John Simmonds, Noel Cadigan, Jose D'Oliviera, Timothy Earl
-Maintainer: Colin Millar <colinpmillar@jrc.ec.europa.eu>
+Author: Colin Millar, Noel Cadigan, Timothy Earl, Jose D'Oliviera
+Maintainer: Colin Millar <colinpmillar@gmail.com>
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
 Depends:
     FLCore,
-    MASS
+    MASS,
+    mgcv,
+    scam
 LazyLoad: yes
 Collate:
     'myMH.R'
-    'SimEq-package.R'
     'SimulateRefPts.R'
     'cod-data.R'
     'ModelAverage.R'
+    'convertSumSen.r'
+    'NSR.R'
+    'plotMSY.r'
+    'readLow.r'
+    'msy-package.R'

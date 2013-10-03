@@ -3,7 +3,8 @@
 \title{stock recruitment function}
 \usage{
   EqSim(fit, Nrun = 200, wt.years = c(2007, 2011),
-    Fscan = seq(0, 1, len = 20))
+    Fscan = seq(0, 1, len = 20), process.error = TRUE,
+    verbose = TRUE, Btrigger = 0)
 }
 \arguments{
   \item{ab}{the model parameters}

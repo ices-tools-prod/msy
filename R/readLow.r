@@ -1,30 +1,10 @@
-#Read in Lowestoft stock data files as specified on p12 and 13 of VPA handbook
-# Read.Lowestoft is the usual interface:
-# developed by Tim Earl at Cefas, UK, April 2010,
-# in collaboration with Chris Darby and José De Oliveira, also at Cefas.
-#
-# read.Lowestoft(filename=NA,index=1:10,expand=TRUE,silent=FALSE)
-#
-# filename - name of file to open. NA provides interactive file selection in Windows
-# expand   - if FALSE returns number, vector or matrix depending on DFA
-#          -    TRUE returns a matrix for all years and ages, repeating data as necessary
-# index    - Vector of file indices to read in
-# silent   - If TRUE, most screen output is supressed.
-#
-# This calls read.Stockfile to access individual files.
-#
-# read.Lowestoft returns a list containing an array, vector or number for each element of index. 
-# If expand=TRUE, read.Lowestoft returns a list of arrays of the same dimensions 
-#
-# - DOESN'T READ TUNING DATA AT THE MOMENT
-# - Option "Expand=TRUE" doesn't make much sense for total landings.
 
-
-
-#******Doesn't deal with DFI = 4*******
-
-
-
+#' plotMSY
+#'
+#' @param  thing
+#' @return something
+#' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
+#' @export
 read.Stockfile = function(filename,expand=FALSE,index=NA,silent=FALSE)
 {
   #Check that the file exist, can be read and is not empty
@@ -106,14 +86,12 @@ read.Stockfile = function(filename,expand=FALSE,index=NA,silent=FALSE)
 }       
 
 
-
-
-
-
-
-
-##Read in index files and create a list of matrices of the files
-
+#' plotMSY
+#'
+#' @param  thing
+#' @return something
+#' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
+#' @export
 read.Lowestoft = function(filename=NA,index=1:10,expand=TRUE,silent=FALSE)
 {
   if (all(!expand,!silent)) cat("Expand is FALSE, this suppresses warnings about inconsistent array sizes\n")
