@@ -17,10 +17,10 @@
 #' @param    datfilename    A pre-calculated dat file - if provided, senfilename, indexfilename, varybiodata, srconstrain and pfpm are ignored in preference to values in the dat file.  Data from the sum file will be added to the plots if it can be found
 #' @param    silent         Supresses the majority of the output to screen. Default is TRUE
 #' @param    onlyYPR        Calculate only the yield per recruit reference points, for stocks where the SRR is unknown or uncertain. Default is FALSE
-#' @return something
+#' @return mean(5:7) ##Some function
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
-#' @example  
+
 plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(NA, NA, NA), trimming = NA, nits = 100, nhair = 100, varybiodata = TRUE, stockname = "", fpa=NA, flim=NA, bpa=NA, blim=NA, outputfolder="", datfilename=NA, silent=TRUE, onlyYPR=FALSE)
 {
   

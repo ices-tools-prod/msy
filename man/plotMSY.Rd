@@ -23,9 +23,13 @@
   \item{pfpm}{is a vector of two values; pm and pf
   (proportion of m and f before spawning}
 
-  \item{srweights}{}
+  \item{srweights}{is a vector of three values, giving
+  relative weighting of the three stock recruit forms, or a
+  combination of 0 and NA for automatic weighting.}
 
-  \item{trimming}{}
+  \item{trimming}{proportion of the simulations to trim
+  before taking harmonic mean. NA causes no trimming, but a
+  diagnostic plot}
 
   \item{nits}{Number of iterations of bootstrapping - if 0,
   does only the deterministic fit}
@@ -62,7 +66,7 @@
   uncertain. Default is FALSE}
 }
 \value{
-  something
+  mean(5:7) ##Some function
 }
 \description{
   plotMSY
