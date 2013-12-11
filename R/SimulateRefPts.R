@@ -68,6 +68,10 @@ loader <- function(p)
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
+#' @example
+#' data(codEB)
+#' fit <- fitModels(codEB, nsamp = 100) # a few samples for example
+#'
 EqSim <- function(fit, 
                   Nrun = 200, # number of years to run in total
                   wt.years = c(2007, 2011), # years sample weights, sel from
@@ -165,7 +169,7 @@ EqSim <- function(fit,
       Fnext <- Fbar * pmin(1, SSB/Btrigger)      
 
       # apply some noise to the F
-      Ferr[j,] <- exp(Fphi * log(Ferr[j-1,]) + rnorm(Nrun, 0, Fcv)) 
+      Ferr[j,] <- exp(Fphi * log(Ferr[j-1,]) + rnorm(Nmod, 0, Fcv)) 
       Fnext <- Ferr[j,] * Fnext
 
       # get a selection pattern for each simulation and apply this to get N
