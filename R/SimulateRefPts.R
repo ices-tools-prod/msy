@@ -74,7 +74,9 @@ EqSim <- function(fit,
                   Fscan = seq(0, 1, len = 20), # F values to scan over
                   process.error = TRUE, # use predictive recruitment or mean recruitment?  (TRUE = predictive)
                   verbose = TRUE,
-                  Btrigger = 0) 
+                  Btrigger = 0,
+                  Fphi = 0,
+                  Fcv = 0) 
 {
 
   btyr1 <- wt.years[1]
@@ -114,7 +116,7 @@ EqSim <- function(fit,
   NF <- length(Fscan)
   ages <- dims(stk) $ age
 
-  ssby <- array(0, c(Nrun,Nmod))
+  ssby <- Ferr <- array(0, c(Nrun,Nmod))
   Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- array(0, c(ages, Nrun, Nmod))
   rsam <- array(sample(1:ncol(weca), Nrun * Nmod, TRUE), c(Nrun, Nmod)) 
   Wy[] <- c(weca[, c(rsam)])
@@ -161,6 +163,10 @@ EqSim <- function(fit,
 
       # apply HCR
       Fnext <- Fbar * pmin(1, SSB/Btrigger)      
+
+      # apply some noise to the F
+      Ferr[j,] <- exp(Fphi * log(Ferr[j-1,]) + rnorm(Nrun, 0, Fcv)) 
+      Fnext <- Ferr[j,] * Fnext
 
       # get a selection pattern for each simulation and apply this to get N
       Zpre <- rep(Fnext, each = length(Fprop)) * Fprop * sel[, rsam[j,]] + M * Mprop
@@ -374,29 +380,29 @@ if (plot) {
 ############################################
 # more plotting routines
 ##############################################
-#' plots the ordered posterior densities accross MCMC iterations for each model considered in \code{fitModels}
-#'
-#'
-#' @param fit an fitted MCMC returned from \code{fitModels}
-#' @return NULL produces a plot
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-#' @export
-LLplot <- function(fit) 
-{
-  lliks <- sapply(fit $ fits, function(x) sort(x $ llik))
-
-  plot(0, 0, type = "n", 
-       main = paste("LL of Bayes model:", fit $ stknam), 
-       xlab = "model order", ylab = "log likelihood", 
-       ylim = range(lliks), xlim = c(1, nrow(lliks)))
-  for (i in 2:ncol(lliks)-1) 
-  {
-    lines(lliks[,i], lty = i, col = i)
-  }
-  lines(sort(fit $ fits $ BMA $ llik), lwd = 2)
-  legend(x = "bottomright", legend = c(names(fit $ fits)), 
-         lty = c(2:ncol(lliks)-1,1), col = c(2:ncol(lliks)-1,1), lwd = c(rep(1, ncol(lliks)-1),2)) 
-}
+##' plots the ordered posterior densities accross MCMC iterations for each model considered in \code{fitModels}
+##'
+##'
+##' @param fit an fitted MCMC returned from \code{fitModels}
+##' @return NULL produces a plot
+##' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+##' @export
+#LLplot <- function(fit) 
+#{
+#  lliks <- sapply(fit $ fits, function(x) sort(x $ llik))
+#
+#  plot(0, 0, type = "n", 
+#       main = paste("LL of Bayes model:", fit $ stknam), 
+#       xlab = "model order", ylab = "log likelihood", 
+#       ylim = range(lliks), xlim = c(1, nrow(lliks)))
+#  for (i in 2:ncol(lliks)-1) 
+#  {
+#    lines(lliks[,i], lty = i, col = i)
+#  }
+#  lines(sort(fit $ fits $ BMA $ llik), lwd = 2)
+#  legend(x = "bottomright", legend = c(names(fit $ fits)), 
+#         lty = c(2:ncol(lliks)-1,1), col = c(2:ncol(lliks)-1,1), lwd = c(rep(1, ncol(lliks)-1),2)) 
+#}
 
 
 #' plots the fits for each model considered in \code{fitModels}
