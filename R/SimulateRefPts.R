@@ -380,29 +380,29 @@ if (plot) {
 ############################################
 # more plotting routines
 ##############################################
-##' plots the ordered posterior densities accross MCMC iterations for each model considered in \code{fitModels}
-##'
-##'
-##' @param fit an fitted MCMC returned from \code{fitModels}
-##' @return NULL produces a plot
-##' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-##' @export
-#LLplot <- function(fit) 
-#{
-#  lliks <- sapply(fit $ fits, function(x) sort(x $ llik))
-#
-#  plot(0, 0, type = "n", 
-#       main = paste("LL of Bayes model:", fit $ stknam), 
-#       xlab = "model order", ylab = "log likelihood", 
-#       ylim = range(lliks), xlim = c(1, nrow(lliks)))
-#  for (i in 2:ncol(lliks)-1) 
-#  {
-#    lines(lliks[,i], lty = i, col = i)
-#  }
-#  lines(sort(fit $ fits $ BMA $ llik), lwd = 2)
-#  legend(x = "bottomright", legend = c(names(fit $ fits)), 
-#         lty = c(2:ncol(lliks)-1,1), col = c(2:ncol(lliks)-1,1), lwd = c(rep(1, ncol(lliks)-1),2)) 
-#}
+#' plots the ordered posterior densities accross MCMC iterations for each model considered in \code{fitModels}
+#'
+#'
+#' @param fit an fitted MCMC returned from \code{fitModels}
+#' @return NULL produces a plot
+#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @export
+LLplot <- function(fit) 
+{
+  lliks <- sapply(fit $ fits, function(x) sort(x $ llik))
+
+  plot(0, 0, type = "n", 
+       main = paste("LL of Bayes model:", fit $ stknam), 
+       xlab = "model order", ylab = "log likelihood", 
+       ylim = range(lliks), xlim = c(1, nrow(lliks)))
+  for (i in 2:ncol(lliks)-1) 
+  {
+    lines(lliks[,i], lty = i, col = i)
+  }
+  lines(sort(fit $ fits $ BMA $ llik), lwd = 2)
+  legend(x = "bottomright", legend = c(names(fit $ fits)), 
+         lty = c(2:ncol(lliks)-1,1), col = c(2:ncol(lliks)-1,1), lwd = c(rep(1, ncol(lliks)-1),2)) 
+}
 
 
 #' plots the fits for each model considered in \code{fitModels}
