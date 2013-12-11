@@ -68,10 +68,15 @@ loader <- function(p)
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-#' @example
+#' @examples
 #' data(codEB)
 #' fit <- fitModels(codEB, nsamp = 100) # a few samples for example
-#'
+#' sim <- EqSim(fit, wt.years = c(2007, 2011), Fphi = 0.5, Fcv = 0.1)
+#' hist(c(apply(sim $ ferr, c(1,3), function(x) acf(x, plot = FALSE) $ acf[2])), main = "histogram of estimates of ACF lag 1 in F errors")
+#' arfits <- apply(sim $ ferr, c(1,3), function(x) ar(x)[c("order", "ar", "var.pred")])
+#' summary(sapply(arfits, function(x) x $ order))
+#' summary(sapply(arfits, function(x) x $ ar[1]))
+#' summary(sapply(arfits, function(x) x $ var.pred))
 EqSim <- function(fit, 
                   Nrun = 200, # number of years to run in total
                   wt.years = c(2007, 2011), # years sample weights, sel from
@@ -82,6 +87,8 @@ EqSim <- function(fit,
                   Fphi = 0,
                   Fcv = 0) 
 {
+
+  if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
 
   btyr1 <- wt.years[1]
   btyr2 <- wt.years[2] 
@@ -129,7 +136,7 @@ EqSim <- function(fit,
   R <- mean( data $ rec)
   ssbs <- cats <- recs <- array(0, c(7, NF))
   pssb1 <- pssb2 <- array(0, NF)
-  ssbsa <- catsa <- recsa <- array(0, c(NF, keep, Nmod))
+  ferr <- ssbsa <- catsa <- recsa <- array(0, c(NF, keep, Nmod))
   begin <- Nrun - keep + 1
 
   if (verbose) loader(0)
@@ -169,8 +176,8 @@ EqSim <- function(fit,
       Fnext <- Fbar * pmin(1, SSB/Btrigger)      
 
       # apply some noise to the F
-      Ferr[j,] <- exp(Fphi * log(Ferr[j-1,]) + rnorm(Nmod, 0, Fcv)) 
-      Fnext <- Ferr[j,] * Fnext
+      Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv) 
+      Fnext <- exp(Ferr[j,]) * Fnext
 
       # get a selection pattern for each simulation and apply this to get N
       Zpre <- rep(Fnext, each = length(Fprop)) * Fprop * sel[, rsam[j,]] + M * Mprop
@@ -194,6 +201,7 @@ EqSim <- function(fit,
     ssbs[, i]   <- quantile(ssby[begin:Nrun, ], quants)
     cats[, i]   <- quantile(Cat[begin:Nrun, ], quants)
     recs[, i]   <- quantile(Ny[1, begin:Nrun, ], quants)
+    ferr[i, , ] <- Ferr[begin:Nrun, ]
     ssbsa[i, , ] <- ssby[begin:Nrun, ]
     catsa[i, , ] <- Cat[begin:Nrun, ]
     recsa[i, , ] <- Ny[1, begin:Nrun, ]
@@ -201,7 +209,7 @@ EqSim <- function(fit,
       if (verbose) loader(i/NF)
   }
 
-  list(ssbs = ssbs, cats = cats, recs = recs, ssbsa = ssbsa, catsa = catsa, recsa = recsa,
+  list(ssbs = ssbs, cats = cats, recs = recs, ferr = ferr, ssbsa = ssbsa, catsa = catsa, recsa = recsa,
        Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, west = west, weca = weca, sel = sel,
        Fscan = Fscan)
 }
