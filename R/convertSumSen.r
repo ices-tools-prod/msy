@@ -1,7 +1,21 @@
 
-#' plotMSY
+#' @title Convert sum and sen files
 #'
-#' @param  thing
+#' @param senfilename is the name of the senfile, with a corresponding sumfile
+#' sharing the same name except replacing ".sen" with ".sum".
+#' Produces an interactive window if not specified
+#' @param indexfilename is the name of an index file in the Lowestoft format
+#' pointing to the pf and pm files. If pfpm is specified, this is ignored, 
+#' if neither specified an interactive window appears to choose index file
+#' @param pfpm is a vector of two values; pm and pf (proportion of m and f
+#' before spawning
+#' @param nits Number of iterations of bootstrapping - if 0, does only the 
+#' deterministic fit
+#' @param sr XXX
+#' @param varybiodata XXX
+#' @param stockname XXX
+#' @param silent XXX
+#' @param srconstrain XXX
 #' @return something
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
@@ -178,7 +192,8 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
  
 #' plotMSY
 #'
-#' @param  thing
+#' @param datfilename XXX
+#' @param srtype XXX
 #' @return something
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export                                           

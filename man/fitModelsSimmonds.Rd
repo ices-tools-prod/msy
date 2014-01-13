@@ -7,9 +7,21 @@
     models = c("ricker", "segreg", "bevholt"), ...)
 }
 \arguments{
-  \item{ab}{the model parameters}
+  \item{data}{data.frame containing stock recruitment data}
 
-  \item{ssb}{a vector of ssb}
+  \item{runid}{A character vector}
+
+  \item{delta}{A value}
+
+  \item{nburn}{An integer, specifying the burn-in period}
+
+  \item{nsamp}{An integer, specifying the number of
+  samples}
+
+  \item{models}{A character vector specifying
+  stock-recruitment models}
+
+  \item{...}{Additional arguments}
 }
 \value{
   log recruitment according to model

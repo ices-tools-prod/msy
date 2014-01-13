@@ -5,7 +5,9 @@
   initial(model, data)
 }
 \arguments{
-  \item{...}{}
+  \item{model}{XXX}
+
+  \item{data}{XXX}
 }
 \value{
   vector of starting values

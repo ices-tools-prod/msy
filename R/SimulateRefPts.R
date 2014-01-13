@@ -9,10 +9,10 @@
 #'
 #' a quick fix!!
 #'
-#' @param ...
+#' @param model XXX
+#' @param data XXX
 #' @return vector of starting values
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-#' @export
 initial <- function(model, data)
 {
   if (model == "segreg") {
@@ -26,19 +26,17 @@ initial <- function(model, data)
 #'
 #' for back compatibility
 #'
-#' @param ...
+#' @param ... whatever
 #' @return result of paste with sep = ""
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-#' @export
 paste0 <- function(...) paste(..., sep = "")
 
 
-#' stock recruitment function
+#' @title Progress function
 #'
 #'
-#' @param ab the model parameters
-#' @param ssb a vector of ssb
-#' @return log recruitment according to model
+#' @param p Value
+#' @return NULL
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
 loader <- function(p)
@@ -59,13 +57,46 @@ loader <- function(p)
 
 
 
-##### simulates the equilibrium results for a population
-#' stock recruitment function
+#' @title simulates the equilibrium results for a population
 #'
-#'
-#' @param ab the model parameters
-#' @param ssb a vector of ssb
-#' @return log recruitment according to model
+#' @description XXX
+#' 
+#' @param fit A list returned from the function fitModels
+#' @param Nrun The number of years to run in total
+#' @param wt.years The years to sample weights and selection pattern from
+#' @param Fscan F values to scan over
+#' @param process.error Use stochastic recruitment or mean recruitment?  (TRUE = predictive)
+#' @param verbose Flag, if TRUE (default) indication of the progress of the
+#' simulation is provided in the console. Useful to turn to FALSE when 
+#' knitting documents.
+#' @param Btrigger If other than 0 (default) the target F applied is reduced by
+#' SSB/Btrigger
+#' @param Fphi Autocorrelation in assessment error in the advisory year
+#' @param Fcv Assessment error in the advisory year
+#' @param flgsel A flag, if FALSE (default) use the mean selection value over the "wt.years"
+#' @param flgmatwt A flag, if FALSE (default) use the mean stock and catch values
+#' over the "wt.years"
+#' @return A list containing the following objects:
+#' \itemize{
+#' \item ssbs A matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
+#' percentiles of ssb for the scanned fishing mortalities (see Fscan below).
+#' \item cats A matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
+#' percentiles of catches for the scanned fishing mortalities (see Fscan below).
+#' \item recs A matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
+#' percentiles of rec for the scanned fishing mortalities (see Fscan below).
+#' \item ferr An array 
+#' \item ssbsa
+#' \item catsa
+#' \item recsa
+#' \item Mat
+#' \item M
+#' \item Fprop
+#' \item Mprop
+#' \item west
+#' \item weca
+#' \item sel
+#' \item Fscan
+#' }
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
 #' @examples
@@ -201,12 +232,21 @@ EqSim <- function(fit,
     # summarise everything and spit out!
     quants <- c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975)
     ssbs[, i]   <- quantile(ssby[begin:Nrun, ], quants)
+    dimnames(ssbs) <- list(quants=quants,fmort=Fscan)
     cats[, i]   <- quantile(Cat[begin:Nrun, ], quants)
+    dimnames(cats) <- list(quants=quants,fmort=Fscan)
     recs[, i]   <- quantile(Ny[1, begin:Nrun, ], quants)
+    dimnames(recs) <- list(quants=quants,fmort=Fscan)
     ferr[i, , ] <- Ferr[begin:Nrun, ]
+    y <- dim(ferr)[2]
+    z <- dim(ferr)[3]
+    dimnames(ferr) <- list(fmort=Fscan,year = 1:y, iter=1:z)
     ssbsa[i, , ] <- ssby[begin:Nrun, ]
+    dimnames(ssbsa) <- list(fmort=Fscan,year = 1:y, iter=1:z)
     catsa[i, , ] <- Cat[begin:Nrun, ]
+    dimnames(catsa) <- list(fmort=Fscan,year = 1:y, iter=1:z)
     recsa[i, , ] <- Ny[1, begin:Nrun, ]
+    dimnames(recsa) <- list(fmort=Fscan,year = 1:y, iter=1:z)
 
       if (verbose) loader(i/NF)
   }
@@ -219,12 +259,16 @@ EqSim <- function(fit,
 
 ######## Creates equilibrium plots for a given Blim
 
-#' stock recruitment function
+#' @title Plot summary of the equilibrium simulation
 #'
 #'
-#' @param ab the model parameters
-#' @param ssb a vector of ssb
-#' @return log recruitment according to model
+#' @param sim A list obtained from function \code{EqSim}
+#' @param fit A list obtained from function \code{fitModels}
+#' @param Blim A value for Blim
+#' @param Bpa A value for Bpa. If not specified Bpa is set to 1.4 Blim
+#' @param ymax A vector of length three indicating the maximum values for
+#' each of the first three panel plots
+#' @param plot Flag, if TRUE (default) returns both values and plot
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
 Eqplot <- function (sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA), plot = TRUE)

@@ -5,11 +5,7 @@
   updateparam(param, data, llikhood, delta, model)
 }
 \arguments{
-  \item{nparam}{the x location of the bubbles}
-
   \item{param}{the y location of the bubbles}
-
-  \item{ni}{a vector of bubble sizes}
 
   \item{data}{a scaling factor}
 

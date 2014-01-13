@@ -1,20 +1,29 @@
 \name{Eqplot}
 \alias{Eqplot}
-\title{stock recruitment function}
+\title{Plot summary of the equilibrium simulation}
 \usage{
   Eqplot(sim, fit, Blim, Bpa = 1.4 * Blim,
     ymax = c(NA, NA, NA), plot = TRUE)
 }
 \arguments{
-  \item{ab}{the model parameters}
+  \item{sim}{A list obtained from function \code{EqSim}}
 
-  \item{ssb}{a vector of ssb}
-}
-\value{
-  log recruitment according to model
+  \item{fit}{A list obtained from function
+  \code{fitModels}}
+
+  \item{Blim}{A value for Blim}
+
+  \item{Bpa}{A value for Bpa. If not specified Bpa is set
+  to 1.4 Blim}
+
+  \item{ymax}{A vector of length three indicating the
+  maximum values for each of the first three panel plots}
+
+  \item{plot}{Flag, if TRUE (default) returns both values
+  and plot}
 }
 \description{
-  stock recruitment function
+  Plot summary of the equilibrium simulation
 }
 \author{
   Colin Millar \email{colin.millar@jrc.ec.europa.eu}

@@ -2,10 +2,20 @@
 \alias{bootscam}
 \title{function name}
 \usage{
-  bootscam(scamfit, sp, nboot)
+  bootscam(dat, y, np, scamfit, sp, nboot)
 }
 \arguments{
-  \item{par}{a parameter}
+  \item{dat}{XXX}
+
+  \item{y}{XXX}
+
+  \item{np}{XXX}
+
+  \item{scamfit}{XXX}
+
+  \item{sp}{XXX}
+
+  \item{nboot}{XXX}
 }
 \value{
   something

@@ -1,19 +1,17 @@
 \name{loader}
 \alias{loader}
-\title{stock recruitment function}
+\title{Progress function}
 \usage{
   loader(p)
 }
 \arguments{
-  \item{ab}{the model parameters}
-
-  \item{ssb}{a vector of ssb}
+  \item{p}{Value}
 }
 \value{
-  log recruitment according to model
+  NULL
 }
 \description{
-  stock recruitment function
+  Progress function
 }
 \author{
   Colin Millar \email{colin.millar@jrc.ec.europa.eu}

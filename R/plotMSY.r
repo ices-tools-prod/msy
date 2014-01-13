@@ -13,6 +13,8 @@
 #' @param    stockname      Display title for stock used in titles and output path
 #' @param    fpa            Value of Fpa to be plotted on output (NA for no value to plot)
 #' @param    flim           Value of Flim to be plotted on output (NA for no value to plot)
+#' @param bpa Value of Bpa to be plotted on output (NA for no value to plot)
+#' @param blim Value of Blim to be plotted on output (NA for no value to plot)
 #' @param    outputfolder   Location for output files. Defaults to ".\\output\\[stockname]\\"
 #' @param    datfilename    A pre-calculated dat file - if provided, senfilename, indexfilename, varybiodata, srconstrain and pfpm are ignored in preference to values in the dat file.  Data from the sum file will be added to the plots if it can be found
 #' @param    silent         Supresses the majority of the output to screen. Default is TRUE
@@ -128,7 +130,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
   #Start of plotMSY function proper  
   cat("Stock:", stockname, "\n")
   graphics.off()   #So that graphics output can be sent to files
-  dir.create(outputfolder, show=FALSE, recursive=TRUE)
+  dir.create(outputfolder, showWarnings=FALSE, recursive=TRUE)
   outputfilename = paste(outputfolder, stockname, ".txt", sep="")  
   output = list()
   noredlines = simdatadet = simdata = simy = simSSB  = list()     
@@ -286,7 +288,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
       {
        
         plot(c(0,sumsen$SSB), c(0,sumsen$Recruits), xlab=SSBtext, ylab=rectext,type='n')
-        if (done_fit2) lines(b.cm.pred$stock.size,b.cm.pred$recruit,col="purple")
+        #if (done_fit2) lines(b.cm.pred$stock.size,b.cm.pred$recruit,col="purple")
         title(paste(sumsen$stock, srname[srtype]))
         points(sumsen$SSB, sumsen$Recruits)  #Data points
         recruits = recruitment(SSB, simdatadet[[srtype]]$alpha[1], simdatadet[[srtype]]$beta[1], srtype)

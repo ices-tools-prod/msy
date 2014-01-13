@@ -5,7 +5,7 @@
   paste0(...)
 }
 \arguments{
-  \item{...}{}
+  \item{...}{whatever}
 }
 \value{
   result of paste with sep = ""

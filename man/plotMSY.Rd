@@ -49,6 +49,12 @@
   \item{flim}{Value of Flim to be plotted on output (NA for
   no value to plot)}
 
+  \item{bpa}{Value of Bpa to be plotted on output (NA for
+  no value to plot)}
+
+  \item{blim}{Value of Blim to be plotted on output (NA for
+  no value to plot)}
+
   \item{outputfolder}{Location for output files. Defaults
   to ".\\output\\[stockname]\\"}
 

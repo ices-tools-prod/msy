@@ -6,7 +6,13 @@
     expand = TRUE, silent = FALSE)
 }
 \arguments{
-  \item{thing}{}
+  \item{filename}{XXX}
+
+  \item{index}{XXX}
+
+  \item{expand}{XXX}
+
+  \item{silent}{XXX}
 }
 \value{
   something

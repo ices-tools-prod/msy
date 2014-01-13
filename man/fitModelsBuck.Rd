@@ -6,9 +6,15 @@
     models = c("ricker", "segreg", "bevholt"), ...)
 }
 \arguments{
-  \item{ab}{the model parameters}
+  \item{data}{data.frame containing stock recruitment data}
 
-  \item{ssb}{a vector of ssb}
+  \item{runid}{A character vector}
+
+  \item{nsamp}{Number of samples}
+
+  \item{models}{A character vector}
+
+  \item{...}{Additional arguements}
 }
 \value{
   log recruitment according to model

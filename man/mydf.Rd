@@ -7,11 +7,11 @@
 \arguments{
   \item{rho}{smoothing parameter}
 
-  \item{data}{}
+  \item{data}{XXX}
 
-  \item{nknots}{}
+  \item{nknots}{XXX}
 
-  \item{my.df}{}
+  \item{my.df}{XXX}
 }
 \value{
   something

@@ -127,9 +127,7 @@ scaleProposal <- function(A)
 #' performs a single
 #'
 #'
-#' @param nparam the x location of the bubbles
 #' @param param the y location of the bubbles
-#' @param ni a vector of bubble sizes
 #' @param data a scaling factor 
 #' @param llikhood  extra arguments to plot and points
 #' @param delta  extra arguments to plot and points

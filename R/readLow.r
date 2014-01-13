@@ -1,7 +1,10 @@
 
 #' plotMSY
 #'
-#' @param  thing
+#' @param  filename XXX
+#' @param expand XXX
+#' @param index XXX
+#' @param silent XXX
 #' @return something
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
@@ -88,7 +91,10 @@ read.Stockfile = function(filename,expand=FALSE,index=NA,silent=FALSE)
 
 #' plotMSY
 #'
-#' @param  thing
+#' @param filename XXX
+#' @param index XXX
+#' @param expand XXX
+#' @param silent XXX
 #' @return something
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export

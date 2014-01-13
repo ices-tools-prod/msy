@@ -4,9 +4,9 @@
 #'
 #'
 #' @param rho smoothing parameter
-#' @param data
-#' @param nknots
-#' @param my.df
+#' @param data XXX
+#' @param nknots XXX
+#' @param my.df XXX
 #' @return something
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
 #' @export
@@ -24,11 +24,12 @@ mydf <- function(rho, data, nknots, my.df)
 #' mygcv
 #'
 #'
-#' @param par a parameter
+#' @param dat XXX
+#' @param rho a parameter
 #' @return something
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
 #' @export
-mygcv <- function(rho)
+mygcv <- function(dat, rho)
 {
   temp <- scam(log.recruit ~ s(stock.size, k = nknots, bs = "mpd", m = 2) + offset(offset),
                family = gaussian(link = "identity"), 
@@ -44,11 +45,16 @@ mygcv <- function(rho)
 #' function name
 #'
 #'
-#' @param par a parameter
+#' @param dat XXX
+#' @param y XXX
+#' @param np XXX
+#' @param scamfit XXX
+#' @param sp XXX
+#' @param nboot XXX
 #' @return something
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
 #' @export
-bootscam <- function(scamfit, sp, nboot)
+bootscam <- function(dat, y, np, scamfit, sp, nboot)
 {
   ret <- matrix(NA, length(dat $ stock.size), nboot)
   ind <- dat $ wt == 1

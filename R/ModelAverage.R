@@ -1,10 +1,29 @@
 
-#' stock recruitment function
+#' @title Stock recruitment fit
 #'
 #'
-#' @param ab the model parameters
-#' @param ssb a vector of ssb
-#' @return log recruitment according to model
+#' @param stk FLStock object
+#' @param nsamp Number of samples
+#' @param models A character vector containing sr-models to use. User can set
+#' any combination of "ricker","segreg","bevholt".
+#' @param method A character vector. Currently only "Buckland" is implemented.
+#' @param runid A character vector specifying run name
+#' @param remove.years A vector specifying the years to remove
+#' @param delta A value, used in method "Simmonds" (not implemented)
+#' @param nburn An integer, used in method Simmonds (not implemented)
+#' @return A list containing the following objects:
+#' \itemize{
+#' \item fit data.frame containing the alpha (a), beta (b), cv and model names.
+#' The number of rows correspond to the value set in nsamp in the function call.
+#' \item pred A vector of predicted recruitment values. The length of the vector
+#' corresponds to the value set in nsamp in the function call.
+#' \item fits The parameters in the stock recruitment model corresponding to the
+#' "best fit" of any given model.
+#' \item data data.frame containing the recruitment (rec), spawning stock
+#' biomass (ssb) and year used in the fitting of the data.
+#' \item stknam A character vector containing stock name
+#' \item stk FLStock object, same as provided as input by the user.
+#' }
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
 fitModels <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"), 
@@ -51,8 +70,11 @@ fitModels <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt")
 #' stock recruitment function
 #'
 #'
-#' @param ab the model parameters
-#' @param ssb a vector of ssb
+#' @param data data.frame containing stock recruitment data
+#' @param runid A character vector
+#' @param nsamp Number of samples
+#' @param models A character vector
+#' @param ... Additional arguements
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
@@ -103,8 +125,13 @@ fitModelsBuck <- function(data, runid, nsamp = 5000, models = c("ricker","segreg
 #' stock recruitment function
 #'
 #'
-#' @param ab the model parameters
-#' @param ssb a vector of ssb
+#' @param data data.frame containing stock recruitment data
+#' @param runid A character vector
+#' @param delta A value
+#' @param nburn An integer, specifying the burn-in period
+#' @param nsamp An integer, specifying the number of samples
+#' @param models A character vector specifying stock-recruitment models
+#' @param ... Additional arguments
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
@@ -149,7 +176,7 @@ fitModelsSimmonds <- function(data, runid, delta = 1.3, nburn = 10000, nsamp = 5
 #--------------------------------------------------------
 # get posterior distribution of estimated recruitment
 #--------------------------------------------------------
-  pred <- t(sapply(seq(nsamp), function(j) exp(match.fun(fit $ model[j]) (fit[j,], sort(data $ ssb))) ))
+  preds <- t(sapply(seq(nsamp), function(j) exp(match.fun(fit $ model[j]) (fit[j,], sort(data $ ssb))) ))
   
   list(fit = fit, preds = preds, data = data, stknam = runid)
 }
@@ -178,6 +205,9 @@ SRplot <- function (fit)
   minSSB <- min(ssb, max(ssb)*0.05)
   maxSSB <- max(ssb)*1.1
   maxrec <- max(rec*1.5)
+  
+  x2 <- melt(tapply(fit$fit$model,fit$fit$model,length))
+  x2$lab <- paste(x2$Var1,round(x2$value/sum(x2$value),2))
 
   plot(ssb, rec, xlim = c(0, maxSSB), ylim = c(0, maxrec), type = "n", 
        xlab = "SSB ('000 t)", ylab="Recruits", main = paste("Predictive distribution of recruitment\nfor", fit $ stknam))
@@ -189,10 +219,11 @@ SRplot <- function (fit)
       fssb <- runif(500, minSSB, maxSSB)
       FUN <-  match.fun(modset $ model[i])
       frec <- exp( FUN(modset[i,], fssb) + rnorm(500, sd = modset $ cv[i]) )
-      points(fssb, frec, pch = 20, col = paste0(grey(0), "05"), cex = 0.0625)
+      #points(fssb, frec, pch = 20, col = paste0(grey(0), "05"), cex = 0.0625)
 
       data.frame(ssb = fssb, rec = frec)
     }))
+  points(out$ssb[1:5000], out$rec[1:5000], pch = 20, col = paste0(grey(0), "05"), cex = 1)
   out $ grp <- with(out, floor(10 * (ssb - min(ssb)) / (max(ssb) - min(ssb) + 0.001)))
   out $ mid.grp <- with(out, (grp + 0.5) / 10 * (max(ssb) - min(ssb)) + min(ssb))
 
@@ -212,8 +243,12 @@ SRplot <- function (fit)
 
   lines(ssb, rec, col = 10)
   points(ssb, rec, pch = 19, col = 10, cex = 1.25)
+  
+  for (i in 1:nrow(x2)) {
+    text(0.2*maxSSB,maxrec*(1-i/10),x2$lab[i],cex=0.9)
+  }
 
-
+  
   #TODO plot Blim
   #lines(PBlim$mids,0.1*maxrec/max(PBlim$counts)*PBlim$counts,col=5,lwd=2)
   #lines(c(Blim,Blim),c(0,maxrec),col=5,lwd=2)

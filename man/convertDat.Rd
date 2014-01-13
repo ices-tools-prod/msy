@@ -5,7 +5,9 @@
   convertDat(datfilename, srtype)
 }
 \arguments{
-  \item{thing}{}
+  \item{datfilename}{XXX}
+
+  \item{srtype}{XXX}
 }
 \value{
   something
