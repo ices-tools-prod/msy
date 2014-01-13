@@ -85,15 +85,17 @@ EqSim <- function(fit,
                   verbose = TRUE,
                   Btrigger = 0,
                   Fphi = 0,
-                  Fcv = 0) 
+                  Fcv = 0,
+                  flgsel = 0,
+                  flgmatwt=0) 
 {
 
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
 
   btyr1 <- wt.years[1]
   btyr2 <- wt.years[2] 
-  flgsel <- 0
-  flgmatwt <- 0
+  #flgsel <- 0
+  #flgmatwt <- 0
   keep <- min(Nrun, 50)
 
   SR <- fit $ fit
