@@ -183,14 +183,15 @@ fitModelsSimmonds <- function(data, runid, delta = 1.3, nburn = 10000, nsamp = 5
 
 
 
-#' plot simulated predictive distrubution of recruitment
+#' plot simulated predictive distribution of recruitment
 #'
 #'
 #' @param fit an fitted MCMC returned from \code{fitModels}
+#' @param n Number of random recruitment draws to plot
 #' @return NULL produces a plot
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-SRplot <- function (fit) 
+SRplot <- function (fit, n = 5000) 
 {
   modset <- fit $ fit
   data <- fit $ data
@@ -223,7 +224,7 @@ SRplot <- function (fit)
 
       data.frame(ssb = fssb, rec = frec)
     }))
-  points(out$ssb[1:5000], out$rec[1:5000], pch = 20, col = paste0(grey(0), "05"), cex = 1)
+  points(out$ssb[1:n], out$rec[1:n], pch = 20, col = paste0(grey(0), "05"), cex = 1)
   out $ grp <- with(out, floor(10 * (ssb - min(ssb)) / (max(ssb) - min(ssb) + 0.001)))
   out $ mid.grp <- with(out, (grp + 0.5) / 10 * (max(ssb) - min(ssb)) + min(ssb))
 

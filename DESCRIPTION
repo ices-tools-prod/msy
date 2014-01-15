@@ -11,8 +11,11 @@ Depends:
     FLCore,
     MASS,
     mgcv,
-    scam
-LazyLoad: yes
+    scam,
+    reshape2,
+    plyr,
+    ggplot2
+LazyData: yes
 Collate:
     'myMH.R'
     'SimulateRefPts.R'
@@ -23,3 +26,4 @@ Collate:
     'plotMSY.r'
     'readLow.r'
     'msy-package.R'
+    'eqsim.R'

@@ -23,9 +23,9 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
 {
 
   #filenames
-  senfilename = tolower(senfilename)
-  indexfilename = tolower(indexfilename)
-  if (is.na(senfilename)) senfilename = tolower(choose.files("*.sen", "Choose SEN file",multi=FALSE)) 
+  #senfilename = tolower(senfilename)
+  #indexfilename = tolower(indexfilename)
+  if (is.na(senfilename)) senfilename = choose.files("*.sen", "Choose SEN file",multi=FALSE)
   if (!file.exists(senfilename)) stop("SEN file not found")
   sumfilename = sub(".sen",".sum",senfilename,fixed=TRUE)
   if (!file.exists(sumfilename)) stop("SUM file not found")  
@@ -69,7 +69,7 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
     colnames(Params) = Vars
     rownames(Params) = ages  
     Params[,"Wx"] = 0
-    if (senhead[5] == 0) exit("No Human consumption data")
+    if (senhead[5] == 0) stop("No Human consumption data")
     if (senhead[6] == 0) Params[,c("SD","WD")] = 0      #Discards
     if (senhead[7] == 0) Params[,c("SI","WI")] = 0      #Industrial
     cv = Params
