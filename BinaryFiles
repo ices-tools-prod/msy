@@ -1,2 +1,3 @@
-inst/plotMSY/srmsymc.exe
-inst/plotMSY/srmsymc2.exe
+inst/bin/srmsymc.exe
+inst/bin/srmsymc2.exe
+

@@ -3,7 +3,7 @@
 \title{Plot the results from eqsim}
 \usage{
   eqsim_plot(sim, fit, Blim, Bpa = 1.4 * Blim,
-    ymax = c(NA, NA, NA), plot = TRUE,
+    ymax = c(NA, NA, NA), xmax, plot = TRUE,
     plotMeanCatch = FALSE)
 }
 \arguments{
@@ -20,6 +20,9 @@
   y-value on the recruitment plot, the maximum value on the
   ssb-plot and the maximum value on the catch plot (in that
   order)}
+
+  \item{xmax}{Value for the maximum F to plot, if missing
+  will use the whole F-range simulated.}
 
   \item{plot}{Flag, if TRUE (default) provide a plot as
   part of the output}

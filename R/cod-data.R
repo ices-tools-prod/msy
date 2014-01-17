@@ -18,3 +18,13 @@ NULL
 #' @author NA
 NULL
 
+#' @name codNS
+#' @title codNS
+#' @description Catch number, stocks weights etc for North Sea Cod.
+#' @docType data
+#' @usage codNS
+#' @format an \code{FLStock}.
+#' @source NA
+#' @author NA
+NULL
+

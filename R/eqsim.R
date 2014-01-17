@@ -91,10 +91,10 @@ eqsr_plot <- function (fit, n = 5000, ggPlot=FALSE)
     out <- join(out,x2[,c("variable","Model")])
     ggplot(out[1:n,]) + 
       theme_bw() +
+      geom_point(aes(x=ssb,y=rec,colour=variable),size=1) +
       geom_line(data=d1,aes(x=ssb,y=p05),colour="yellow") +
       geom_line(data=d1,aes(x=ssb,y=p95),colour="yellow") +
       geom_line(data=d1,aes(ssb,p50),col="yellow",lwd=2) +
-      geom_point(aes(x=ssb,y=rec,colour=variable),size=1) +
       geom_line(data=d2,aes(ssb,value,colour=variable),lwd=1) +
       #scale_colour_brewer(palette="Set1") +
       scale_colour_manual(values=c("bevholt"="#F8766D","ricker"="#00BA38","segreg"="#619CFF"),
@@ -126,13 +126,15 @@ eqsr_plot <- function (fit, n = 5000, ggPlot=FALSE)
 #' @param ymax vector of three values, dictating maximum y-value on the recruitment
 #' plot, the maximum value on the ssb-plot and the maximum value on the catch plot (in
 #' that order)
+#' @param xmax Value for the maximum F to plot, if missing will use the whole
+#' F-range simulated.
 #' @param plot Flag, if TRUE (default) provide a plot as part of the output
 #' @param plotMeanCatch Flag, if FALSE (default) does not provide values for the
 #' mean catch.
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
 eqsim_plot <- 
-  function (sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA), plot = TRUE,
+  function (sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA), xmax, plot = TRUE,
             plotMeanCatch = FALSE)
   {
     
@@ -142,6 +144,7 @@ eqsim_plot <-
     Nyrs <- dim(sim $ ssbsa)[2]
     
     Fscan <- sim $ Fscan
+    
     
     catm <- apply(sim $ catsa, 1, mean)
     maxcatm <- which.max(catm)
@@ -192,7 +195,7 @@ eqsim_plot <-
                 cex.axis = 0.75, tcl = 0.25, mgp = c(0, 0.25, 0), las = 1)
       
       # recruits versus Fbar
-      xmax <- max(Fscan)
+      if(missing(xmax)) xmax <- max(Fscan)
       y.max <- if (!is.na(ymax[1])) ymax[1] else max(1.25*rec)
       
       plot(Fscan, recs[7,], type = "l", lty = 4, 
@@ -241,7 +244,7 @@ eqsim_plot <-
       # catch versus Fbar
       y.max <- if (!is.na(ymax[3])) ymax[3] else max(1.25*Catchs)
       plot(Fscan, cats[7,], type = "l", lty = 4,
-           ylim = c(0, y.max), xlim = c(0, max(Fscan)), ylab = "", xlab = "")
+           ylim = c(0, y.max), xlim = c(0, xmax), ylab = "", xlab = "")
       title(ylab = "Catch", xlab = "F bar", 
             cex.lab = 0.75, line = 2.5, cex.main = 0.75)
       mtext(text = "c) Catch", cex = 0.75, side = 3, line = 0.5)
@@ -270,7 +273,7 @@ eqsim_plot <-
       
       # F versus SSB probability profile
       plot(Fscan, 1-pssb1, type = "l", col="red",
-           ylim = c(0,1), xlim = c(0,max(Fscan)), ylab = "", xlab = "")
+           ylim = c(0,1), xlim = c(0,xmax), ylab = "", xlab = "")
       title(ylab = "Prob MSY, SSB<Bpa or Blim", xlab = "F bar", 
             cex.lab = 0.75, line = 2.5, cex.main = 0.75)
       mtext(text = "d) Prob MSY and Risk to SSB", cex = 0.75, side = 3, line = 0.5)
