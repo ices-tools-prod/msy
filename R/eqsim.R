@@ -1,317 +1,641 @@
-#' plot simulated predictive distribution of recruitment
+#' @title simulates the equilibrium results for a population
 #'
-#'
-#' @param fit an fitted MCMC returned from \code{eqsr_fit}
-#' @param n Number of random recruitment draws to plot
-#' @param ggPlot Flag, if FALSE (default) plot base graphics, if true
-#' do a ggplot
-#' @return NULL produces a plot
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @description XXX
+#' 
 #' @export
-eqsr_plot <- function (fit, n = 5000, ggPlot=FALSE) 
-  {
-  modset <- fit $ fit
-  data <- fit $ data
-  
-  #ssb <- data $ ssb
-  #rec <- data $ rec
-  
-  #TODO Blim <- res $ Blim
-  #TODO PBlim <- res $ PBlim
-  
-  #mn <- length(data$ssb)
-  minSSB <- min(data$ssb, max(data$ssb)*0.0125)
-  maxSSB <- max(data$ssb)*1.1
-  maxrec <- max(data$rec*1.5)
-  
-  x2 <- melt(tapply(fit$fit$model,fit$fit$model,length))
-  x2$lab <- paste(x2$Var1,round(x2$value/sum(x2$value),2))
-  names(x2) <- c("variable","value","Model")
-  x2$variable <- as.character(x2$variable)
-  
-  x3 <- melt(tapply(fit$fit$model,fit$fit$model,length))
-  x3$prop <- round(x2$value/sum(x2$value),2)
-  # 1) Take 500 samples from nrow(modset) - default value is 5000
-  # 2) Make 500 uniformly distributed SSBs (fssb)
-  # 3) Generate recruitment value
-  # A total of 250000 (500*500) recruitment values are thus generated. The
-  # weight that each model gets when generating the recruits is equivalent
-  # to the number of occurrences in the fit$fit object, i.e table(fit$fit$models)
-  
-  out <-
-    do.call(rbind, lapply(sample(1:nrow(modset), 500), 
-                          function(i)
-                          {
-                            fssb <- runif(500, minSSB, maxSSB)
-                            FUN <-  match.fun(modset $ model[i])
-                            frec <- exp( FUN(modset[i,], fssb) + rnorm(500, sd = modset $ cv[i]) )
-                            srModel <- modset$model[i]
-                            #points(fssb, frec, pch = 20, col = paste0(grey(0), "05"), cex = 0.0625)
-                            data.frame(ssb = fssb, rec = frec, variable=srModel)
-                          }))
-  # group the ssbs into 10 bins
-  out $ grp <- with(out, floor(10 * (ssb - min(ssb)) / (max(ssb) - min(ssb) + 0.001)))
-  # find the midvalue of ssb within each group
-  out $ mid.grp <- with(out, (grp + 0.5) / 10 * (max(ssb) - min(ssb)) + min(ssb))
-  # calculate the recruitment median and 5th and 95th percentile within each
-  # ssb group and then plot the distribution
-  summ <- with(out, 
-               t(simplify2array( tapply(rec, grp, quantile, c(0.5, .05, .95)) )))
-  mid.grp <- sort(unique(out $ mid.grp))
-  d1 <- data.frame(ssb=mid.grp,p50=summ[,1],p05=summ[,2],p95=summ[,3])
-  
-  if(!ggPlot) {
-    plot(data$ssb, data$rec, xlim = c(0, maxSSB), ylim = c(0, maxrec), type = "n", 
-       xlab = "SSB ('000 t)", ylab="Recruits", main = paste("Predictive distribution of recruitment\nfor", fit $ stknam))
-    points(out$ssb[1:n], out$rec[1:n], pch = 20, col = paste0(grey(0), "05"), cex = 1)
-    lines(mid.grp, summ[,1], col = 7, lwd = 3)
-    lines(mid.grp, summ[,2], col = 4, lwd = 3)
-    lines(mid.grp, summ[,3], col = 4, lwd = 3)
-    # plot the best fit for each model as a line
-    x <- fit $ fits
-    y <- seq(1, round(max(data$ssb)), length = 100)
-    sapply(1:nrow(x), function(i) lines(y, exp(match.fun(as.character(x$model[i])) (x[i,], y)), col = "black", lwd = 2, lty = i))
-    # plot the observation points
-    lines(data$ssb, data$rec, col = "red")
-    points(data$ssb, data$rec, pch = 19, col = "red", cex = 1.25)
-    # plot the model weights on the graph
-    for (i in 1:nrow(x2)) {
-      text(0.2*maxSSB,maxrec*(1-i/10),x2$lab[i],cex=0.9)
-    }
-  } else { # ggplot
-    
-    # best model fit
-    x <- fit $ fits
-    ssb <- seq(1, round(max(data$ssb)), length = 100)
-    z <- sapply(1:nrow(x), function(i) rec <- exp(match.fun(as.character(x$model[i])) (x[i,], ssb)))
-    d2 <- as.data.frame(cbind(ssb,z))
-    names(d2) <- c("ssb",x$model)
-    d2 <- melt(d2,id.vars="ssb")
-    d2 <- join(d2,x2[,c("variable","Model")])
-    out <- join(out,x2[,c("variable","Model")])
-    ggplot(out[1:n,]) + 
-      theme_bw() +
-      geom_point(aes(x=ssb,y=rec,colour=variable),size=1) +
-      geom_line(data=d1,aes(x=ssb,y=p05),colour="yellow") +
-      geom_line(data=d1,aes(x=ssb,y=p95),colour="yellow") +
-      geom_line(data=d1,aes(ssb,p50),col="yellow",lwd=2) +
-      geom_line(data=d2,aes(ssb,value,colour=variable),lwd=1) +
-      #scale_colour_brewer(palette="Set1") +
-      scale_colour_manual(values=c("bevholt"="#F8766D","ricker"="#00BA38","segreg"="#619CFF"),
-                          labels=paste(x3$Var1,x3$prop)) +
-      coord_cartesian(ylim=c(0,quantile(out$rec[1:n],0.99))) +
-      geom_path(data=fit$data,aes(ssb,rec),col="grey") +
-      geom_text(data=fit$data,aes(ssb,rec,label=substr(year,3,4)),angle=45,size=3) +
-      theme(legend.position = c(0.15,0.80)) +
-      labs(x="Spawning stock biomass",y="Recruitment",colour="Model")
+#' 
+#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' 
+#' @param fit A list returned from the function fitModels
+#' @param Nrun The number of years to run in total
+#' @param wt.years The years to sample weights and selection pattern from
+#' @param sel.years The years to sample sel and discard proportion by number from
+#' @param Fscan F values to scan over
+#' @param process.error Use stochastic recruitment or mean recruitment?  (TRUE = predictive)
+#' @param verbose Flag, if TRUE (default) indication of the progress of the
+#' simulation is provided in the console. Useful to turn to FALSE when 
+#' knitting documents.
+#' @param Btrigger If other than 0 (default) the target F applied is reduced by
+#' SSB/Btrigger
+#' @param Fphi Autocorrelation in assessment error in the advisory year
+#' @param Fcv Assessment error in the advisory year
+#' @param flgsel A flag, if FALSE (default) use the mean selection value over the "wt.years"
+#' @param flgmatwt A flag, if FALSE (default) use the mean stock and catch values
+#' over the "wt.years"
+#' 
+#' @return A list containing the following objects:
+#' \itemize{
+#' \item ssbs A matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
+#' percentiles of ssb for the scanned fishing mortalities (see Fscan below).
+#' \item cats A matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
+#' percentiles of catches for the scanned fishing mortalities (see Fscan below).
+#' \item recs A matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
+#' percentiles of rec for the scanned fishing mortalities (see Fscan below).
+#' \item ferr An array 
+#' \item ssbsa
+#' \item catsa
+#' \item recsa
+#' \item Mat
+#' \item M
+#' \item Fprop
+#' \item Mprop
+#' \item west
+#' \item weca
+#' \item sel
+#' \item Fscan
+#' }
 
+eqsim_run <- function(fit,
+                  Nrun = 200, # number of years to run in total
+                  wt.years = c(2008, 2012), # years sample weights, M and mat
+                  sel.years= c(2008, 2012), # years sample sel and discard proportion by number from
+                  Fscan = seq(0, 1, len = 20), # F values to scan over
+                  process.error = TRUE, # use predictive recruitment or mean recruitment? (TRUE = predictive)
+                  verbose = TRUE,
+                  Btrigger = 0,
+                  Fphi = 0,
+                  Fcv = 0,
+                  flgsel = 0,
+                  flgmatwt = 0)
+{
+  
+  if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
+  
+  btyr1 <- wt.years[1]
+  btyr2 <- wt.years[2]
+  slyr1 <- sel.years[1]
+  slyr2 <- sel.years[2]
+  
+  keep <- min(Nrun, 50)
+  
+  SR <- fit $ fit
+  data <- fit $ data
+  stk <- fit $ stk
+  
+  # forecast settings (mean wt etc)
+  stk.win <- window(stk, start = btyr1, end = btyr2)
+  stk.winsel <- window(stk, start = slyr1  , end = slyr2)
+  
+  west <- matrix(stock.wt(stk.win), ncol = btyr2 - btyr1 + 1)
+  weca <- matrix(catch.wt(stk.win), ncol = btyr2 - btyr1 + 1)
+  wela <- matrix(landings.wt(stk.win), ncol = btyr2 - btyr1 + 1)
+  Mat <- matrix(mat(stk.win), ncol = btyr2 - btyr1 + 1)
+  M <- matrix(m(stk.win), ncol = btyr2 - btyr1 + 1)
+  landings <- matrix(landings.n(stk.winsel), ncol = slyr2 - slyr1 + 1)
+  catch <- matrix(catch.n(stk.winsel), ncol = slyr2 - slyr1 + 1)
+  sel <- matrix(harvest(stk.winsel), ncol = slyr2 - slyr1 + 1)
+  Fbar <- matrix(fbar(stk.winsel), ncol = slyr2 - slyr1  + 1)
+  sel <- sweep(sel, 2, Fbar, "/")
+  
+  if (flgsel == 0) { # take means of selection
+    sel[] <- apply(sel, 1, mean)
+    landings[]  <- apply(landings, 1, mean)
+    catch[]  <- apply(catch, 1, mean)
+  }
+  if (flgmatwt==0){ # take means of wts Mat and M and ratio of landings to catch
+    west[] <- apply(west, 1, mean)
+    weca[] <- apply(weca, 1, mean)
+    Mat[] <- apply(Mat, 1, mean)
+    M[] <- apply(M, 1, mean) #me
+  }
+  land.cat= landings / catch  # ratio of number of landings to catch
+  
+  Fprop <- apply(harvest.spwn(stk.winsel), 1, mean)[drop=TRUE] # vmean(harvest.spwn(stk.win))
+  Mprop <- apply(m.spwn(stk.win), 1, mean)[drop=TRUE] # mean(m.spwn(stk.win))
+  
+  # get ready for the simulations
+  Nmod <- nrow(SR)
+  NF <- length(Fscan)
+  ages <- dims(stk) $ age
+  
+  ssby <- Ferr <- array(0, c(Nrun,Nmod))
+  Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <- array(0, c(ages, Nrun, Nmod))
+  rsam <- array(sample(1:ncol(weca), Nrun * Nmod, TRUE), c(Nrun, Nmod))
+  rsamsel <- array(sample(1:ncol(sel), Nrun * Nmod, TRUE), c(Nrun, Nmod))
+  Wy[] <- c(weca[, c(rsam)])
+  Wl[] <- c(wela[, c(rsam)])
+  Ry[]  <- c(land.cat[, c(rsamsel)])
+  # initial recruitment
+  R <- mean( data $ rec)
+  ssbs <- cats <- lans <- recs <- array(0, c(7, NF))
+  pssb1 <- pssb2 <- array(0, NF)
+  ferr <- ssbsa <- catsa <- lansa <- recsa <- array(0, c(NF, keep, Nmod))
+  begin <- Nrun - keep + 1
+  
+  
+  if (verbose) loader(0)
+  for (i in 1:NF) {
+    
+    # The F value to test
+    Fbar <- Fscan[i]
+    
+    # the selection patterns for the first year
+    Zpre <- ( sel[,rsamsel[1,]]*Fbar * Fprop + M[,rsam[1,]] * Mprop)
+    Zpos <- (Fbar * (1-Fprop) * sel[,rsamsel[1,]] + M[,rsam[1,]] * (1-Mprop))
+    # run Z out to age 50 ...
+    Zcum <- c(0, cumsum(Fbar * sel[c(1:ages, rep(ages, 49 - ages)), rsamsel[1,]] + M[c(1:ages, rep(ages, 49 - ages)), rsam[1,]]))
+    N1 <- R * exp(- unname(Zcum))
+    
+    # set up age structure in first year for all simulations
+    Ny[,1,] <- c(N1[1:(ages-1)], sum(N1[ages:50]))
+    
+    # calculate ssb in first year using a different stock.wt and Mat selection and M for each simulation
+    ssby[1,] <- colSums(Mat[,rsam[1,]] * Ny[,1,] * west[,rsam[1,]] / exp(Zpre)[])
+    
+    # loop over years
+    for (j in 2:Nrun) {
+      # get ssb from previous year
+      SSB <- ssby[j-1,]
+      
+      # predict recruitment using various models
+      if (process.error) {
+        allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB) + rnorm(Nmod, 0, SR $ cv)))
+      } else {
+        allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB)))
+      }
+      select <- cbind(seq(Nmod), as.numeric(factor(SR $ mod, levels = unique(SR $ mod))))
+      Ny[1,j,] <- allrecs[select]
+      
+      # apply HCR
+      Fnext <- Fbar * pmin(1, SSB/Btrigger)
+      
+      # apply some noise to the F
+      Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv)
+      Fnext <- exp(Ferr[j,]) * Fnext
+      
+      # get a selection pattern for each simulation and apply this to get N
+      Zpre <- rep(Fnext, each = length(Fprop)) * Fprop * sel[, rsamsel[j,]] + M[, rsam[j,]] * Mprop
+      
+      # get Fy
+      Fy[ , j-1, ] <- rep(Fnext, each = ages) * sel[, rsamsel[j-1,]]
+      
+      Ny[ -1, j, ] <- Ny[1:(ages-1), j-1, ] * exp(-Fy[1:(ages-1), j-1, ] - M[1:(ages-1), rsam[j-1,]])
+      Ny[ages, j, ] <- Ny[ages, j, ] + Ny[ages, j-1, ] * exp(-Fy[ages, j-1, ] - M[ages, rsam[j-1,]])
+      # calculate ssb and catch.n
+      ssby[j, ] <- apply(array(Mat[, rsam[j,]] * Ny[,j,] * west[, rsam[j,]] / exp(Zpre), c(ages, Nmod)), 2, sum)
+      Cy[, j, ] <- Ny[, j-1, ] * Fy[, j-1, ] / (Fy[, j-1, ] + M[, rsam[j-1,]]) * (1 - exp(-Fy[, j-1, ] - M[, rsam[j-1,]]))
+    }
+    
+    # convert to catch weight
+    Cw <- Cy * Wy   # catch Numbers *catch wts
+    land <- Cy*Ry*Wl # catch Numbers * Fraction (in number) landed and landed wts
+    Lan=apply(land,2:3,sum)
+    Cat <- apply(Cw, 2:3, sum)
+    
+    # summarise everything and spit out!
+    quants <- c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975)
+    ssbs[, i] <- quantile(ssby[begin:Nrun, ], quants)
+    cats[, i] <- quantile(Cat[begin:Nrun, ], quants)
+    lans[, i] <- quantile(Lan[begin:Nrun, ], quants)
+    recs[, i] <- quantile(Ny[1, begin:Nrun, ], quants)
+    
+    
+    ferr[i, , ] <- Ferr[begin:Nrun, ]
+    ssbsa[i, , ] <- ssby[begin:Nrun, ]
+    catsa[i, , ] <- Cat[begin:Nrun, ]
+    lansa[i, , ] <- Lan[begin:Nrun, ]
+    recsa[i, , ] <- Ny[1, begin:Nrun, ]
+
+        if (verbose) loader(i/NF)
   }
   
-  #"#F8766D" "#00BA38" "#619CFF"
-  #TODO plot Blim
-  #lines(PBlim$mids,0.1*maxrec/max(PBlim$counts)*PBlim$counts,col=5,lwd=2)
-  #lines(c(Blim,Blim),c(0,maxrec),col=5,lwd=2)
+  dimnames(ssbs) <- dimnames(cats) <- 
+    dimnames(lans) <- dimnames(recs) <- 
+    list(quants=c("p025","p05","p25","p50","p75","p95","p975"),
+         fmort=Fscan)
+  dimnames(ferr) <- dimnames(ssbsa) <- dimnames(catsa) <- 
+    dimnames(lansa) <- dimnames(recsa) <-
+    list(fmort=Fscan,year = 1:dim(ferr)[2], iter=1:dim(ferr)[3])
+  
+  list(Percentiles=list(ssbs = ssbs, cats = cats, lans = lans, recs = recs),
+       rby=list(ferr = ferr, ssbsa = ssbsa, catsa = catsa, lansa = lansa, recsa = recsa),
+       ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, west = west, weca = weca, sel = sel), 
+       land.cat = land.cat,Fscan = Fscan, stk=fit$stk,data=fit$data)
 }
+
+
 
 #' @title Plot the results from eqsim
 #'
-#' @description This is a modification of the \code{Eqplot}-function where the mean
-#' catch can be turned on-off by users choise with some additional deletion
-#' of vertical lines that were deemed unessessary at the wkmsyref2 meeting.
+#' @description XXX
 #' 
-#' @param sim An object returned from the function EqSim 
-#' @param fit An object returned from the function fitModels
+#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' 
+#' @export
+#' 
+#' @param sim An object returned from the function eqsim_run 
 #' @param Blim Value for the Blim
 #' @param Bpa Value for the Bpa
 #' @param ymax vector of three values, dictating maximum y-value on the recruitment
 #' plot, the maximum value on the ssb-plot and the maximum value on the catch plot (in
 #' that order)
-#' @param xmax Value for the maximum F to plot, if missing will use the whole
-#' F-range simulated.
 #' @param plot Flag, if TRUE (default) provide a plot as part of the output
-#' @param plotMeanCatch Flag, if FALSE (default) does not provide values for the
-#' mean catch.
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-#' @export
-eqsim_plot <- 
-  function (sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA), xmax, plot = TRUE,
-            plotMeanCatch = FALSE)
-  {
+#' @param yield Character
+
+eqsim_plot0 <- function (sim, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA), plot = TRUE, yield='landings')
+{
+  
+  stk <- sim$stk
+  
+  Nmod <- dim(sim$rby$ ssbsa)[3]
+  Nyrs <- dim(sim$rby$ ssbsa)[2]
+  
+  Fscan <- sim $ Fscan
+  catm <- apply(sim$rby$ catsa, 1, mean)
+  lanm <- apply(sim$rby$ lansa, 1, mean)
+  maxcatm <- which.max(catm)
+  maxlanm <- which.max(lanm)
+  
+  catsam <- apply(sim$rby$ catsa, c(1,3), mean)
+  lansam <- apply(sim$rby$ lansa, c(1,3), mean)
+  maxpf <- apply(catsam, 2, which.max)
+  maxpfl <- apply(lansam, 2, which.max)
+  
+  #  using catch as default or landings if required
+  if (yield=='landings') { fmsy <- Fscan[maxpfl]  } else { fmsy <- Fscan[maxpf] }
+  
+  msym <- mean(fmsy)
+  vcum <- median(fmsy)
+  fmsy.dens <- density(fmsy)
+  vmode <- fmsy.dens $ x[which.max(fmsy.dens $ y)]
+  
+  pssb1 <- apply(sim$rby$ ssbsa > Blim, 1, mean)
+  pssb2 <- apply(sim$rby$ ssbsa > Bpa, 1, mean)
+  
+  pp1 <- max(which(pssb1>.95))
+  grad <- diff(Fscan[pp1 + 0:1]) / diff(pssb1[pp1 + 0:1])
+  flim <- Fscan[pp1] + grad * (0.95 - pssb1[pp1]) # linear interpolation i think..
+  
+  
+  maint <- sim$stknam
+  
+  rec <- sim$ data $ rec
+  ssb <- sim$ data $ ssb
+  
+  Catchs <- catch(stk)[, 1:length(ssb), drop = TRUE]
+  Landings <- landings(stk)[, 1:length(ssb), drop = TRUE]
+  
+  FbarO <- fbar(stk)[, 1:length(ssb), drop = TRUE]
+  
+  recs <- sim$Percentiles $ recs
+  ssbs <- sim$Percentiles $ ssbs
+  cats <- sim$Percentiles $ cats
+  lans <- sim$Percentiles $ lans
+  ssbsa <- sim$rby $ ssbsa
+  catsa <- sim$rby $catsa
+  lansa <- sim$rby $lansa
+  
+  
+  NF <- length(Fscan)
+  pp1 <- max(which(pssb1>.50))
+  grad <- diff(Fscan[pp1 + 0:1]) / diff(pssb1[pp1 + 0:1])
+  flim50 <- Fscan[pp1]+grad*(0.5-pssb1[pp1]) # linear interpolation i think..
+  
+  pp1 <- max(which(pssb1>.90))
+  grad <- diff(Fscan[pp1 + 0:1]) / diff(pssb1[pp1 + 0:1])
+  flim10 <- Fscan[pp1]+grad*(0.9-pssb1[pp1]) # linear interpolation i think..
+  
+  
+  if (plot) {
+    op <- par(mfrow = c(2, 2), mar = c(2.5, 4, 1.5, 1), oma = c(0, 0, 0, 0),
+              cex.axis = 0.75, tcl = 0.25, mgp = c(0, 0.25, 0), las = 1)
     
-    stk <- fit $ stk
+    # recruits versus Fbar
+    xmax <- max(Fscan)
+    y.max <- if (!is.na(ymax[1])) ymax[1] else max(recs[6,], rec)
     
-    Nmod <- dim(sim $ ssbsa)[3]
-    Nyrs <- dim(sim $ ssbsa)[2]
+    plot(Fscan, recs[6,], type = "l", lty = 4,
+         ylim = c(0, y.max), xlim = c(0, xmax), ylab = "", xlab = "")
+    title(ylab = "Recruitment", xlab = "F bar",
+          cex.lab = 0.75, line = 2.5, cex.main = 0.75)
+    mtext(text = paste(maint," a) Recruits"), cex = 0.75, side = 3, line = 0.5)
+    lines(Fscan, recs[4,], lty = 1)
+    lines(Fscan, recs[2,], lty = 3)
+    points(FbarO, rec, pch = 21, cex = .75, bg = 1)
+    lines(c(flim, flim), c(0, y.max), col = 3)
     
-    Fscan <- sim $ Fscan
-    
-    
-    catm <- apply(sim $ catsa, 1, mean)
-    maxcatm <- which.max(catm)
-    catsam <- apply(sim $ catsa, c(1,3), mean)
-    maxpf <- apply(catsam, 2, which.max)
-    fmsy <- Fscan[maxpf]
-    
-    msym <- mean(fmsy)
-    vcum <- median(fmsy)
-    fmsy.dens <- density(fmsy)
-    vmode <- fmsy.dens $ x[which.max(fmsy.dens $ y)]
-    
-    pssb1 <- apply(sim $ ssbsa > Blim, 1, mean)
-    pssb2 <- apply(sim $ ssbsa > Bpa, 1, mean)
-    
-    pp1 <- max(which(pssb1>.95))
-    grad <- diff(Fscan[pp1 + 0:1]) / diff(pssb1[pp1 + 0:1])
-    flim <- Fscan[pp1] + grad * (0.95 - pssb1[pp1])  # linear interpolation i think..
-    
-    
-    maint <- fit $ stknam  
-    
-    rec <- fit $ data $ rec
-    ssb <- fit $ data $ ssb
-    
-    Catchs <- catch(stk)[, 1:length(ssb), drop = TRUE]
-    FbarO <- fbar(stk)[, 1:length(ssb), drop = TRUE]
-    
-    recs <- sim $ recs
-    ssbs <- sim $ ssbs
-    cats <- sim $ cats
-    ssbsa <- sim $ ssbsa
-    
-    NF <- length(Fscan)
-    pp1 <- max(which(pssb1>.50))
-    grad <- diff(Fscan[pp1 + 0:1]) / diff(pssb1[pp1 + 0:1])
-    flim50 <- Fscan[pp1]+grad*(0.5-pssb1[pp1]) # linear interpolation i think..
-    
-    pp1 <- max(which(pssb1>.90))
-    grad <- diff(Fscan[pp1 + 0:1]) / diff(pssb1[pp1 + 0:1])
-    flim10 <- Fscan[pp1]+grad*(0.9-pssb1[pp1]) # linear interpolation i think..
-    
-    maxcatm <- which.max(catm)
-    
-    
-    if (plot) {
-      op <- par(mfrow = c(2, 2), mar = c(2.5, 4, 1.5, 1), oma = c(0, 0, 0, 0), 
-                cex.axis = 0.75, tcl = 0.25, mgp = c(0, 0.25, 0), las = 1)
-      
-      # recruits versus Fbar
-      if(missing(xmax)) xmax <- max(Fscan)
-      y.max <- if (!is.na(ymax[1])) ymax[1] else max(1.25*rec)
-      
-      plot(Fscan, recs[7,], type = "l", lty = 4, 
-           ylim = c(0, y.max), xlim = c(0, xmax), ylab = "", xlab = "")
-      title(ylab = "Recruitment", xlab = "F bar", 
-            cex.lab = 0.75, line = 2.5, cex.main = 0.75)
-      mtext(text = paste(maint," a) Recruits"), cex = 0.75, side = 3, line = 0.5)
-      lines(Fscan, recs[6,], lty = 3)
-      lines(Fscan, recs[5,], lty = 2)
-      lines(Fscan, recs[4,], lty = 1)
-      lines(Fscan, recs[3,], lty = 2)
-      lines(Fscan, recs[2,], lty = 3)
-      lines(Fscan, recs[1,], lty = 4)
-      points(FbarO, rec, pch = 21, cex = .75, bg = 1)
-      lines(c(flim, flim), c(0, y.max), col = "red")
-      text(x = flim, y = 0, "Flim", cex = 0.7, col="red")
-      lines(rep(vcum,2), c(0,y.max), lty = 1, col = "blue")
-      text(x = vcum, y = max(1.25*rec) * 0.9, "Fmsy",cex=0.7,col="blue")
-      
-      # recruits versus SSB
-      y.max <- if (!is.na(ymax[2])) ymax[2] else max(1.25*ssb)
-      plot(Fscan, ssbs[7,], type = "l", lty = 4, 
-           ylim = c(0, y.max), xlim = c(0, xmax), ylab = "", xlab = "")
-      title(ylab = "SSB", xlab = "F bar", 
-            cex.lab = 0.75, line = 2.5, cex.main = 0.75)
-      mtext(text = "b) Spawning Stock Biomass", cex = 0.75, side = 3, line = 0.5)
-      lines(Fscan, ssbs[6,], lty=3)
-      lines(Fscan, ssbs[5,], lty=2)
-      lines(Fscan, ssbs[4,], lty=1)
-      lines(Fscan, ssbs[3,], lty=2)
-      lines(Fscan, ssbs[2,], lty=3)
-      lines(Fscan, ssbs[1,], lty=4)
-      lines(c(0,xmax), c(Blim, Blim),col="red")
-      text(x = 0.1, y = Blim * 1.1, "Blim", cex = 0.7,col="red")
-      points(FbarO, ssb, pch = 21, cex = .75, bg = 1)
-      lines(c(flim, flim), c(0, Blim), col = "red")
-      text(x = flim, y = 0, "Flim", cex = 0.7, col="red")
-      lines(rep(vcum,2), c(0,y.max), lty = 1, col = "blue")
-      text(x = vcum, y  = max(1.25*ssb) * 0.9, "Fmsy",cex=0.7,col="blue")
-    }
-    FCrash5  <- Fscan[which.max(cats[2,]):NF][ which(cats[2, which.max(cats[2,]):NF] < 0.05*max(cats[2,]) )[1] ]
-    
-    FCrash50 <- Fscan[which.max(cats[4,]):NF][ which(cats[4, which.max(cats[4,]):NF] < 0.05*max(cats[4,]) )[1] ]
-    
-    if (plot) {
+    # recruits versus SSB
+    y.max <- if (!is.na(ymax[2])) ymax[2] else max(ssbs[6,])
+    plot(Fscan, ssbs[6,], type = "l", lty = 4,
+         ylim = c(0, y.max), xlim = c(0, xmax), ylab = "", xlab = "")
+    title(ylab = "SSB", xlab = "F bar",
+          cex.lab = 0.75, line = 2.5, cex.main = 0.75)
+    mtext(text = "b) Spawning Stock Biomass", cex = 0.75, side = 3, line = 0.5)
+    lines(Fscan, ssbs[4,], lty=1)
+    lines(Fscan, ssbs[2,], lty=3)
+    lines(c(0,xmax), c(Blim, Blim))
+    text(x = 0.1, y = Blim * 1.1, "Blim", cex = 0.7)
+    points(FbarO, ssb, pch = 21, cex = .75, bg = 1)
+    lines(c(flim, flim), c(0, y.max), col = 3)
+  }
+  FCrash5 <- Fscan[which.max(cats[2,]):NF][ which(cats[2, which.max(cats[2,]):NF] < 0.05*max(cats[2,]) )[1] ]
+  
+  FCrash50 <- Fscan[which.max(cats[4,]):NF][ which(cats[4, which.max(cats[4,]):NF] < 0.05*max(cats[4,]) )[1] ]
+  
+  if (plot) {
+    if ( yield=="catch" )  {
       # catch versus Fbar
-      y.max <- if (!is.na(ymax[3])) ymax[3] else max(1.25*Catchs)
-      plot(Fscan, cats[7,], type = "l", lty = 4,
-           ylim = c(0, y.max), xlim = c(0, xmax), ylab = "", xlab = "")
-      title(ylab = "Catch", xlab = "F bar", 
+      y.max <- if (!is.na(ymax[3])) ymax[3] else max(cats[6,])
+      plot(Fscan, cats[6,], type = "l", lty = 4,
+           ylim = c(0, y.max), xlim = c(0, max(Fscan)), ylab = "", xlab = "")
+      title(ylab = "Catch", xlab = "F bar",
             cex.lab = 0.75, line = 2.5, cex.main = 0.75)
       mtext(text = "c) Catch", cex = 0.75, side = 3, line = 0.5)
       #points(fbarsa[ssbsa<BLIM], catsa[ssbsa<BLIM],pch=21,col=6,bg=6,cex=0.125)
       #points(fbarsa[ssbsa>BLIM]+.0075,catsa[ssbsa>BLIM],pch=21,col=7,bg=7,cex=0.125)
-      lines(Fscan, cats[7,], lty=4)
       lines(Fscan, cats[6,], lty=3)
-      lines(Fscan, cats[5,], lty=2)
       lines(Fscan, cats[4,], lty=1)
-      lines(Fscan, cats[3,], lty=2)
       lines(Fscan, cats[2,], lty=3)
-      lines(Fscan, cats[1,], lty=4)
+      
       points(FbarO, Catchs, pch = 21, cex = .75, bg = 1)
-      lines(c(flim, flim), c(0, y.max), col = "red")
-      lines(c(vcum,vcum),c(0,y.max),col="blue")
-      #lines(c(FCrash5, FCrash5), c(0, y.max), col = 5)
-      #lines(c(FCrash50, FCrash50), c(0, y.max), col = 5)
-      if(plotMeanCatch) {
-        lines(Fscan, catm, lty=1, col = "grey")
-        lines(rep(Fscan[maxcatm], 2), c(0, y.max), lty = 4, col = "grey",lwd=1)
-        text(x=Fscan[maxcatm],y=0,"mean Fmsy",cex=0.7,col="grey")
-      }
-      text(x = flim, y = 0, "Flim", cex = 0.7, col="red")
-      lines(rep(vcum,2), c(0,y.max), lty = 1, col = "blue")
-      text(x = vcum,  y = max(1.25*Catchs) * 0.9, "Fmsy",cex=0.7,col="blue")
-      
-      # F versus SSB probability profile
-      plot(Fscan, 1-pssb1, type = "l", col="red",
-           ylim = c(0,1), xlim = c(0,xmax), ylab = "", xlab = "")
-      title(ylab = "Prob MSY, SSB<Bpa or Blim", xlab = "F bar", 
-            cex.lab = 0.75, line = 2.5, cex.main = 0.75)
-      mtext(text = "d) Prob MSY and Risk to SSB", cex = 0.75, side = 3, line = 0.5)
-      lines(Fscan, 1 - pssb2, lty = 4, col="darkgreen")
-      
-      
-      #text(x = max(Fscan[pssb2 > 0.5]) - .05, y = 0.5, "SSB<Bpa", cex = 0.75, col="darkgreen")
-      text(x = 0.1, y = 0.8, "SSB<Bpa", cex = 0.75, col="darkgreen")
-      text(x = 0.1, y = 0.7, "SSB<Blim", cex = 0.75, col="red")
-      
-      #lines(c(flim,flim), c(0,1), col = "red")
-      lines(c(flim,flim), c(0,0.05), col = "red")
-      lines(c(0,flim), c(0.05,0.05), lty = 2, col = "red")
-      text(x = 0.1, y = 0.075, "5%", cex = 0.75, col = "red")
-      #lines(c(flim10,flim10), c(0,1), col = "darkgreen")
-      lines(c(flim10,flim10), c(0,0.10), col = "orange")
-      lines(c(0,flim10), c(0.1,0.1), lty = 2, col = "orange")
-      text(x = 0.05, y = 0.125, "10%", cex = 0.75, col = "orange")
-      lines(fmsy.dens $ x, cumsum(fmsy.dens $ y * diff(fmsy.dens $ x)[1]), col = "blue",lwd=2)
-      lines(c(0, vcum), c(0.5, 0.5), lty = 2, col = "blue")
-      text(x = 0.1, y = 0.9, "p(Fmsy)", cex = 0.75, col = "blue")
-      lines(rep(vcum,2), c(0,0.50), lty = 1, col = "blue")
-      lines(c(0,vcum),c(0.5,0.5),lty=1,col="blue")
-      text(x=vcum,y=0.05,"Fmsy",col="blue",cex = 0.75)
-      lines(c(Fscan[maxcatm],Fscan[maxcatm]), c(0,1), col = "brown", lwd=1)
+      lines(c(flim, flim), c(0, y.max), col = 3)
+      lines(c(FCrash5, FCrash5), c(0, y.max), col = 5)
+      lines(c(FCrash50, FCrash50), c(0, y.max), col = 5)
+      lines(Fscan, catm, lty=1, col = 2)
+      lines(rep(Fscan[maxcatm], 2), c(0, y.max), lty = 1, col = 5)
     }
     
+    if (yield ==  "landings") {
+      # catch versus Fbar
+      y.max <- if (!is.na(ymax[3])) ymax[3] else max(lans[6,])
+      plot(Fscan, lans[6,], type = "l", lty = 4,
+           ylim = c(0, y.max), xlim = c(0, max(Fscan)), ylab = "", xlab = "")
+      title(ylab = "Landings", xlab = "F bar",
+            cex.lab = 0.75, line = 2.5, cex.main = 0.75)
+      mtext(text = "c) Landings", cex = 0.75, side = 3, line = 0.5)
+      #points(fbarsa[ssbsa<BLIM], catsa[ssbsa<BLIM],pch=21,col=6,bg=6,cex=0.125)
+      #points(fbarsa[ssbsa>BLIM]+.0075,catsa[ssbsa>BLIM],pch=21,col=7,bg=7,cex=0.125)
+      #  set of quantile lines for landings
+      lines(Fscan, lans[6,], lty=3,col=6)
+      lines(Fscan, lans[4,], lty=1,col=6)
+      lines(Fscan, lans[2,], lty=3,col=6)
+      
+      points(FbarO, Landings, pch = 21, cex = .75, bg = 1)
+      lines(c(flim, flim), c(0, y.max), col = 3)
+      lines(c(FCrash5, FCrash5), c(0, y.max), col = 5)
+      lines(c(FCrash50, FCrash50), c(0, y.max), col = 5)
+      lines(Fscan, lanm, lty=1, col = 2)
+      lines(rep(Fscan[maxlanm], 2), c(0, y.max), lty = 1, col = 5)
+      
+    }
     
-    out <- c(Blim, Bpa)
-    outF <- c(flim, flim10, flim50, vcum, Fscan[maxcatm], FCrash5, FCrash50)
-    outB <- approx(Fscan, ssbs[4,], xout = outF) $ y
-    outC <- approx(Fscan, cats[4,], xout = outF) $ y
+    # F versus SSB
+    plot(Fscan, 1-pssb1, type = "l", lty = 2,
+         ylim = c(0,1), xlim = c(0,max(Fscan)), ylab = "", xlab = "")
+    title(ylab = "Prob MSY, SSB<Bpa or Blim", xlab = "F bar",
+          cex.lab = 0.75, line = 2.5, cex.main = 0.75)
+    mtext(text = "d) Prob MSY and Risk to SSB", cex = 0.75, side = 3, line = 0.5)
+    lines(Fscan, 1 - pssb2, lty = 4)
     
-    outTable <- rbind(outF, outB, outC)
-    rownames(outTable) <- c("F","SSB","Catch") 
-    colnames(outTable) <- c("Flim","Flim10","Flim50","MSY:median","Maxmeanland","FCrash5","FCrash50")
     
-    list(Blim = Blim, Bpa = Bpa, Refs = outTable)
+    text(x = max(Fscan[pssb2 > 0.5]) - .05, y = 0.5, "SSB<Bpa", cex = 0.75)
+    text(x = max(Fscan[pssb1 > 0.7]) + .1, y = 0.3, "SSB<Blim", cex = 0.75)
+    
+    lines(c(flim,flim), c(0,1), col = 3)
+    lines(c(0,flim), c(0.05,0.05), lty = 2, col = 3)
+    text(x = 0.1, y = 0.075, "5%", cex = 0.75, col = 3)
+    #lines(c(flim10,flim10), c(0,1), col = "darkgreen")
+    #lines(c(0,flim10), c(0.1,0.1), lty = 2, col = "darkgreen")
+    #text(x = 0.05, y = 0.125, "10%", cex = 0.75, col = "darkgreen")
+    lines(fmsy.dens $ x, cumsum(fmsy.dens $ y * diff(fmsy.dens $ x)[1]), col = 4)
+    # lines(c(0, vcum), c(0.5, 0.5), lty = 2, col = 4)
+    text(x = 0.9, y = 0.8, "Prob of Fmsy", cex = 0.75, col = 4)
+    lines(rep(vcum,2), c(0,1), lty = 1, col = 4)
+    
+    lines(c(Fscan[maxcatm],Fscan[maxcatm]), c(0,1), col = 5)
   }
+  
+  
+  out <- c(Blim, Bpa)
+  if (yield =="landings") {
+    outF <- c(flim, flim10, flim50, vcum, Fscan[maxlanm], FCrash5, FCrash50)
+    outC <- approx(Fscan, lans[4,], xout = outF) $ y
+  }
+  if (yield =="catch") {
+    outF <- c(flim, flim10, flim50, vcum, Fscan[maxcatm], FCrash5, FCrash50)
+    outC <- approx(Fscan, cats[4,], xout = outF) $ y
+  }
+  outB <- approx(Fscan, ssbs[4,], xout = outF) $ y
+  outTable <- rbind(outF, outB, outC)
+  rownames(outTable) <- c("F","SSB",yield)
+  colnames(outTable) <- c("Flim","Flim10","Flim50","MSY:median","Maxmeanland","FCrash5","FCrash50")
+  
+  list(Blim = Blim, Bpa = Bpa, Refs = outTable)
+}
 
 
+#' @title Summaries the results from eqsim
+#'
+#' @description XXX
+#' 
+#' @author Einar Hjorleifsson \email{einar.hjorleifsson@@gmail.com}
+#' 
+#' @export
+#' 
+#' @param sim An object returned from the function eqsim_run 
+#' @param Blim Value for the Blim
+#' @param Bpa Value for the Bpa
+#' @param yield Character
+
+eqsim_summary <- function (sim, Blim, Bpa = 1.4 * Blim, yield='landings')
+{
+  # DIMENSIONS
+  Nmod <- dim(sim$rby$ssbsa)[3]
+  Nyrs <- dim(sim$rby$ssbsa)[2]
+  
+  Fscan <- sim$Fscan
+  NF <- length(Fscan)
+  maint <- sim$stknam
+
+  
+  # OTHER STUFF
+
+  
+  # INPUTS
+  stk <- sim$stk
+  rec <- sim$data$rec
+  ssb <- sim$data$ssb
+  
+  rby <- data.frame(year = as.integer(names(catch(stk)[, 1:length(ssb), drop = TRUE])),
+                    r=rec,
+                    ssb=ssb,
+                    catch = catch(stk)[, 1:length(ssb), drop = TRUE],
+                    landings = landings(stk)[, 1:length(ssb), drop = TRUE],
+                    fbar = fbar(stk)[, 1:length(ssb), drop = TRUE])
+  
+  Catchs <- catch(stk)[, 1:length(ssb), drop = TRUE]
+  Landings <- landings(stk)[, 1:length(ssb), drop = TRUE]
+  FbarO <- fbar(stk)[, 1:length(ssb), drop = TRUE]
+  
+  # PERCENTILES
+  recs <- sim$Percentiles$recs
+  ssbs <- sim$Percentiles$ssbs
+  cats <- sim$Percentiles$cats
+  lans <- sim$Percentiles$lans
+  # make as dataframe
+  rbp2dataframe <- function(x,par) {
+    x <- data.frame(t(x))
+    x$par <- par
+    x$Ftarget <- as.numeric(row.names(x))
+    rownames(x) <- NULL
+    return(x)
+  }
+  rbp <- rbind(rbp2dataframe(sim$Percentiles$recs,"Recruitment"),
+               rbp2dataframe(sim$Percentiles$ssbs,"SSB"),
+               rbp2dataframe(sim$Percentiles$cats,"Catch"),
+               rbp2dataframe(sim$Percentiles$lans,"Landings"))
+  
+  
+  # STOCK REFERENCE POINTS
+  catm <- apply(sim$rby$catsa, 1, mean)
+  lanm <- apply(sim$rby$lansa, 1, mean)
+  maxcatm <- which.max(catm)
+  maxlanm <- which.max(lanm)
+  
+  catsam <- apply(sim$rby$catsa, c(1,3), mean)
+  lansam <- apply(sim$rby$lansa, c(1,3), mean)
+  maxpf <- apply(catsam, 2, which.max)
+  maxpfl <- apply(lansam, 2, which.max)
+  
+  #  using catch as default or landings if required
+  if (yield=='landings') { fmsy <- Fscan[maxpfl]  } else { fmsy <- Fscan[maxpf] }
+  
+  msym <- mean(fmsy)
+  vcum <- median(fmsy)
+  fmsy.dens <- density(fmsy)
+  vmode <- fmsy.dens$x[which.max(fmsy.dens$y)]
+  
+  FCrash5 <- Fscan[which.max(cats[2,]):NF][ which(cats[2, which.max(cats[2,]):NF] < 0.05*max(cats[2,]) )[1] ]
+  FCrash50 <- Fscan[which.max(cats[4,]):NF][ which(cats[4, which.max(cats[4,]):NF] < 0.05*max(cats[4,]) )[1] ]
+  
+  # PA REFERENCE POINTS
+  pBlim <- apply(sim$rby$ssbsa > Blim, 1, mean)
+  pBpa <- apply(sim$rby$ssbsa > Bpa, 1, mean)
+  
+  i <- max(which(pBlim > .95))
+  grad <- diff(Fscan[i + 0:1]) / diff(pBlim[i + 0:1])
+  flim <- Fscan[i] + grad * (0.95 - pBlim[i]) # linear interpolation i think..
+  
+  i <- max(which(pBlim > .90))
+  grad <- diff(Fscan[i + 0:1]) / diff(pBlim[i + 0:1])
+  flim10 <- Fscan[i]+grad*(0.9-pBlim[i]) # linear interpolation i think..
+  
+  i <- max(which(pBlim > .50))
+  grad <- diff(Fscan[i + 0:1]) / diff(pBlim[i + 0:1])
+  flim50 <- Fscan[i]+grad*(0.5-pBlim[i]) # linear interpolation i think..
+  
+  
+  # GENERATE OUTPUT
+  out <- c(Blim, Bpa)
+  if (yield =="landings") {
+    outF <- c(flim, flim10, flim50, vcum, Fscan[maxlanm], FCrash5, FCrash50)
+    outC <- approx(Fscan, lans[4,], xout = outF)$y
+  }
+  if (yield =="catch") {
+    outF <- c(flim, flim10, flim50, vcum, Fscan[maxcatm], FCrash5, FCrash50)
+    outC <- approx(Fscan, cats[4,], xout = outF)$y
+  }
+  outB <- approx(Fscan, ssbs[4,], xout = outF)$y
+  outTable <- rbind(outF, outB, outC)
+  rownames(outTable) <- c("F","SSB",yield)
+  colnames(outTable) <- c("Flim","Flim10","Flim50","MSY:median","Maxmeanland","FCrash05","FCrash50")
+  
+  pProfiles <- data.frame(Ftarget = Fscan,
+                          pBlim = 1-pBlim,
+                          pBpa = 1-pBpa)
+  pProfiles <- melt(pProfiles,id.vars="Ftarget")
+  pFmsy  <- data.frame(Ftarget=fmsy.dens$x,
+                       value=cumsum(fmsy.dens$y * diff(fmsy.dens$x)[1]),
+                       variable="pFmsy")
+  pProfiles <- rbind(pProfiles,pFmsy)
+  list(Blim = Blim, Bpa = Bpa, Refs = outTable, pProfiles=pProfiles,rby=rby,rbp=rbp)
+  
+}
+
+
+#' @title Plots of the results from eqsim
+#'
+#' @description XXX
+#' 
+#' @author Einar Hjorleifsson \email{einar.hjorleifsson@@gmail.com}
+#' 
+#' @export
+#' 
+#' @param x An object returned from the function eqsim_summary
+#' @param Scale A value, the scaling on the yaxis
+#' @param plotit Boolean, if TRUE (default) returns a plot
+
+eqsim_plot <- function(x, Scale=1e3, plotit=TRUE) 
+{
+  rby <- x$rby
+  for (i in 2:5) rby[,i] <- rby[,i]/Scale
+  
+  rbp <- x$rbp
+  for(i in 1:7) rbp[,i] <- rbp[,i]/Scale
+  
+  refs <- x$Refs
+  refs[2:3,] <- refs[2:3,]/Scale
+  
+  pProfiles <- x$pProfiles
+  
+  i <- rbp$par %in% "Recruitment"
+  plotR <- ggplot(rbp[i,],aes(Ftarget)) + 
+    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
+    geom_line(aes(y=p50)) + 
+    geom_point(data=rby,aes(fbar,r)) +
+    geom_vline(xintercept=refs[1,4],col="darkgreen") +
+    geom_vline(xintercept=refs[1,5],col="blue") +
+    geom_vline(xintercept=refs[1,1],col="red") +
+    facet_wrap(~ par) +
+    coord_cartesian(ylim=c(0,rby$r * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    labs(y = "",x="")
+  
+  i <- rbp$par %in% "SSB"
+  plotSSB <- ggplot(rbp[i,],aes(Ftarget)) + 
+    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
+    geom_line(aes(y=p50)) + 
+    geom_point(data=rby,aes(fbar,ssb)) +
+    geom_vline(xintercept=refs[1,4],col="darkgreen") +
+    geom_vline(xintercept=refs[1,5],col="blue") +
+    geom_vline(xintercept=refs[1,1],col="red") +
+    facet_wrap(~ par) +
+    coord_cartesian(ylim=c(0,rby$ssb * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    labs(y = "",x="")
+  
+  i <- rbp$par %in% "Catch"
+  plotCatch <- ggplot(rbp[i,],aes(Ftarget)) + 
+    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
+    geom_line(aes(y=p50)) + 
+    geom_point(data=rby,aes(fbar,catch)) +
+    geom_vline(xintercept=refs[1,4],col="darkgreen") +
+    geom_vline(xintercept=refs[1,5],col="blue") +
+    geom_vline(xintercept=refs[1,1],col="red") +
+    facet_wrap(~ par) +
+    coord_cartesian(ylim=c(0,rby$catch * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    labs(y = "",x="")
+  
+  i <- rbp$par %in% "Landings"
+  plotLandings <- ggplot(rbp[i,],aes(Ftarget)) + 
+    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
+    geom_line(aes(y=p50)) + 
+    geom_point(data=rby,aes(fbar,landings)) +
+    geom_vline(xintercept=refs[1,4],col="darkgreen") +
+    geom_vline(xintercept=refs[1,5],col="blue") +
+    geom_vline(xintercept=refs[1,1],col="red") +
+    facet_wrap(~ par) +
+    coord_cartesian(ylim=c(0,rby$landings * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    labs(y = "",x="")
+  
+  plotProbs <- ggplot(pProfiles,aes(Ftarget,value,colour=variable)) + 
+    geom_line() +
+    coord_cartesian(xlim=c(0,rby$fbar * 1.2)) +
+    labs(x="",y="")
+  
+  if(plotit) {
+    require(gridExtra)
+    grid.arrange(plotR,plotSSB,plotCatch,plotLandings, ncol=2)
+  }
+  
+  return(list(plotR=plotR,plotSSB=plotSSB,plotCatch=plotCatch,
+              plotLandings=plotLandings,plotProbs=plotProbs))
+}

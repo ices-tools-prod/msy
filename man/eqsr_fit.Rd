@@ -1,0 +1,54 @@
+\name{eqsr_fit}
+\alias{eqsr_fit}
+\title{Stock recruitment fit}
+\usage{
+  eqsr_fit(stk, nsamp = 5000,
+    models = c("ricker", "segreg", "bevholt"),
+    method = "Buckland", runid = NULL, remove.years = NULL,
+    delta = 1.3, nburn = 10000)
+}
+\arguments{
+  \item{stk}{FLStock object}
+
+  \item{nsamp}{Number of samples}
+
+  \item{models}{A character vector containing sr-models to
+  use. User can set any combination of
+  "ricker","segreg","bevholt".}
+
+  \item{method}{A character vector. Currently only
+  "Buckland" is implemented.}
+
+  \item{runid}{A character vector specifying run name}
+
+  \item{remove.years}{A vector specifying the years to
+  remove}
+
+  \item{delta}{A value, used in method "Simmonds" (not
+  implemented)}
+
+  \item{nburn}{An integer, used in method Simmonds (not
+  implemented)}
+}
+\value{
+  A list containing the following objects: \itemize{ \item
+  fit data.frame containing the alpha (a), beta (b), cv and
+  model names. The number of rows correspond to the value
+  set in nsamp in the function call. \item pred A vector of
+  predicted recruitment values. The length of the vector
+  corresponds to the value set in nsamp in the function
+  call. \item fits The parameters in the stock recruitment
+  model corresponding to the "best fit" of any given model.
+  \item data data.frame containing the recruitment (rec),
+  spawning stock biomass (ssb) and year used in the fitting
+  of the data. \item stknam A character vector containing
+  stock name \item stk FLStock object, same as provided as
+  input by the user. }
+}
+\description{
+  Stock recruitment fit
+}
+\author{
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+}
+
