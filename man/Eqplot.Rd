@@ -3,7 +3,7 @@
 \title{Plot summary of the equilibrium simulation}
 \usage{
   Eqplot(sim, fit, Blim, Bpa = 1.4 * Blim,
-    ymax = c(NA, NA, NA), plot = TRUE)
+    ymax = c(NA, NA, NA), plot = TRUE, yield = "landings")
 }
 \arguments{
   \item{sim}{A list obtained from function \code{EqSim}}
@@ -21,6 +21,9 @@
 
   \item{plot}{Flag, if TRUE (default) returns both values
   and plot}
+
+  \item{yield}{Character vector of length 1, either
+  "landings" (default) or "catch"}
 }
 \description{
   Plot summary of the equilibrium simulation

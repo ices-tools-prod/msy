@@ -2,18 +2,21 @@
 \alias{EqSim}
 \title{simulates the equilibrium results for a population}
 \usage{
-  EqSim(fit, Nrun = 200, wt.years = c(2007, 2011),
-    Fscan = seq(0, 1, len = 20), process.error = TRUE,
-    verbose = TRUE, Btrigger = 0, Fphi = 0, Fcv = 0,
-    flgsel = 0, flgmatwt = 0)
+  EqSim(fit, Nrun = 200, bio.years = c(2007, 2012),
+    sel.years = c(2005, 2010), Fscan = seq(0, 1, len = 20),
+    process.error = TRUE, verbose = TRUE, Btrigger = 0,
+    Fphi = 0, Fcv = 0, sel.const = 0, bio.const = 0)
 }
 \arguments{
   \item{fit}{A list returned from the function fitModels}
 
   \item{Nrun}{The number of years to run in total}
 
-  \item{wt.years}{The years to sample weights and selection
-  pattern from}
+  \item{bio.years}{The years to sample weights and
+  selection pattern from}
+
+  \item{sel.years}{The years sample sel and discard
+  proportion by number from}
 
   \item{Fscan}{F values to scan over}
 
@@ -32,11 +35,11 @@
 
   \item{Fcv}{Assessment error in the advisory year}
 
-  \item{flgsel}{A flag, if FALSE (default) use the mean
-  selection value over the "wt.years"}
+  \item{sel.const}{A flag, if FALSE (default) use the mean
+  selection value over the "bio.years"}
 
-  \item{flgmatwt}{A flag, if FALSE (default) use the mean
-  stock and catch values over the "wt.years"}
+  \item{bio.const}{A flag, if FALSE (default) use the mean
+  stock and catch values over the "bio.years"}
 }
 \value{
   A list containing the following objects: \itemize{ \item
@@ -55,16 +58,6 @@
 }
 \description{
   XXX
-}
-\examples{
-data(codEB)
-fit <- fitModels(codEB, nsamp = 100) # a few samples for example
-sim <- EqSim(fit, wt.years = c(2007, 2011), Fphi = 0.5, Fcv = 0.1)
-hist(c(apply(sim $ ferr, c(1,3), function(x) acf(x, plot = FALSE) $ acf[2])), main = "histogram of estimates of ACF lag 1 in F errors")
-arfits <- apply(sim $ ferr, c(1,3), function(x) ar(x)[c("order", "ar", "var.pred")])
-summary(sapply(arfits, function(x) x $ order))
-summary(sapply(arfits, function(x) x $ ar[1]))
-summary(sapply(arfits, function(x) x $ var.pred))
 }
 \author{
   Colin Millar \email{colin.millar@jrc.ec.europa.eu}
