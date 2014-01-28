@@ -2,15 +2,22 @@
 \alias{eqsim_plot}
 \title{Plots of the results from eqsim}
 \usage{
-  eqsim_plot(x, Scale = 1000, plotit = TRUE)
+  eqsim_plot(sim, ymax.multiplier = 1.2, catch = TRUE)
 }
 \arguments{
-  \item{x}{An object returned from the function
-  eqsim_summary}
+  \item{sim}{An object returned from the function
+  eqsim_run}
 
-  \item{Scale}{A value, the scaling on the yaxis}
+  \item{ymax.multiplier}{A value that acts as a multiplier
+  of the maximum observed variable being plotted. E.g. 1.2
+  means that for each of the three panels a, b and c the
+  ymax is set to 1.2 of the maximum observed recruitment,
+  spawning stock biomass and yield (catch or landings,
+  depending on user input.}
 
-  \item{plotit}{Boolean, if TRUE (default) returns a plot}
+  \item{catch}{Boolean, if TRUE (default) returns a plot
+  based on catch. If false returns a plot based on
+  landings.}
 }
 \description{
   XXX

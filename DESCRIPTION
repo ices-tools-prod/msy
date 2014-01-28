@@ -36,3 +36,4 @@ Collate:
     'srmsymc_run.R'
     'utilities.R'
     'eqsr.R'
+    'data.R'

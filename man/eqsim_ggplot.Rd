@@ -1,0 +1,21 @@
+\name{eqsim_ggplot}
+\alias{eqsim_ggplot}
+\title{Plots of the results from eqsim}
+\usage{
+  eqsim_ggplot(sim, Scale = 1000, plotit = TRUE)
+}
+\arguments{
+  \item{sim}{An object returned from the function
+  eqsim_run}
+
+  \item{Scale}{A value, the scaling on the yaxis}
+
+  \item{plotit}{Boolean, if TRUE (default) returns a plot}
+}
+\description{
+  XXX
+}
+\author{
+  Einar Hjorleifsson \email{einar.hjorleifsson@gmail.com}
+}
+

@@ -2,23 +2,42 @@
 \alias{eqsim_run}
 \title{simulates the equilibrium results for a population}
 \usage{
-  eqsim_run(fit, Nrun = 200, wt.years = c(2008, 2012),
-    sel.years = c(2008, 2012), Fscan = seq(0, 1, len = 20),
-    process.error = TRUE, verbose = TRUE, Btrigger = 0,
-    Fphi = 0, Fcv = 0, flgsel = 0, flgmatwt = 0)
+  eqsim_run(fit, bio.years = c(2008, 2012),
+    bio.const = FALSE, sel.years = c(2008, 2012),
+    sel.const = FALSE, Fscan = seq(0, 1, len = 20),
+    Fcv = 0, Fphi = 0, Blim, Bpa, Btrigger = 0, Nrun = 200,
+    process.error = TRUE, verbose = TRUE)
 }
 \arguments{
   \item{fit}{A list returned from the function fitModels}
 
-  \item{Nrun}{The number of years to run in total}
+  \item{bio.years}{The years to sample maturity, weights
+  and M from}
 
-  \item{wt.years}{The years to sample weights and selection
-  pattern from}
+  \item{bio.const}{A flag, if FALSE mean of the biological
+  values are used}
 
   \item{sel.years}{The years to sample sel and discard
   proportion by number from}
 
+  \item{sel.const}{A flag, if FALSE mean selection values
+  used}
+
   \item{Fscan}{F values to scan over}
+
+  \item{Fcv}{Assessment error in the advisory year}
+
+  \item{Fphi}{Autocorrelation in assessment error in the
+  advisory year}
+
+  \item{Blim}{This we know}
+
+  \item{Bpa}{This we know}
+
+  \item{Btrigger}{If other than 0 (default) the target F
+  applied is reduced by SSB/Btrigger}
+
+  \item{Nrun}{The number of years to run in total}
 
   \item{process.error}{Use stochastic recruitment or mean
   recruitment?  (TRUE = predictive)}
@@ -26,35 +45,6 @@
   \item{verbose}{Flag, if TRUE (default) indication of the
   progress of the simulation is provided in the console.
   Useful to turn to FALSE when knitting documents.}
-
-  \item{Btrigger}{If other than 0 (default) the target F
-  applied is reduced by SSB/Btrigger}
-
-  \item{Fphi}{Autocorrelation in assessment error in the
-  advisory year}
-
-  \item{Fcv}{Assessment error in the advisory year}
-
-  \item{flgsel}{A flag, if FALSE (default) use the mean
-  selection value over the "wt.years"}
-
-  \item{flgmatwt}{A flag, if FALSE (default) use the mean
-  stock and catch values over the "wt.years"}
-}
-\value{
-  A list containing the following objects: \itemize{ \item
-  ssbs A matrix containing the 0.025, 0.050, 0.25, 0.50,
-  0.75, 0.95, 0.975 percentiles of ssb for the scanned
-  fishing mortalities (see Fscan below). \item cats A
-  matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75,
-  0.95, 0.975 percentiles of catches for the scanned
-  fishing mortalities (see Fscan below). \item recs A
-  matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75,
-  0.95, 0.975 percentiles of rec for the scanned fishing
-  mortalities (see Fscan below). \item ferr An array \item
-  ssbsa \item catsa \item recsa \item Mat \item M \item
-  Fprop \item Mprop \item west \item weca \item sel \item
-  Fscan }
 }
 \description{
   XXX

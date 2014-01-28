@@ -2,13 +2,11 @@
 \alias{eqsr_Buckland}
 \title{stock recruitment function}
 \usage{
-  eqsr_Buckland(data, runid, nsamp = 5000,
+  eqsr_Buckland(data, nsamp = 5000,
     models = c("ricker", "segreg", "bevholt"), ...)
 }
 \arguments{
   \item{data}{data.frame containing stock recruitment data}
-
-  \item{runid}{A character vector}
 
   \item{nsamp}{Number of samples}
 

@@ -4,13 +4,13 @@
 \usage{
   eqsr_fit(stk, nsamp = 5000,
     models = c("ricker", "segreg", "bevholt"),
-    method = "Buckland", runid = NULL, remove.years = NULL,
+    method = "Buckland", id.sr = NULL, remove.years = NULL,
     delta = 1.3, nburn = 10000)
 }
 \arguments{
   \item{stk}{FLStock object}
 
-  \item{nsamp}{Number of samples}
+  \item{nsamp}{Number of samples (iterations)}
 
   \item{models}{A character vector containing sr-models to
   use. User can set any combination of
@@ -19,7 +19,9 @@
   \item{method}{A character vector. Currently only
   "Buckland" is implemented.}
 
-  \item{runid}{A character vector specifying run name}
+  \item{id.sr}{A character vector specifying an id for the
+  stock recruitment model. If not specified (default) the
+  slot "name" in the FLStock is used.}
 
   \item{remove.years}{A vector specifying the years to
   remove}
