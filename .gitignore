@@ -1,4 +1,8 @@
 *~
 .Rproj.user
 notes/*
-vignettes_main/*
+vignettes_main*
+tmp/*
+plotMSY_test/*
+vignettes/cache/*
+vignettes/figure/*

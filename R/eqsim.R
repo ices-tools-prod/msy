@@ -8,21 +8,25 @@
 #' 
 #' @param fit A list returned from the function fitModels
 #' @param bio.years The years to sample maturity, weights and M from
-#' @param bio.const A flag, if FALSE mean of the biological values are used
-#' @param sel.years The years to sample sel and discard proportion by number from
-#' @param sel.const A flag, if FALSE mean selection values used
+#' @param bio.const A flag, if FALSE mean of the biological values from the years selected are used
+#' @param sel.years The years to sample the selection patterns from
+#' @param sel.const A flag, if FALSE mean of the selection patterns from the years selected are used
 #' @param Fscan F values to scan over
 #' @param Fcv Assessment error in the advisory year
 #' @param Fphi Autocorrelation in assessment error in the advisory year
 #' @param Blim This we know
 #' @param Bpa This we know
+#' @param recruitment.trim A numeric vector with two log-value clipping the extreme
+#' recruitment values from a continuous lognormal distribution. The values must
+#' be set as c("high","low").
 #' @param Btrigger If other than 0 (default) the target F applied is reduced by
 #' SSB/Btrigger 
-#' @param Nrun The number of years to run in total
+#' @param Nrun The number of years to run in total (last 50 years from that will be retained)
 #' @param process.error Use stochastic recruitment or mean recruitment?  (TRUE = predictive)
 #' @param verbose Flag, if TRUE (default) indication of the progress of the
 #' simulation is provided in the console. Useful to turn to FALSE when 
 #' knitting documents.
+#' @param extreme.trim Call John Simmonds :-)
 
 eqsim_run <- function(fit,
                       bio.years = c(2008, 2012), # years sample weights, M and mat
@@ -33,14 +37,17 @@ eqsim_run <- function(fit,
                       Fcv = 0,
                       Fphi = 0,
                       Blim,
-                      Bpa,                 
+                      Bpa,
+                      recruitment.trim = c(3, -3),
                       Btrigger = 0,
                       Nrun = 200, # number of years to run in total
                       process.error = TRUE, # use predictive recruitment or mean recruitment? (TRUE = predictive)
-                      verbose = TRUE)
+                      verbose = TRUE,
+                      extreme.trim)
 {
   
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
+  if ((recruitment.trim[1] + recruitment.trim[2])> 0) stop("recruitment truncation must be between a high - low range")
   
   btyr1 <- bio.years[1]
   btyr2 <- bio.years[2]
@@ -123,6 +130,12 @@ eqsim_run <- function(fit,
   ferr <- ssbsa <- catsa <- lansa <- recsa <- array(0, c(NF, keep, Nmod))
   begin <- Nrun - keep + 1
   
+  # New from Simmonds' 29.1.2014
+  resids= array(rnorm(Nmod*(Nrun+1), 0, SR$cv),c(Nmod, Nrun+1))     # set up random
+  lims = t(array(SR$cv,c(Nmod,2))) * recruitment.trim
+  for (k in 1:Nmod) { resids[k,resids[k,]>lims[1,k]]=lims[1,k]}
+  for (k in 1:Nmod) { resids[k,resids[k,]<lims[2,k]]=lims[2,k]}
+  # end New from Simmonds 29.1.2014
   
   if (verbose) loader(0)
   for (i in 1:NF) {
@@ -150,7 +163,12 @@ eqsim_run <- function(fit,
       
       # predict recruitment using various models
       if (process.error) {
-        allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB) + rnorm(Nmod, 0, SR $ cv)))
+        # Changes 29.1.2014
+        # new random draws each time
+        # allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB) + rnorm(Nmod, 0, SR $ cv)))
+        # same random draws used for each F
+        allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod)(SR, SSB) + resids[,j]))
+        # end Changes 29.1.2014
       } else {
         allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB)))
       }
@@ -223,10 +241,33 @@ eqsim_run <- function(fit,
   FCrash05 <- Fscan[which.max(cats[2,]):NF][ which(cats[2, which.max(cats[2,]):NF] < 0.05*max(cats[2,]) )[1] ]
   FCrash50 <- Fscan[which.max(cats[4,]):NF][ which(cats[4, which.max(cats[4,]):NF] < 0.05*max(cats[4,]) )[1] ]
   
-  catm <- apply(catsa, 1, mean)
-  lanm <- apply(lansa, 1, mean)
+  
+  # Einar added 29.1.2014
+  if(missing(extreme.trim)) {
+    catm <- apply(catsa, 1, mean)
+    lanm <- apply(lansa, 1, mean)
+  } else {
+    i <- catsa > quantile(catsa,extreme.trim[2]) |
+         catsa < quantile(catsa,extreme.trim[1])
+    catsa[i] <- NA
+    catm <- apply(catsa, 1, mean, na.rm=TRUE)
+    i <- lansa > quantile(lansa,extreme.trim[2]) |
+      lansa < quantile(lansa,extreme.trim[1])
+    lansa[i] <- NA
+    lanm <- apply(lansa, 1, mean, na.rm=TRUE)
+  }
+  
+  # end Einar added 29.1.2014
+    
   maxcatm <- which.max(catm)
   maxlanm <- which.max(lanm)
+  
+  # Einar added 29.1.2014
+  rbp$Mean <- NA
+  rbp$Mean[rbp$variable == "Catch"] <- catm
+  rbp$Mean[rbp$variable == "Landings"] <- lanm
+  # end Einar added 29.1.2014
+  
   
   catsam <- apply(catsa, c(1,3), mean)
   lansam <- apply(lansa, c(1,3), mean)
@@ -377,6 +418,8 @@ eqsim_plot <- function(sim, ymax.multiplier=1.2, catch=TRUE)
     Variable <- "Catch"
     i <- rbp$variable == Variable
     littleHelper(rbp[i,],dat=rby[,c("fbar","catch")],Flim)
+    # Einar added 29.1.2014
+    with(rbp[i,],lines(Ftarget,Mean, lty = 1, lwd=4,col="red"))    
     title(ylab=Variable, xlab="F bar", cex.lab=0.75, line=2.5, cex.main=0.75)
     mtext(text = paste("c)", Variable), cex = 0.75, side = 3, line = 0.5)
     #add landings
@@ -399,6 +442,8 @@ eqsim_plot <- function(sim, ymax.multiplier=1.2, catch=TRUE)
     Variable <- "Landings"
     i <- rbp$variable == Variable
     littleHelper(rbp[i,],dat=rby[,c("fbar","landings")],Flim)
+    # Einar added 29.1.2014
+    with(rbp[i,],lines(Ftarget,Mean, lty = 1, lwd=4,col="red"))   
     title(ylab=Variable, xlab="F bar", cex.lab=0.75, line=2.5, cex.main=0.75)
     mtext(text = paste("c)", Variable), cex = 0.75, side = 3, line = 0.5)
     #add catch

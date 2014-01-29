@@ -37,3 +37,32 @@ do.ggplot <- function(x,d) {
   
   return(gg.plot)
 }
+
+#' @title Convert FLStock to rby
+#' 
+#' @description XXX
+#' 
+#' @export
+#' 
+#' @param stk FLStock object
+fls2rby <- function(stk) {
+  dms <- dims(stk)
+  rage <- dms $ min
+  if (rage == 0)
+    {
+    rby <- data.frame(rec = stock.n(stk)[1,drop=TRUE],
+                    ssb = ssb(stk)[drop=TRUE],
+                    year = with(dms, 1:year + minyear - 1),
+                    catch=catch(stk)[drop=TRUE],
+                    landings=landings(stk)[drop=TRUE],
+                    fbar=fbar(stk)[drop=TRUE]) 
+    } else {
+      rby <- data.frame(rec = stock.n(stk)[1,-seq(rage),drop=TRUE],
+                    ssb = ssb(stk)[1,seq(dms$year - rage),drop=TRUE],
+                    year = with(dms, (rage+1):year + minyear - 1),
+                    catch=catch(stk)[1,seq(dms$year - rage),drop=TRUE],
+                    landings=landings(stk)[1,seq(dms$year - rage),drop=TRUE],
+                    fbar = fbar(stk)[1,seq(dms$year - rage),drop=TRUE])
+    }
+  return(rby)
+}

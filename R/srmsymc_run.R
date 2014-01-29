@@ -34,14 +34,17 @@ srmsymc_compile <- function()
 #' @param path characters. Name of the directory for storing the output. If
 #' missing, the output remains in the working directory.
 #' @param output boolean. If FALSE (default) no results (*.dat) files are returned.
+#' @param do_clean XXX
+#' @param echo boolean. If TRUE (default) output stuff to console. Setting to FALSE is
+#' useful when using function while knitting.
 
-
-srmsymc_run <- function(sr,opt_sen=1,opt_pen=1,nits=100,path,output=FALSE) {
+srmsymc_run <- function(sr,opt_sen=1,opt_pen=1,nits=100,path,output=FALSE,
+                        do_clean=TRUE,echo=TRUE) {
   
   # check if file exists
   if (!file.exists('srmsymc')) srmsymc_compile()
   if (!file.exists('srmsymc.dat')) stop('The srmsymc.dat file must be in the working directory')
-  if (!file.exists('out.dat')) stop('The out.dat file must be in the working directory')
+  if (!file.exists('age.dat')) stop('The age.dat file must be in the working directory')
   
   # update the .dat file
   # Update the recruitment model number
@@ -59,8 +62,13 @@ srmsymc_run <- function(sr,opt_sen=1,opt_pen=1,nits=100,path,output=FALSE) {
   cat('21 1 ', nits, "\n", sep="", file = tmpfile)
   close(tmpfile)
   
-  system(paste('srmsymc -mcmc', (nits+11)*10000, '-mcsave 10000 -nosdmcmc'))
-  system("srmsymc -mceval")
+  cmd <- paste('srmsymc -mcmc', (nits+11)*10000, '-mcsave 10000 -nosdmcmc')
+  # -nosdmcmc turn off mcmc histogram calcs to make mcsave run faster
+  if(!echo) cmd <- paste(cmd,'&> /dev/null')
+  system(cmd)
+  cmd <- "srmsymc -mceval"
+  if(!echo) cmd <- paste(cmd,'&> /dev/null')
+  system(cmd)
   
   if(!missing(path)) {
     
@@ -78,9 +86,15 @@ srmsymc_run <- function(sr,opt_sen=1,opt_pen=1,nits=100,path,output=FALSE) {
     x$par <- srmsymc_read_par()
     x$yield <- srmsymc_read_yield()
     x$ssb <- srmsymc_read_ssb()
-    return(x)
   }
   
   # TODO: clean directory
+  if(do_clean) {
+    clean_admb("srmsymc")
+    clean_admb("srmsymc2")
+    system("rm biopar.dat sim.dat simpar.dat simparssb.dat simpary.dat srmsymc_pe.dat simparssbpr.dat simparypr.dat")
+  }
+  
+  if(output) return(x)
 }
 

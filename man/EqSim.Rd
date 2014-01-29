@@ -2,23 +2,44 @@
 \alias{EqSim}
 \title{simulates the equilibrium results for a population}
 \usage{
-  EqSim(fit, Nrun = 200, bio.years = c(2007, 2012),
-    sel.years = c(2005, 2010), Fscan = seq(0, 1, len = 20),
-    process.error = TRUE, verbose = TRUE, Btrigger = 0,
-    Fphi = 0, Fcv = 0, sel.const = 0, bio.const = 0)
+  EqSim(fit, bio.years = c(2007, 2012), bio.const = 0,
+    sel.years = c(2005, 2010), sel.const = 0,
+    Fscan = seq(0, 1, len = 20), Fcv = 0, Fphi = 0,
+    recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
+    process.error = TRUE, verbose = TRUE)
 }
 \arguments{
   \item{fit}{A list returned from the function fitModels}
 
-  \item{Nrun}{The number of years to run in total}
+  \item{bio.years}{The years to sample maturity, weights
+  and M from}
 
-  \item{bio.years}{The years to sample weights and
-  selection pattern from}
+  \item{bio.const}{A flag, if FALSE mean of the biological
+  values from the years selected are used}
 
-  \item{sel.years}{The years sample sel and discard
-  proportion by number from}
+  \item{sel.years}{The years to sample the selection
+  patterns from}
+
+  \item{sel.const}{A flag, if FALSE mean of the selection
+  patterns from the years selected are used}
 
   \item{Fscan}{F values to scan over}
+
+  \item{Fcv}{Assessment error in the advisory year}
+
+  \item{Fphi}{Autocorrelation in assessment error in the
+  advisory year}
+
+  \item{recruitment.trim}{A numeric vector with two
+  log-value clipping the extreme recruitment values from a
+  continuous lognormal distribution. The values must be set
+  as c("high","low").}
+
+  \item{Btrigger}{If other than 0 (default) the target F
+  applied is reduced by SSB/Btrigger}
+
+  \item{Nrun}{The number of years to run in total (last 50
+  years from that will be retained)}
 
   \item{process.error}{Use stochastic recruitment or mean
   recruitment?  (TRUE = predictive)}
@@ -26,20 +47,6 @@
   \item{verbose}{Flag, if TRUE (default) indication of the
   progress of the simulation is provided in the console.
   Useful to turn to FALSE when knitting documents.}
-
-  \item{Btrigger}{If other than 0 (default) the target F
-  applied is reduced by SSB/Btrigger}
-
-  \item{Fphi}{Autocorrelation in assessment error in the
-  advisory year}
-
-  \item{Fcv}{Assessment error in the advisory year}
-
-  \item{sel.const}{A flag, if FALSE (default) use the mean
-  selection value over the "bio.years"}
-
-  \item{bio.const}{A flag, if FALSE (default) use the mean
-  stock and catch values over the "bio.years"}
 }
 \value{
   A list containing the following objects: \itemize{ \item

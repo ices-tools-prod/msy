@@ -1,0 +1,297 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Short manual}
+\documentclass[a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,margin=2.5cm}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{textcomp}
+\usepackage{amstext}
+\usepackage{graphicx}
+\usepackage{longtable}
+\setlength{\parindent}{0cm}
+\begin{document}
+
+<<set-options, echo = FALSE, cache = FALSE>>=
+require(knitr)
+options(replace.assign = TRUE)
+opts_chunk$set(warning=FALSE,
+               message=FALSE,
+               fig.align='center',
+               fig.path='figure/manual/',
+               fig.width=7, 
+               fig.height=5,
+               fig.show = "hold",
+               par = TRUE,
+               tidy=FALSE,
+               tidy.opts=list(width.cutoff=40),
+               echo=TRUE,
+               cache=FALSE,
+               cache.path='cache/manual/')
+suppressPackageStartupMessages(require(xtable))
+suppressPackageStartupMessages(library(msy))
+@
+
+\title{Examples of using the msy package}
+
+\author{John Simmond, Colin Millar and Einar Hjörleifsson}
+\maketitle
+
+<<sessionInfo, results='asis', echo=FALSE>>=
+toLatex(sessionInfo(), locale=FALSE)
+@
+
+<<x, comment='', echo=FALSE>>=
+print('This document was created in knitr')
+@
+\newpage{}
+
+\section{Preamble}
+This document is as much as the msy-package itself still in developement.
+
+\section{Installation}
+The developmental page for the \texttt{msy} package is located on \href{https://github.com/wgmg}{github}. To install the \texttt{msy} package the best way is to install Hadley Wickams \texttt{devtools} and use the function \texttt{install\_github}.  If you are using windows you will also need to install \texttt{Rtools.exe} which is a collection of software which enables you to compile R packages from source code.  Run the following lines to install the latest version of msy, any other packages that you require will automatically be downloaded from \texttt{CRAN}, the R package repository.  All except for \texttt{FLCore} package, which is also installed from \texttt{github}.
+<<install, eval=FALSE>>=
+library(devtools)
+install_github("msy", "wgmg", ref = "master")
+install_github("FLCore", "flr")
+@
+The above is equivalent to \texttt{install.packages} and hence need only to be performed once. However, since the \texttt{msy} package is currently under development (including bug-fixing) one may expect more frequent code updating in the package than what one may be familiar with for packages on \texttt{CRAN}. Once the packages have been installed the library is simply loaded via the familiar:
+<<loadLibrary, eval=FALSE>>=
+library(msy)
+@
+Besides functions the package comes with the following data:
+\begin{itemize}
+  \item codNS: \texttt{FLStock} object of the North Sea cod
+  \item codEB: \texttt{FLStock} object of the Eastern Baltic cod
+  \item codWB: \texttt{FLStock} object of the Western Baltic cod
+  \item ...
+\end{itemize}
+
+The current version of the \texttt{msy} - package implements two methods that go under the working names EqSim and plotMSY. These two approaches are described in the following sections (plotMSY not yet implemented).
+
+\section{EqSim}
+EqSim is a stochastic equilibrium reference point software that provides MSY reference points based on the equilibrium distribution of stochastic projections. Productivity parameters (i.e. year vectors for natural mortality, weights-at-age and maturities) as well as selection are re-sampled at random from user specified range of years from the assessment. Fixing these parameters to an average over specified years can also be set by the user. Recruitments are re-sampled from their predictive distribution. Uncertainty in the stock-recruitment model is taken into account by applying model averaging using smooth AIC weights (Buckland et al. 1997). In addition assessment errors are emulated by applying a user-specified error (CV and autocorrelation) to the intended target fishing mortality.
+
+\subsection{A quick start}
+
+In the following subsections we will simulate the north sea cod stock into the future under some basic assumptions.  For the simulations we need to choose which years we will use to generate noise in the quantities: weight at age, maturity at age, natural mortality at age, and selection pattern.  We also need to choose a set of Fbar values to simulate over in order estimate F reference points.  A convenient way to store this set up information is to contain it in a list:
+<<setupcod, tidy = FALSE>>=
+codsetup <- list(
+  data = icesStocks$codNS,
+  bio.years = c(2008, 2012),
+  bio.const = FALSE,
+  sel.years = c(2008, 2012),
+  sel.const = FALSE, 
+  Fscan = seq(0, 1.2, len = 40),
+  Fcv = 0.25,
+  Fphi = 0.30,
+  Bpa = 150000,
+  Blim = 70000,
+  verbose = FALSE)
+@
+The eqsim approach consists of three components:
+\begin{enumerate}
+  \item Estimate the stock recruitment relationship
+  \item Simulate a stock to equilibrium and continue simulating for some years
+  \item Calculate reference points from the simulated stock at equilibrium
+\end{enumerate}
+
+This can be done in one go with the following code:
+<<codNSsim, cache=TRUE>>=
+codsg <-
+  within(codsetup,
+{
+  fit <- fitModels(data, nsamp = 2000, models = c("ricker", "segreg", "bevholt"))
+  sim <- EqSim(fit,
+               bio.years = bio.years, bio.const=bio.const,
+               sel.years = sel.years, sel.const=sel.const,
+               Fscan = Fscan, 
+               Fcv=Fcv,Fphi=Fphi,verbose = verbose)
+  refC <- Eqplot(sim, fit, Blim = Blim, Bpa = Bpa, plot = FALSE, yield="catch")
+  refL <- Eqplot(sim, fit, Blim = Blim, Bpa = Bpa, plot = FALSE, yield="landings")
+})
+@
+
+The stock recruitment function can be plotted by:
+<<codSRplot>>=
+with(codsg,SRplot(fit))
+@
+
+The reference points are obtained by:
+<<getrefCatch1, results='asis'>>=
+with(codsg,xtable(refC$Refs))
+@
+And summary plots is got by calling the Eqplot function again:
+<<plotrefCatch1, results = 'hide'>>=
+tmp <- with(codsg,Eqplot(sim,fit,Blim=Blim,Bpa=Bpa,plot=TRUE,yield="catch"))
+@
+
+TEST TRIMMING
+<<plotrefCatch2, results = 'asis'>>=
+tmp <- with(codsg,Eqplot(sim,fit,Blim=Blim,Bpa=Bpa,plot=TRUE,yield="catch",
+                         extreme.trim=c(0.01,0.99)))
+xtable(tmp$Refs)
+@
+
+Equivalently for landings we have:
+<<getrefLandings, results='asis'>>=
+with(codsg,xtable(refL$Refs))
+@
+And summary plots is got by calling the Eqplot function again:
+<<plotrefLandings1, results = 'hide'>>=
+tmp <- with(codsg,Eqplot(sim,fit,Blim=Blim,Bpa=Bpa,plot=TRUE,yield="landings",extreme.trim=c(0.01,0.99)))
+@
+
+These are the main functions of the EqSim approach. The following sections will cover each step in more detail.
+
+WHAT IS DESCRIBED ABOVE IS ALL ONE NEEDS TO RUN THE EQSIM.
+
+NOTE: WHAT FOLLOWS IS STILL DEVELOPMENTAL. AND THERE ARE SOME BUGS. IT GIVES A PEEK INTO WHAT MAY BE THE FUTURE DEFAULT PROTOCOL.
+
+\newpage{}
+NOTE: WHAT FOLLOWS IS STILL DEVELOPMENTAL. AND THERE ARE SOME BUGS.
+\subsection{The recruitment model}
+Model fitting is done by maximum likelihood using the \texttt{nlminb} optimiser in R. By refitting to non-parametric bootstrap resamples of the stock and recruit pairs, samples from the approximate joint distribution of the model parameters can be made.  This all happens in the \texttt{eqrs\_fit} function (equivalent to the \texttt{fitModels} function used above, the difference being the in the format of the output).  The function first sets up the stock and recruit pairs based on the information in the \texttt{FLStock} object and removes any incomplete pairs, before dispatching on the model fitting / averaging algorithm chosen.  Currently only a bootstrap based model averaging method called smooth AIC is implemented fully.  The details can be found in \texttt{eqrs\_Buckland}.  The algorithm implemented is:
+
+\begin{enumerate}
+\item take a resample with replacement from the stock and recruit pairs
+\item fit every stock-recruit model under consideration and store the AIC of each
+\item retain the parameter estimates from the best model
+\item repeat
+\end{enumerate}
+
+This process provides a robust way to average over several models, as long as the bootstrap resampling procedure provides an adequate approximation to the empirical distribution of the stock and recruit pairs.
+
+The arguments to the fitting function are
+<<args1>>=
+args(eqsr_fit)
+@
+Where \texttt{stk} is an \texttt{FLStock} object, \texttt{nsamp} is the number of simulations to run (often referred to as iterations), \texttt{models} is the models to average over (any of the combination of these can be supplied, including only a single model), \texttt{method} the method used (only Buckland as of now), \texttt{id.sr} is an opportunity for the user to name the fit, \texttt{remove.years} is used to remove years from the fit, \texttt{delta} and \texttt{nburn} are related to an MCMC based fitting procedure that is not complete.
+
+The fit:
+<<sr_1, cache=TRUE>>=
+FIT <- eqsr_fit(icesStocks$codNS,nsamp=1000)
+@
+
+The results from the fitting process are returned to the user as a list:
+<<sr_2>>=
+str(FIT, 2, give.attr=FALSE)
+@
+where
+\begin{itemize}
+  \item \texttt{sr.sto} is the the (joint) stochastic distribution of the estimated model and parameters. The number of rows of the data frame is equivalent to the value supplied to \texttt{nsamp} in the \texttt{eqsr\_fit} function.
+  \item \texttt{sr.det} is the conventional determinimstic predictive estimate. The \texttt{n} indicates the numbers in the stochastic sample (\texttt{sr.sto} drawn from the different model and the \texttt{prop} the proportion, given \texttt{nsamp}.
+  \item \texttt{pRec} contains the fitted parameters to the observed data
+  \item \texttt{stk} retains the original \texttt{FLStock} object passed to the function.
+  \item \texttt{rby} (results by year) contains a summary of the ssb and rec data used in the fitting as well as other stock summary information used later down the line
+  \item \texttt{id.rs} is the user specified id
+\end{itemize}
+
+A summary of the runs ran be obtained by:
+<<sr_2b, results='asis'>>=
+xtable(FIT$sr.det,digits=c(0,2,-2,2,0,0,3))
+@
+
+Here the a, b and cv are the estimated parameters from the deterministic fit for each model. the \texttt{n} and \texttt{prop} is a summary of the number and proportion that each model contributes to the final fit.
+
+To obtain a plot one simply calls:
+<<sr_3>>=
+eqsr_plot(FIT,n=2e4)
+@
+The \texttt{n} supplied to the \texttt{eqsr\_plot} stands here for the number of stochastic recruitment points desired to include in the plot. The various black dashed lines represent the best fit of the different recruitment models and the yellow and blue lines the median and 5\% and 95\% percentiles of the distributions of the stochastic recruits drawn from the models. The input data are represented by red points.
+
+An alternative to the \texttt{base} plot is a \texttt{ggplot2} version (with too fancy colours :-):
+<<sr_4>>=
+eqsr_plot(FIT,n=2e4,ggPlot=TRUE)
+@
+Here the model fits are represented in different colours with the yellow lines indicating the 5\%, 50\% and 95\% percentiles of the stochastic recruitment distribution. The input data are represented by text indicating year class. The weight of each model in the final stochastic recruitment draw is indicated as a proportion in the legends and by different colours for the stochastic draws.
+
+\subsection{The simulation}
+Simulating forward is done using the \texttt{eqsim\_run} function (replaces the \texttt{EqSim} function used above).  The function takes as input the output from the \texttt{eqsr\_fit} function. Simulations are run independently for each sample from the distribution of model and parameters.  This is done for a range of $F_{advisory}$ values. For example if we scanned over 10 values of $F_{advisory}$ and had taken 2000 samples from the stock-recruit relationship then 20000 simulations would be run in total.  These simulations run for 200 years say, and the last 50 years are retained to calculate summaries, like the proportion of times the stock crashes at a given $F_{advisory}$.  It is important to note that each simulation is conditioned on a single stock recruit relationship with fixed parameters and cv.
+
+Error is introduced within the simulations by generating process error about the constant stock-recruit fit, and by using variation in maturity, natural mortality, weight at age and selection estimates.  Note that if there is no variability in these quantities in the stock object then no variability will be taken in to the simulations. The user can also specify using average values for these parameters.
+
+The arguments to the simulation function are:
+<<sim_1>>=
+args(eqsim_run)
+@
+where:
+\begin{itemize}
+  \item \texttt{fit} is the output list from \texttt{eqsr\_fit}
+  \item \texttt{bio.years} is the start and end year from which to generate noise in maturity, M and weights. 
+  \item \texttt{bio.const} is a flag indicating if the average maturity, M and weights over the specified years should be used (\texttt{TRUE}) or not (\texttt{FALSE}).
+  \item \texttt{sel.years} is the start and end year from which to generated noise in the selection at age
+  \item \texttt{sel.const} is a flag indicating if the average selection over the specified years should be used (\texttt{TRUE}) or not (\texttt{FALSE}).
+  \item \texttt{Fscan} is the range of $F_{advisory}$ values to scan over
+  \item \texttt{Btrigger} is the location of a modifier of a HCR upon which $F_{advisory}$ becomes linearily reduced. If \texttt{Btrigger} is 0 (default) this is equivalent to a constant F-rule.
+  \item \texttt{Fcv} The assessment error in the advisory year.
+  \item \texttt{Fphi} The autocorrelation in assessment error
+  \item \texttt{Blim} $B_{lim}$
+  \item \texttt{Bpa}  $B_{pa}$
+  \item \texttt{Nrun} is the number of years to simulate forward (fixed for now is that the last 50 years from those are used for summarising equilibrium conditions)
+  \item \texttt{process.error} allows the simulations to be run using the predictive distribition of recruitment or the mean recruitment
+  \item \texttt{verbose} controls if progress bar is displayed during the simulation
+\end{itemize}
+
+
+<<sim_2, cache=TRUE>>=
+SIM <- eqsim_run(fit=FIT,
+                 bio.years=c(2008,2012), sel.years=c(2008,2012),
+                 Fcv=0.25, Fphi=0.30,
+                 verbose=FALSE, Blim=70000, Bpa=150000,
+                 extreme.trim=c(0.05,0.95))
+
+@
+
+The results from the simulation process are returned to the user as a list
+<<sim_3>>=
+str(SIM, 2, give.attr = FALSE)
+
+@
+where 
+\begin{itemize}
+  \item \texttt{ibya} (input by year and age) contains the biological and fisheries input data.
+  \item \texttt{rby} (results by year) contains the stock summary input data.
+  \item \texttt{rbp} contains the 0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975 percentiles of the simulations of SSB, catch, landings and recruitment for each Fscan value.
+  \item \texttt{Blim} Blim input value
+  \item \texttt{Bpa} Bpa input value
+  \item \texttt{Refs} Calculated reference points
+  \item \texttt{pProfile} The probability profiles for a given target F for $B_{lim}$, $B_{pa}$ and $F_{msy}$ (both for catch and landings).
+\end{itemize}
+
+Summarise simulations:
+<<sim_4, results='asis'>>=
+xtable(SIM$Refs)
+
+@
+
+Plot simulations:
+Catch:
+<<sim_5>>=
+eqsim_plot(SIM, catch=TRUE)
+
+@
+Landings:
+<<sim_6>>=
+eqsim_plot(SIM, catch=FALSE)
+
+@
+Some ggplots:
+<<ggplots>>=
+p <- eqsim_ggplot(SIM,plotit=FALSE)
+p$plotR
+p$plotSSB
+p$plotCatch
+p$plotLandings
+p$plotProbs
+
+@
+
+\section{EqSim}
+
+Documentation is pending, further coding needed ...
+
+\end{document}

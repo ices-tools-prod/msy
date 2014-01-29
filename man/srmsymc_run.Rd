@@ -3,7 +3,7 @@
 \title{Run srmsymc}
 \usage{
   srmsymc_run(sr, opt_sen = 1, opt_pen = 1, nits = 100,
-    path, output = FALSE)
+    path, output = FALSE, do_clean = TRUE, echo = TRUE)
 }
 \arguments{
   \item{sr}{integer. containg the stock-recruitment model}
@@ -21,6 +21,12 @@
 
   \item{output}{boolean. If FALSE (default) no results
   (*.dat) files are returned.}
+
+  \item{do_clean}{XXX}
+
+  \item{echo}{boolean. If TRUE (default) output stuff to
+  console. Setting to FALSE is useful when using function
+  while knitting.}
 }
 \description{
   Run the ADM srmsymc program
