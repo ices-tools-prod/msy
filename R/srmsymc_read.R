@@ -1,23 +1,27 @@
 #' @title Read key parameter estimates from the srmsymc program
 #' 
-#' @description Reads the fiel \code{simpar.dat} generate by the \code{srmsymc}.
+#' @description Reads the \code{simpar.dat} generate by the \code{srmsymc}.
 #' Returns a list containing the stochastic and the deterministic estimates.
 #' 
-#' @param file the file name, should not be anything else than \code{simpar.dat}
+#' @export
+#' 
 #' @param path character containing the path to the file. If missing it is
 #' assumed that the file is in the current working directory.
+#' @param file the file name, should not be anything else than \code{simpar.dat}
 #' @param srno integer. 1=Ricker, 2=Beverton-Holt, 3=Hockey-stick.
 #' @param minSSB numerical. Minimum observed SSB value. Used for the hockey-stick,
 #' excluding values below the lowest observed. If set to 0 (default) do not exclude
 #' values below the minimum.
 #' @param trim boolean. If TRUE (default) come cleaning (NEED TO SPECIFY) is done.
 #' @param longformat boolean. If TRUE (default) return a long format.
-#' @export
 
-srmsymc_read_par <- function(file="simpar.dat",path,srno=1,minSSB=0,trim=TRUE,longformat=TRUE) {
+
+srmsymc_read_par <- function(path,file="simpar.dat",srno=1,minSSB=0,trim=TRUE,longformat=TRUE) {
   
   if(!missing(path)) file <- paste(path, "/", file, sep="")
   if (!file.exists(file)) stop(paste(file, "not found"))
+  
+  
   
   d = read.table(file)
   names(d) = c("iter","ap","bp","alpha","beta","sigr","scor",
@@ -71,17 +75,16 @@ srmsymc_read_par <- function(file="simpar.dat",path,srno=1,minSSB=0,trim=TRUE,lo
 #' rows represents the catch for each iterations.
 #' Returns a list containing two data.frames, one containing the deterministic
 #' estimate, the other containing the stochastic simulations.
-#' 
-#' @param file the file name, should not be anything else than \code{simpary.dat}
 #' @param path character containing the path to the file. If missing it is
 #' assumed that the file is in the current working directory.
+#' @param file the file name, should not be anything else than \code{simpary.dat}
 #' @param srno integer. 1=Ricker, 2=Beverton-Holt, 3='Hockey-stick.
 #' @param trim boolean. If TRUE (default) come cleaning (NEED TO SPECIFY) is done.
 #' @param longformat boolean. If TRUE (default) return a long format.
 #' @param doPlot boolean. If TRUE (default) returns a ggplot
 #' @export
 
-srmsymc_read_yield <- function(file="simpary.dat",path,srno=1,trim=TRUE,longformat=TRUE,doPlot=TRUE) {
+srmsymc_read_yield <- function(path,file="simpary.dat",srno=1,trim=TRUE,longformat=TRUE,doPlot=TRUE) {
   
   if(!missing(path)) file <- paste(path, "/", file, sep="")
   if (!file.exists(file)) stop(paste(file, "not found"))
@@ -137,16 +140,16 @@ srmsymc_read_yield <- function(file="simpary.dat",path,srno=1,trim=TRUE,longform
 #' Returns a list containing two data.frames, one containing the deterministic
 #' estimate, the other containing the stochastic simulations.
 #' 
-#' @param file the file name, should not be anything else than \code{simpary.dat}
 #' @param path character containing the path to the file. If missing it is
 #' assumed that the file is in the current working directory.
+#' @param file the file name, should not be anything else than \code{simpary.dat}
 #' @param srno integer. 1=Ricker, 2=Beverton-Holt, 3='Hockey-stick.
 #' @param trim boolean. If TRUE (default) come cleaning (NEED TO SPECIFY) is done.
 #' @param longformat boolean. If TRUE (default) return a long format.
 #' @param doPlot boolean. If TRUE (default) returns a ggplot
 #' @export
 
-srmsymc_read_ssb <- function(file="simparssb.dat",path,srno=1,trim=TRUE,longformat=TRUE,doPlot=TRUE) {
+srmsymc_read_ssb <- function(path,file="simparssb.dat",srno=1,trim=TRUE,longformat=TRUE,doPlot=TRUE) {
   
   if(!missing(path)) file <- paste(path, "/", file, sep="")
   if (!file.exists(file)) stop(paste(file, "not found"))
@@ -199,9 +202,11 @@ srmsymc_read_ssb <- function(file="simparssb.dat",path,srno=1,trim=TRUE,longform
 #' 
 #' @description xxx
 #' 
+#' @export
+#' 
 #' @param path x
 #' @param ... addition arguements
-#' @export
+
 srmsymc_read <- function(path, ...) {
   x <- list()
   x$par   <- srmsymc_read_par(path=path)
@@ -212,7 +217,7 @@ srmsymc_read <- function(path, ...) {
 
 
 
-#' @title Read the ssb per recruit estimates the srmsymc program
+#' @title Read the ssb per recruit estimates from the srmsymc program
 #' 
 #' @description Reads the file \code{simparssbpr.dat} generate by the \code{srmsymc}.
 #' In the \code{simparssbpr.dat} the first row is the fishing mortality,
@@ -221,11 +226,13 @@ srmsymc_read <- function(path, ...) {
 #' Returns a list containing two data.frames, one containing the deterministic
 #' estimate, the other containing the stochastic simulations.
 #' 
+#' @export
+#' 
 #' @param file the file name, should not be anything else than \code{simparssbpr.dat}
 #' @param trim boolean. If TRUE (default) come cleaning (NEED TO SPECIFY) is done.
 #' @param longformat boolean. If TRUE (default) return a long format.
 #' @param doPlot boolean. If TRUE (default) returns a ggplot
-#' @export
+
 
 srmsymc_read_ssbpr <- function(file="simparssbpr.dat",trim=TRUE,longformat=TRUE,doPlot=TRUE) {
   
