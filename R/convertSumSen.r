@@ -32,8 +32,8 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
  # path = gsub("/","\\\\",senfilename) #converts "c:/" to "c:\\"  
  # path = paste(rev(rev(strsplit(senfilename, "\\\\")[[1]])[-1]),collapse="\\")
 
-  opfilename = ".\\out.dat"
-  srfilename = ".\\srmsymc.dat"
+  opfilename = "age.dat"
+  srfilename = "srmsymc.dat"
   
   # create temp file with commas replaced by spaces
   senf = scan(senfilename,"",sep="\n",quote=NULL,quiet=silent)

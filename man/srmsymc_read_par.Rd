@@ -2,8 +2,8 @@
 \alias{srmsymc_read_par}
 \title{Read key parameter estimates from the srmsymc program}
 \usage{
-  srmsymc_read_par(path, file = "simpar.dat", srno = 1,
-    minSSB = 0, trim = TRUE, longformat = TRUE)
+  srmsymc_read_par(path, file = "simpar.dat", minSSB = 0,
+    trim = TRUE, longformat = TRUE)
 }
 \arguments{
   \item{path}{character containing the path to the file. If
@@ -12,9 +12,6 @@
 
   \item{file}{the file name, should not be anything else
   than \code{simpar.dat}}
-
-  \item{srno}{integer. 1=Ricker, 2=Beverton-Holt,
-  3=Hockey-stick.}
 
   \item{minSSB}{numerical. Minimum observed SSB value. Used
   for the hockey-stick, excluding values below the lowest

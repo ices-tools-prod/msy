@@ -1,0 +1,21 @@
+\name{plot_type2}
+\alias{plot_type2}
+\title{Plot type 2}
+\usage{
+  plot_type2(sto, det, n, xlim, ylim)
+}
+\arguments{
+  \item{sto}{XXX}
+
+  \item{det}{XXX}
+
+  \item{n}{XX}
+
+  \item{xlim}{XXX}
+
+  \item{ylim}{XXX}
+}
+\description{
+  Plot type 2
+}
+

@@ -1,7 +1,7 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.6
+Version: 0.1.7
 Date: 2014-01-30
 Author: Colin Millar, Noel Cadigan, Timothy Earl, Jose D'Oliviera
 Maintainer: Colin Millar <colinpmillar@gmail.com>
@@ -37,3 +37,5 @@ Collate:
     'utilities.R'
     'eqsr.R'
     'data.R'
+    'srmsymc_basePlots.R'
+    'srmsymc_converter.R'
