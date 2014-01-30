@@ -302,22 +302,25 @@ Eqplot <- function (sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA),
   
   Fscan <- sim $ Fscan
   
-  # Einar added 29.1.2014
+  # Einar amended 30.1.2014
   if(missing(extreme.trim)) {
     catm <- apply(sim $ catsa, 1, mean)
     lanm <- apply(sim $ lansa, 1, mean)
   } else {
-    i <- sim$catsa > quantile(sim$catsa,extreme.trim[2]) |
-      sim$catsa < quantile(sim$catsa,extreme.trim[1])
-    sim$catsa[i] <- NA
-    catm <- apply(sim $ catsa, 1, mean, na.rm=TRUE)
-    i <- sim$lansa > quantile(sim$lansa,extreme.trim[2]) |
-      sim$lansa < quantile(sim$lansa,extreme.trim[1])
-    sim$lansa[i] <- NA
-    lanm <- apply(sim $ lansa, 1, mean, na.rm=TRUE)
+    x <- sim$catsa
+    i <- x > quantile(x,extreme.trim[2]) |
+      x < quantile(x,extreme.trim[1])
+    x[i] <- NA
+    catm <- apply(x, 1, mean, na.rm=TRUE)
+    
+    x <- sim$lansa
+    i <- x > quantile(x,extreme.trim[2]) |
+      x < quantile(x,extreme.trim[1])
+    x[i] <- NA
+    lanm <- apply(x, 1, mean, na.rm=TRUE)
   }
     
-  # end Einar added 29.1.2014
+  # end Einar amended 30.1.2014
   
   
   maxcatm <- which.max(catm)

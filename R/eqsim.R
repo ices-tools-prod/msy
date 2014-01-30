@@ -242,22 +242,25 @@ eqsim_run <- function(fit,
   FCrash50 <- Fscan[which.max(cats[4,]):NF][ which(cats[4, which.max(cats[4,]):NF] < 0.05*max(cats[4,]) )[1] ]
   
   
-  # Einar added 29.1.2014
+  # Einar amended 30.1.2014
   if(missing(extreme.trim)) {
     catm <- apply(catsa, 1, mean)
     lanm <- apply(lansa, 1, mean)
   } else {
-    i <- catsa > quantile(catsa,extreme.trim[2]) |
-         catsa < quantile(catsa,extreme.trim[1])
-    catsa[i] <- NA
-    catm <- apply(catsa, 1, mean, na.rm=TRUE)
-    i <- lansa > quantile(lansa,extreme.trim[2]) |
-      lansa < quantile(lansa,extreme.trim[1])
-    lansa[i] <- NA
-    lanm <- apply(lansa, 1, mean, na.rm=TRUE)
+    x <- catsa
+    i <- x > quantile(x,extreme.trim[2]) |
+      x < quantile(x,extreme.trim[1])
+    x[i] <- NA
+    catm <- apply(x, 1, mean, na.rm=TRUE)
+    
+    x <- lansa
+    i <- x > quantile(x,extreme.trim[2]) |
+      x < quantile(x,extreme.trim[1])
+    x[i] <- NA
+    lanm <- apply(x, 1, mean, na.rm=TRUE)
   }
   
-  # end Einar added 29.1.2014
+  # end Einar amended 30.1.2014
     
   maxcatm <- which.max(catm)
   maxlanm <- which.max(lanm)

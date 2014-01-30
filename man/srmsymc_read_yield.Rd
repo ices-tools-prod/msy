@@ -2,16 +2,16 @@
 \alias{srmsymc_read_yield}
 \title{Read the yield estimates the srmsymc program}
 \usage{
-  srmsymc_read_yield(file = "simpary.dat", path, srno = 1,
+  srmsymc_read_yield(path, file = "simpary.dat", srno,
     trim = TRUE, longformat = TRUE, doPlot = TRUE)
 }
 \arguments{
-  \item{file}{the file name, should not be anything else
-  than \code{simpary.dat}}
-
   \item{path}{character containing the path to the file. If
   missing it is assumed that the file is in the current
   working directory.}
+
+  \item{file}{the file name, should not be anything else
+  than \code{simpary.dat}}
 
   \item{srno}{integer. 1=Ricker, 2=Beverton-Holt,
   3='Hockey-stick.}

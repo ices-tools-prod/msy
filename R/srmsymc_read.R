@@ -84,10 +84,23 @@ srmsymc_read_par <- function(path,file="simpar.dat",srno=1,minSSB=0,trim=TRUE,lo
 #' @param doPlot boolean. If TRUE (default) returns a ggplot
 #' @export
 
-srmsymc_read_yield <- function(path,file="simpary.dat",srno=1,trim=TRUE,longformat=TRUE,doPlot=TRUE) {
+srmsymc_read_yield <- function(path,file="simpary.dat",srno,trim=TRUE,longformat=TRUE,doPlot=TRUE) {
   
   if(!missing(path)) file <- paste(path, "/", file, sep="")
   if (!file.exists(file)) stop(paste(file, "not found"))
+  
+  # Try to get the recruitment number from the srmsymc.dat file
+  if(missing(srno)) {
+    tmpFile <- paste(path,"/","srmsymc.dat",sep="")
+    if(file.exists(tmpFile)) {
+      x <- readLines(tmpFile)
+      i <- grep("# Ropt:   S-R function type",x)
+      srno <- as.integer(substr(x[i],1,1))
+    } else {
+      stop("srno needs to be specified")
+    }
+  }
+  
   
   d = as.matrix(read.table(file))
   

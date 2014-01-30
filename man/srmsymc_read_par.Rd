@@ -2,16 +2,16 @@
 \alias{srmsymc_read_par}
 \title{Read key parameter estimates from the srmsymc program}
 \usage{
-  srmsymc_read_par(file = "simpar.dat", path, srno = 1,
+  srmsymc_read_par(path, file = "simpar.dat", srno = 1,
     minSSB = 0, trim = TRUE, longformat = TRUE)
 }
 \arguments{
-  \item{file}{the file name, should not be anything else
-  than \code{simpar.dat}}
-
   \item{path}{character containing the path to the file. If
   missing it is assumed that the file is in the current
   working directory.}
+
+  \item{file}{the file name, should not be anything else
+  than \code{simpar.dat}}
 
   \item{srno}{integer. 1=Ricker, 2=Beverton-Holt,
   3=Hockey-stick.}
@@ -28,7 +28,7 @@
   long format.}
 }
 \description{
-  Reads the fiel \code{simpar.dat} generate by the
+  Reads the \code{simpar.dat} generate by the
   \code{srmsymc}. Returns a list containing the stochastic
   and the deterministic estimates.
 }

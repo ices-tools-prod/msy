@@ -1,6 +1,6 @@
 \name{srmsymc_read_ssbpr}
 \alias{srmsymc_read_ssbpr}
-\title{Read the ssb per recruit estimates the srmsymc program}
+\title{Read the ssb per recruit estimates from the srmsymc program}
 \usage{
   srmsymc_read_ssbpr(file = "simparssbpr.dat", trim = TRUE,
     longformat = TRUE, doPlot = TRUE)
