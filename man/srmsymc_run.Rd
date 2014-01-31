@@ -3,7 +3,8 @@
 \title{Run srmsymc}
 \usage{
   srmsymc_run(sr, opt_sen = 1, opt_pen = 1, nits = 100,
-    path, output = FALSE, do_clean = TRUE, echo = TRUE)
+    path, output = FALSE, do_clean = TRUE, echo = TRUE,
+    windose = TRUE)
 }
 \arguments{
   \item{sr}{integer. containg the stock-recruitment model}
@@ -27,6 +28,8 @@
   \item{echo}{boolean. If TRUE (default) output stuff to
   console. Setting to FALSE is useful when using function
   while knitting.}
+
+  \item{windose}{boolean - a quick fix for now}
 }
 \description{
   Run the ADM srmsymc program
