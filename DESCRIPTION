@@ -1,8 +1,8 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.7
-Date: 2014-01-30
+Version: 0.1.9
+Date: 2014-02-02
 Author: Colin Millar, Noel Cadigan, Timothy Earl, Jose D'Oliviera
 Maintainer: Colin Millar <colinpmillar@gmail.com>
 Description: Estimation of equilibrium reference points for fisheries
@@ -16,10 +16,10 @@ Depends:
     reshape2,
     plyr,
     ggplot2,
-    gridExtra
-Suggests:
-    knitr,
+    gridExtra,
     R2admb
+Suggests:
+    knitr
 LazyData: yes
 Collate:
     'myMH.R'

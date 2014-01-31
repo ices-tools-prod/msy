@@ -54,12 +54,9 @@ plot_type1 <- function(p,d,xlim,ylim) {
 #' @param xlim XXX
 #' @param ylim XXX
 plot_type2 <- function(sto,det,n,xlim,ylim) {
-  if(missing(xlim)) {
-    xlim=c(0,max(sto$variable))
-  }
-  if(missing(ylim)) {
-    ylim=c(0,max(sto$value))
-  }
+  
+  if(missing(xlim)) xlim=c(0,max(sto$variable))
+  if(missing(ylim)) ylim=c(0,max(sto$value))
   plot(xlim,ylim,type="n",axes=TRUE,xlab="",ylab="")
   for (i in 1:n) lines(sto$variable[sto$iter == i],sto$value[sto$iter == i],col="red")
   lines(det$variable,det$value,col="blue")
@@ -75,14 +72,15 @@ plot_type2 <- function(sto,det,n,xlim,ylim) {
 #' 
 #' @param path list
 #' @param rby data.frame with stock summary data
+#' @param ylim XXX
 #' @param n XXX
 #' @param hair XXX
-srmsymc_plotYield <- function(path="ricker",rby,n=100,hair=FALSE) {
+srmsymc_plotYield <- function(path="ricker",rby,ylim,n=100,hair=FALSE) {
   dat <- srmsymc_read_yield(path=path,doPlot=FALSE) 
   if(!hair) {
-    plot_type1(dat$quantiles,rby[,c("year","fbar","catch")])
+    plot_type1(dat$quantiles,rby[,c("year","fbar","catch")],ylim=ylim)
   } else {
-    plot_type2(dat$stochastic,dat$deterministic,rby[,c("year","fbar","catch")],n=n)
+    plot_type2(dat$stochastic,dat$deterministic,n=n,ylim=ylim)
   }
 }
 
@@ -96,12 +94,13 @@ srmsymc_plotYield <- function(path="ricker",rby,n=100,hair=FALSE) {
 #' @param rby data.frame with stock summary data
 #' @param n XXX
 #' @param hair XXX
-srmsymc_plotSSB <- function(path="ricker",rby,n=100,hair=FALSE) {
+#' @param ylim XXX
+srmsymc_plotSSB <- function(path="ricker",rby,n=100,hair=FALSE,ylim) {
   dat <- srmsymc_read_ssb(path=path,doPlot=FALSE) 
   if(!hair) {
-    plot_type1(dat$quantiles,rby[,c("year","fbar","ssb")])
+    plot_type1(dat$quantiles,rby[,c("year","fbar","ssb")],ylim=ylim)
   } else {
-    plot_type2(dat$stochastic,dat$deterministic,rby[,c("year","fbar","ssb")],n=100)
+    plot_type2(dat$stochastic,dat$deterministic,n=n,ylim=ylim)
   }
 }
 
@@ -115,22 +114,23 @@ srmsymc_plotSSB <- function(path="ricker",rby,n=100,hair=FALSE) {
 #' @param rby data.frame with stock summary data
 #' @param n XXX
 #' @param hair XXX
+
 srmsymc_plotSSBR <- function(path="ricker",rby,n=30,hair=FALSE) {
   par <- srmsymc_read_par(path=path,longformat=FALSE)
   sto <- par$stochastic[,c("alpha","beta")]
-  names(sto) <- c("a","b")
-  n <- nrow(sto)
+  #names(sto) <- c("a","b")
   det <- par$deterministic[,c("alpha","beta")]
-  names(det) <- c("a","b")
-  x <- c(1:(max(rby$ssb) * 1.2))
-  eq <- switch(par$srno,ricker,bevholt,segreg)
+  #names(det) <- c("a","b")
+  x <- max(rby$ssb)*(0:105)/100
+  eq <- switch(par$srno,srmsymc_ricker,srmsymc_bevholt,srmsymc_segreg)
+  
+  dat <- data.frame(iter = rep(1:nrow(sto),each=length(x)),
+                    ssb=rep(x,nrow(sto)),
+                    rec=NA)
+  for (i in 1:nrow(sto)) dat$rec[dat$iter == i] <- eq(dat$ssb[dat$iter == i],sto$alpha[i],sto$beta[i])
   
   if(!hair) {
-  dat <- data.frame(iter = rep(1:n,each=length(x)),
-                    ssb=rep(x,n),
-                    rec=NA)
-  for (i in 1:n) dat$rec[dat$iter == i] <- exp(eq(sto[i,],x))
-  p <- ddply(dat,c("ssb"),summarise,
+    p <- ddply(dat,c("ssb"),summarise,
                        p05=quantile(rec,0.05),
                        p10=quantile(rec,0.10),
                        p50=quantile(rec,0.50),
@@ -147,8 +147,8 @@ srmsymc_plotSSBR <- function(path="ricker",rby,n=30,hair=FALSE) {
   points(rby$ssb,rby$rec,cex=.7)
   } else {
   plot(c(0,max(x)),c(0,max(rby$rec)),type="n",xlab="",ylab="")
-  for (i in 1:n) curve(exp(eq(sto[i,],x)), add=TRUE,col="red")
-  curve(exp(eq(det,x)), add=TRUE, col="blue")
+  for (i in 1:n) curve(eq(x,sto$alpha[i],sto$beta[i]), add=TRUE,col="red")
+  curve(eq(x,det$alpha,det$beta), add=TRUE, col="blue")
   }
 }
 
@@ -169,6 +169,7 @@ srmsymc_plotPar <- function(path="ricker",Fbar,Fpa,Flim) {
   par <- srmsymc_read_par(path=path,longformat=FALSE)
   cn <- c("f40","f35","fmsy","f01","fmax","fcrash")
   x <- par$stochastic[,cn]
+  xlim <- c(0,2)
   
   plot(0,0,axes=FALSE,type='n',xlim=xlim,ylim=c(-2.5,6.5),xlab=" ",ylab="")
   axis(2,(-2):6,c("fbartext","Fpa","Flim","Fcra","Fmax","F01","Fmsy","F35","F40"),cex.axis=1.3,las=1)
@@ -196,26 +197,35 @@ srmsymc_plotPar <- function(path="ricker",Fbar,Fpa,Flim) {
 #' 
 #' @param path list
 #' @param rby data.frame with stock summary data
+#' @param ylim XXX 
 #' @param n XXX
 #' @param Fbar XXX
 #' @param Fpa XXX
 #' @param Flim XXX
-srmsymc_plotComposite <- function(path="ricker",rby,n=40,Fbar,Fpa,Flim) {
-  #png(paste(outputfolder, stockname, "_Yield_",srsn[srtype],".png",sep=""),height=11.5,width=9,units="in",res=144)
-  png("tmp.png",height=11.5,width=9,units="in",res=144)
+srmsymc_plotcomposit_yield <- function(path="ricker",ylim,rby,n=40,Fbar,Fpa,Flim) {
+  
+  if (!file.exists("output")) {
+    dir.create("output")
+  }
+  
+  Setup <- srmsymc_read_setup(path)
+  srName <- srmsymc_get_modelname(Setup$opt_sr_model)
+  
+  png(paste("output/", Setup$name_stock, "_Yield_",path,".png",sep=""),height=11.5,width=9,units="in",res=144)
+
   layout(t(matrix(c(1,1:7),2)), widths=c(5,5), heights=c(1,3,3.5,4))
   par(mai=c(0,0,0.8,0))
   plot.new()
-  title(paste("stockname","srname[srtype]"))
+  title(paste(Setup$name_stock,srName))
   #srnhair = min(nhair,length(simdata[[srtype]]$fcrash))
   par(mai=c(0.5,1,0,0.5))
   
   srmsymc_plotPar(path=path)
   srmsymc_plotPar(path=path)
-  srmsymc_plotYield(path=path,rby=rby)
-  srmsymc_plotYield(path=path,rby=rby,n=n,hair=TRUE)
-  srmsymc_plotSSB(path=path,rby=rby)
-  srmsymc_plotSSB(path=path,rby=rby,n=n,hair=TRUE)
+  srmsymc_plotYield(path=path,rby=rby,ylim=c(0,1.2*max(rby$catch)))
+  srmsymc_plotYield(path=path,rby=rby,n=n,hair=TRUE,ylim=c(0,1.2*max(rby$catch)))
+  srmsymc_plotSSB(path=path,rby=rby,ylim=c(0,1.2*max(rby$ssb)))
+  srmsymc_plotSSB(path=path,rby=rby,n=n,hair=TRUE,ylim=c(0,1.2*max(rby$ssb)))
   dev.off()
 }
 
@@ -228,9 +238,16 @@ srmsymc_plotComposite <- function(path="ricker",rby,n=40,Fbar,Fpa,Flim) {
 #' @param rby XXX
 #' @param n XXX
 
-srmsymc_plotComposite2 <- function(rby,n=40) {
-  #png(paste(outputfolder, stockname, "_SRR.png",sep=""),height=11.5,width=9,units="in",res=144)
-  png("tmp2.png",height=11.5,width=9,units="in",res=144)
+srmsymc_plotcomposit_ssbr <- function(rby,n=40) {
+
+  if (!file.exists("output")) {
+    dir.create("output")
+  }
+  
+  Setup <- srmsymc_read_setup("ricker")  #NOTE: ASSUMES ricker EXISTS
+  srName <- srmsymc_get_modelname(Setup$opt_sr_model)
+  
+  png(paste("output/", Setup$name_stock, "_SRR.png",sep=""),height=11.5,width=9,units="in",res=144)
   layout(t(matrix(1:6,2)))
   srmsymc_plotSSBR("ricker",rby=rby)
   srmsymc_plotSSBR("ricker",rby=rby,hair=TRUE)
@@ -296,4 +313,15 @@ srmsymc_plotDistribution <- function(path,variable="fmsy",srweights=NA,stockname
   text(qs[5,1],my,"95%",pos=3,col="red")
   
   legend(0.75*mx,my,c("Ricker","Beverton-Holt","Hockeystick"), fill=grey(0.25*1:3))
+}
+
+
+#' @title Get the name of the recruitment function
+#' 
+#' @description This is used in some plotting routines
+#' 
+#' @param srno The recruitment model number
+srmsymc_get_modelname <- function(srno) {
+  modelname <- switch(srno,"Ricker","Beverton-Holt","Segmented regression")
+  return(modelname)
 }

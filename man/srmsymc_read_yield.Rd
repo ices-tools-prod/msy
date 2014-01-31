@@ -2,7 +2,7 @@
 \alias{srmsymc_read_yield}
 \title{Read the yield estimates the srmsymc program}
 \usage{
-  srmsymc_read_yield(path, file = "simpary.dat", srno,
+  srmsymc_read_yield(path, file = "simpary.dat",
     trim = TRUE, longformat = TRUE, doPlot = TRUE)
 }
 \arguments{
@@ -12,9 +12,6 @@
 
   \item{file}{the file name, should not be anything else
   than \code{simpary.dat}}
-
-  \item{srno}{integer. 1=Ricker, 2=Beverton-Holt,
-  3='Hockey-stick.}
 
   \item{trim}{boolean. If TRUE (default) come cleaning
   (NEED TO SPECIFY) is done.}

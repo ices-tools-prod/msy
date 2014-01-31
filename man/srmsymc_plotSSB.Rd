@@ -3,7 +3,7 @@
 \title{XXX}
 \usage{
   srmsymc_plotSSB(path = "ricker", rby, n = 100,
-    hair = FALSE)
+    hair = FALSE, ylim)
 }
 \arguments{
   \item{path}{list}
@@ -13,6 +13,8 @@
   \item{n}{XXX}
 
   \item{hair}{XXX}
+
+  \item{ylim}{XXX}
 }
 \description{
   XXX

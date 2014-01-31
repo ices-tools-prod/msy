@@ -1,0 +1,173 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Short manual}
+\documentclass[a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,margin=2.5cm}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{textcomp}
+\usepackage{amstext}
+\usepackage{graphicx}
+\usepackage{longtable}
+\setlength{\parindent}{0cm}
+\begin{document}
+
+<<set-options, echo = FALSE, cache = FALSE>>=
+require(knitr)
+options(replace.assign = TRUE)
+opts_chunk$set(warning=FALSE,
+               message=FALSE,
+               fig.align='center',
+               fig.path='figure/plotMSY/',
+               fig.width=7, 
+               fig.height=5,
+               fig.show = "hold",
+               par = TRUE,
+               tidy=FALSE,
+               tidy.opts=list(width.cutoff=40),
+               echo=TRUE,
+               cache=FALSE,
+               cache.path='cache/plotMSY/')
+suppressPackageStartupMessages(require(xtable))
+suppressPackageStartupMessages(library(msy))
+@
+
+\title{Examples of using the plotMSY}
+
+\author{Einar Hjörleifsson}
+\maketitle
+
+<<sessionInfo, results='asis', echo=FALSE>>=
+toLatex(sessionInfo(), locale=FALSE)
+@
+
+<<x, comment='', echo=FALSE>>=
+print('This document was created in knitr')
+@
+\newpage{}
+
+\section{plotMSY}
+
+\section{Quick start}
+Compile:
+<<x1, eval=FALSE>>=
+srmsymc_compile()
+@
+Convert FLStock object to srmsymc data files, use last three years as the basis for biological and selection information (not done here, use prepared .dat files):
+<<x2>>=
+stk <- icesStocks$codNS
+#FLS2srmsymc(stk,y=3,"codNS","age.dat",1)
+cmd <- paste('cp',paste(path.package("msy"),'extdata/age.dat',sep='/'),'.')
+system(cmd)
+cmd <- paste('cp',paste(path.package("msy"),'extdata/srmsymc.dat',sep='/'),'.')
+system(cmd)
+rby <- fls2rby(stk)
+rby[,c(1,2,4,5)] <- rby[,c(1,2,4,5)]/1e3
+
+@
+Run the srmsymc
+<<x3>>=
+srmsymc_run(sr=1,path="ricker",echo=FALSE, windose=FALSE)
+srmsymc_run(sr=2,path="bevholt",echo=FALSE, windose=FALSE)
+srmsymc_run(sr=3,path="segreg",echo=FALSE, windose=FALSE)
+@
+
+Plot the ssb recruitment fits (png files):
+<<standardOutputs1>>=
+srmsymc_plotcomposit_ssbr(rby)
+@
+
+Plot the refs and yield and ssb as a funtion of fishing mortality (png file):
+<<standardOutputs>>=
+srmsymc_plotcomposit_yield(path="ricker",rby=rby)
+srmsymc_plotcomposit_yield(path="bevholt",rby=rby)
+srmsymc_plotcomposit_yield(path="segreg",rby=rby)
+@
+
+
+
+
+<<xx10>>=
+x1 <- srmsymc_read_yield("ricker")
+x2 <- srmsymc_read_yield("bevholt")
+x3 <- srmsymc_read_yield("segreg")
+qs <- rbind(x1$quantiles,x2$quantiles,x3$quantiles)
+d <- rbind(x1$stochastic,x2$stochastic,x3$stochastic)
+
+plotTEST <- function(type="yield") {
+  if(type == "yield") {
+    x1 <- srmsymc_read_yield("ricker")
+    x2 <- srmsymc_read_yield("bevholt")
+    x3 <- srmsymc_read_yield("segreg")
+  }
+  if(type == "ssb") {
+    x1 <- srmsymc_read_ssb("ricker")
+    x2 <- srmsymc_read_ssb("bevholt")
+    x3 <- srmsymc_read_ssb("segreg")
+  }
+  
+  qs <- rbind(x1$quantiles,x2$quantiles,x3$quantiles)
+  d <- rbind(x1$stochastic,x2$stochastic,x3$stochastic)
+  
+  p <- ggplot(qs,aes(variable)) +
+  geom_ribbon(aes(ymin=q05,ymax=q95),fill='grey',alpha=1/2) +
+  geom_ribbon(aes(ymin=q10,ymax=q90),fill='grey',alpha=1/2) +
+  geom_ribbon(aes(ymin=q16,ymax=q84),fill='grey',alpha=1/2) +
+  geom_line(aes(y=q50),col='red',lwd=1) +
+  geom_line(aes(y=mean),col='blue',lwd=1) +
+  geom_line(data=d,aes(variable,value,group=iter),alpha = 0.1,col='red') +
+  facet_grid(srno ~ .)
+  return(p)
+}
+
+p <- plotTEST("yield")
+p1 <- p + geom_point(data=rby,aes(fbar,catch)) +
+  coord_cartesian(xlim=c(0,1),ylim=c(0,1.2*max(rby$catch)))
+p <- plotTEST("ssb")
+p2 <- p + geom_point(data=rby,aes(fbar,ssb)) +
+  coord_cartesian(xlim=c(0,1),ylim=c(0,1.2*max(rby$ssb)))
+vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(p1,vp=vplayout(1,1))
+print(p2,vp=vplayout(1,2))
+
+@
+
+
+\subsection{Setup}
+
+\subsubsection*{Compiling the ADMB code}
+The uncompiled srmsymc ADMB-codes come with the \texttt{msy-package}. They can be located on your computer using the following command: 
+<<admbCodeLocation, eval=FALSE>>=
+paste(path.package("msy"),"tpl",sep="/")
+@
+To compile the code as well as for further communication with the progam you need to have the \texttt{R2admb} library installed and loaded as well of course the ADMB-program itself. Once these are in place compiling the code is done by:
+<<admbCodeCompile, eval=FALSE>>=
+srmsymc_compile()
+@
+This command copies the tpl-files (uncompiled ADMB codes, named srmsymc.tpl and srmsymc2.tpl) into your current working directory and compiles them. You should now have four new files in the working directory, the two .tpl files and then srmsymc and srmsymc2 (or if on windose srmsymc.exe and srmsymc2.exe). I.e. you should have something like this in your directory:
+<<dir1, echo=FALSE>>=
+dir(pattern="srmsymc")
+@
+
+\subsubsection*{The data files}
+The srmsymc programs read data from separate files. Examples are provided with the \texttt{msy-package} in the following directory your computer using the following command:
+<<dir2, eval=FALSE>>=
+paste(path.package("msy"),"extdata",sep="/")
+@
+Example output of these files are provided in the appendix. Further information about the meaning of various xxx can be found in xxxx.
+
+\newpage{}
+APPENDIX
+They look like this:
+<<srmsymc_dat>>=
+readLines("ricker/srmsymc.dat")
+@
+and:
+<<age_dat>>=
+readLines("ricker/age.dat")
+@
+
+\end{document}

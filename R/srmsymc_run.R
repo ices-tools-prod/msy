@@ -37,9 +37,10 @@ srmsymc_compile <- function()
 #' @param do_clean XXX
 #' @param echo boolean. If TRUE (default) output stuff to console. Setting to FALSE is
 #' useful when using function while knitting.
+#' @param windose boolean - a quick fix for now
 
 srmsymc_run <- function(sr,opt_sen=1,opt_pen=1,nits=100,path,output=FALSE,
-                        do_clean=TRUE,echo=TRUE) {
+                        do_clean=TRUE,echo=TRUE,windose=TRUE) {
   
   # check if file exists
   if (!file.exists('srmsymc')) srmsymc_compile()
@@ -62,11 +63,17 @@ srmsymc_run <- function(sr,opt_sen=1,opt_pen=1,nits=100,path,output=FALSE,
   cat('21 1 ', nits, "\n", sep="", file = tmpfile)
   close(tmpfile)
   
-  cmd <- paste('srmsymc -mcmc', (nits+11)*10000, '-mcsave 10000 -nosdmcmc')
+  if(windose) {
+    programName <- "srmsymc.exe"
+  } else {
+    programName <- "srmsymc"
+  }
+  
+  cmd <- paste(programName,'-mcmc', (nits+11)*10000, '-mcsave 10000 -nosdmcmc')
   # -nosdmcmc turn off mcmc histogram calcs to make mcsave run faster
   if(!echo) cmd <- paste(cmd,'&> /dev/null')
   system(cmd)
-  cmd <- "srmsymc -mceval"
+  cmd <- paste(programName," -mceval")
   if(!echo) cmd <- paste(cmd,'&> /dev/null')
   system(cmd)
   

@@ -2,13 +2,15 @@
 \alias{srmsymc_plotYield}
 \title{XXX}
 \usage{
-  srmsymc_plotYield(path = "ricker", rby, n = 100,
+  srmsymc_plotYield(path = "ricker", rby, ylim, n = 100,
     hair = FALSE)
 }
 \arguments{
   \item{path}{list}
 
   \item{rby}{data.frame with stock summary data}
+
+  \item{ylim}{XXX}
 
   \item{n}{XXX}
 

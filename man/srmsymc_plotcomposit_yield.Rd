@@ -1,14 +1,16 @@
-\name{srmsymc_plotComposite}
-\alias{srmsymc_plotComposite}
+\name{srmsymc_plotcomposit_yield}
+\alias{srmsymc_plotcomposit_yield}
 \title{XXX}
 \usage{
-  srmsymc_plotComposite(path = "ricker", rby, n = 40, Fbar,
-    Fpa, Flim)
+  srmsymc_plotcomposit_yield(path = "ricker", ylim, rby,
+    n = 40, Fbar, Fpa, Flim)
 }
 \arguments{
   \item{path}{list}
 
   \item{rby}{data.frame with stock summary data}
+
+  \item{ylim}{XXX}
 
   \item{n}{XXX}
 
