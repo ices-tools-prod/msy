@@ -29,7 +29,11 @@ FLS2srmsymc <- function(stk,y=3,name_stock,filename_age,opt_sr_model,
                            year=x$rby$year)
   z <- srmsymc_cat_age(filename_age,n_fleets=2,pf=0,pm=0,
                        sel=cbind(x$sH[,1],x$sD[,1]),
+<<<<<<< HEAD
                        sel_cv=cbind(x$sH[,2],x$sD[,2]),
+=======
+                       sel_cv=cbind(x$sH[,1],x$sD[,2]),
+>>>>>>> ed52ad17d63170c955d7bc7f0a2cd8f9ac6f18d9
                        w=cbind(x$wH[,1],x$wD[,1]),
                        w_cv=cbind(x$wH[,2],x$wD[,2]),
                        bio=cbind(x$M[,1],x$MT[,1],x$wS[,1]),
