@@ -51,6 +51,7 @@ print('This document was created in knitr')
 \section{plotMSY}
 
 \section{Quick start}
+\subsection*{Setup and run}
 Compile:
 <<x1, eval=FALSE>>=
 srmsymc_compile()
@@ -65,30 +66,61 @@ cmd <- paste('cp',paste(path.package("msy"),'extdata/srmsymc.dat',sep='/'),'.')
 system(cmd)
 rby <- fls2rby(stk)
 rby[,c(1,2,4,5)] <- rby[,c(1,2,4,5)]/1e3
-
 @
 Run the srmsymc
-<<x3>>=
+<<x3, eval=FALSE>>=
 srmsymc_run(sr=1,path="ricker",echo=FALSE, windose=FALSE)
 srmsymc_run(sr=2,path="bevholt",echo=FALSE, windose=FALSE)
 srmsymc_run(sr=3,path="segreg",echo=FALSE, windose=FALSE)
 @
 
+\subsection*{Standard plots}
 Plot the ssb recruitment fits (png files):
-<<standardOutputs1>>=
+<<standardOutputs1, message=FALSE>>=
 srmsymc_plotcomposit_ssbr(rby)
 @
 
 Plot the refs and yield and ssb as a funtion of fishing mortality (png file):
-<<standardOutputs>>=
+<<standardOutputs, message=FALSE>>=
 srmsymc_plotcomposit_yield(path="ricker",rby=rby)
 srmsymc_plotcomposit_yield(path="bevholt",rby=rby)
 srmsymc_plotcomposit_yield(path="segreg",rby=rby)
 @
 
+Plot mortality distributions (png files):
+<<xxxxx1100>>=
+srmsymc_plotcomposit_mort()
+srmsymc_plotcomposit_mort("equal")
+@
 
+\subsection*{Standard output}
 
+\newpage{}
+\section{Slow reading}
 
+\subsection*{Compiling the ADMB code}
+The uncompiled srmsymc ADMB-codes come with the \texttt{msy-package}. They can be located on your computer using the following command: 
+<<admbCodeLocation, eval=FALSE>>=
+paste(path.package("msy"),"tpl",sep="/")
+@
+To compile the code as well as for further communication with the progam you need to have the \texttt{R2admb} library installed and loaded as well of course the ADMB-program itself. Once these are in place compiling the code is done by:
+<<admbCodeCompile, eval=FALSE>>=
+srmsymc_compile()
+@
+This command copies the tpl-files (uncompiled ADMB codes, named srmsymc.tpl and srmsymc2.tpl) into your current working directory and compiles them. You should now have four new files in the working directory, the two .tpl files and then srmsymc and srmsymc2 (or if on windose srmsymc.exe and srmsymc2.exe). I.e. you should have something like this in your directory:
+<<dir1, echo=FALSE>>=
+dir(pattern="srmsymc")
+@
+
+\subsection*{The data files}
+The srmsymc programs read data from separate files. Examples are provided with the \texttt{msy-package} in the following directory your computer using the following command:
+<<dir2, eval=FALSE>>=
+paste(path.package("msy"),"extdata",sep="/")
+@
+Example output of these files are provided in the appendix. Further information about the meaning of various xxx can be found in xxxx.
+
+\newpage{}
+\section{ggplot2 doodles}
 <<xx10>>=
 x1 <- srmsymc_read_yield("ricker")
 x2 <- srmsymc_read_yield("bevholt")
@@ -122,42 +154,20 @@ plotTEST <- function(type="yield") {
   return(p)
 }
 
-p <- plotTEST("yield")
-p1 <- p + geom_point(data=rby,aes(fbar,catch)) +
-  coord_cartesian(xlim=c(0,1),ylim=c(0,1.2*max(rby$catch)))
-p <- plotTEST("ssb")
-p2 <- p + geom_point(data=rby,aes(fbar,ssb)) +
-  coord_cartesian(xlim=c(0,1),ylim=c(0,1.2*max(rby$ssb)))
+
+p1 <- plotTEST("yield") + geom_point(data=rby,aes(fbar,landings)) +
+  coord_cartesian(xlim=c(0,1.1*max(rby$fbar)),ylim=c(0,1.2*max(rby$landings))) +
+  labs(x="Fishing mortality",y="Yield")
+p2 <- plotTEST("ssb") + geom_point(data=rby,aes(fbar,ssb)) +
+  coord_cartesian(xlim=c(0,1.1*max(rby$fbar)),ylim=c(0,1.2*max(rby$ssb))) +
+  labs(x="Fishing mortality",y="Spawning stock biomass")
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 pushViewport(viewport(layout = grid.layout(1, 2)))
 print(p1,vp=vplayout(1,1))
 print(p2,vp=vplayout(1,2))
-
 @
 
 
-\subsection{Setup}
-
-\subsubsection*{Compiling the ADMB code}
-The uncompiled srmsymc ADMB-codes come with the \texttt{msy-package}. They can be located on your computer using the following command: 
-<<admbCodeLocation, eval=FALSE>>=
-paste(path.package("msy"),"tpl",sep="/")
-@
-To compile the code as well as for further communication with the progam you need to have the \texttt{R2admb} library installed and loaded as well of course the ADMB-program itself. Once these are in place compiling the code is done by:
-<<admbCodeCompile, eval=FALSE>>=
-srmsymc_compile()
-@
-This command copies the tpl-files (uncompiled ADMB codes, named srmsymc.tpl and srmsymc2.tpl) into your current working directory and compiles them. You should now have four new files in the working directory, the two .tpl files and then srmsymc and srmsymc2 (or if on windose srmsymc.exe and srmsymc2.exe). I.e. you should have something like this in your directory:
-<<dir1, echo=FALSE>>=
-dir(pattern="srmsymc")
-@
-
-\subsubsection*{The data files}
-The srmsymc programs read data from separate files. Examples are provided with the \texttt{msy-package} in the following directory your computer using the following command:
-<<dir2, eval=FALSE>>=
-paste(path.package("msy"),"extdata",sep="/")
-@
-Example output of these files are provided in the appendix. Further information about the meaning of various xxx can be found in xxxx.
 
 \newpage{}
 APPENDIX

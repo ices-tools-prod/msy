@@ -1,0 +1,14 @@
+\name{srmsymc_plotcomposit_mort}
+\alias{srmsymc_plotcomposit_mort}
+\title{Standard plot - mortality}
+\usage{
+  srmsymc_plotcomposit_mort(weights = "automatic")
+}
+\arguments{
+  \item{weights}{character vector, "automatic" (default)
+  plots by weight of model fits. otherweise use "equal".}
+}
+\description{
+  Standard plot - mortality
+}
+

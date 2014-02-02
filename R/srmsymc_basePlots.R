@@ -226,7 +226,7 @@ srmsymc_plotcomposit_yield <- function(path="ricker",ylim,rby,n=40,Fbar,Fpa,Flim
   srmsymc_plotYield(path=path,rby=rby,n=n,hair=TRUE,ylim=c(0,1.2*max(rby$catch)))
   srmsymc_plotSSB(path=path,rby=rby,ylim=c(0,1.2*max(rby$ssb)))
   srmsymc_plotSSB(path=path,rby=rby,n=n,hair=TRUE,ylim=c(0,1.2*max(rby$ssb)))
-  dev.off()
+  invisible(dev.off())
 }
 
 #' @title XXX
@@ -256,7 +256,7 @@ srmsymc_plotcomposit_ssbr <- function(rby,n=40) {
   srmsymc_plotSSBR("segreg",rby=rby)
   srmsymc_plotSSBR("segreg",rby=rby,hair=TRUE)
 
-  dev.off()
+  invisible(dev.off())
 }
 
 
@@ -266,17 +266,18 @@ srmsymc_plotcomposit_ssbr <- function(rby,n=40) {
 #' 
 #' @export 
 #' 
-#' @param path XXX
 #' @param variable XXX
-#' @param srweights XXX
-#' @param stockname XXX
+#' @param weights XXX
 
-srmsymc_plotDistribution <- function(path,variable="fmsy",srweights=NA,stockname="The stock") {
+srmsymc_plot_distribution_fmort <- function(variable="fmsy",weights="automatic") {
   
-  dat <- srmsymc_combineParameterFiles(srweights)
+  dat <- srmsymc_combine_parameters()
+  Setup <- srmsymc_read_setup("ricker")
   
-  Title <- paste(stockname,"- combined",variable,"distribution:",
-                 ifelse(any(is.na(srweights)),"equally weighted","automatically weighted"))
+  if(weights=="automatic") dat <- dat[dat$wgt == 1,]
+  
+  Title <- paste(Setup$name_stock,"- combined",variable,"distribution:",
+                 ifelse(weights=="equal","equally weighted","automatically weighted"))
                  
   
   f.breaks <- hist(c(dat$fmsy,dat$fcrash),50, plot=FALSE)$breaks
@@ -314,6 +315,82 @@ srmsymc_plotDistribution <- function(path,variable="fmsy",srweights=NA,stockname
   
   legend(0.75*mx,my,c("Ricker","Beverton-Holt","Hockeystick"), fill=grey(0.25*1:3))
 }
+
+#' @title Standard plot - mortality
+#' 
+#' @export 
+#' 
+#' @param weights character vector, "automatic" (default) plots by weight of 
+#' model fits. otherweise use "equal".
+srmsymc_plotcomposit_mort <- function(weights="automatic") {
+  Setup <- srmsymc_read_setup("ricker")
+  png(paste("output/", Setup$name_stock, "_Fmsy_",weights,".png",sep=""),height=11.5,width=9,units="in",res=144)
+  par(mfrow=c(2,1))
+  srmsymc_plot_distribution_fmort("fmsy",weights=weights)
+  srmsymc_plot_distribution_fmort("fcrash",weights=weights)
+  invisible(dev.off())
+}
+
+
+
+
+#' @title XXX
+#' 
+#' @description XXX
+#' 
+#' @export 
+#' 
+#' @param variable XXX
+#' @param weights XXX
+
+srmsymc_plot_distribution <- function(variable="fmsy",weights="automatic") {
+  
+  dat <- srmsymc_combine_parameters()
+  Setup <- srmsymc_read_setup("ricker")
+  
+  if(weights=="automatic") dat <- dat[dat$wgt == 1,]
+  
+  Title <- paste(Setup$name_stock,"- combined",variable,"distribution:",
+                 ifelse(weights=="equal","equally weighted","automatically weighted"))
+  
+  
+  f.breaks <- hist(c(dat$fmsy,dat$fcrash),50, plot=FALSE)$breaks
+  mx = max(f.breaks)
+  my <-  max(hist(c(dat$fmsy,dat$fcrash),50, plot=FALSE)$counts)
+  
+  y <- dat[,c(variable,"srno")]
+  names(y) <- c("variable","srno")
+  hist(y$variable, #rbind(simdata[[1]],simdata[[2]],simdata[[3]])$fmsy,
+       f.breaks, 
+       col=grey(0.75), 
+       ylim = c(0,1.10*my),
+       xlab="Fmsy", 
+       main = Title)
+  hist(y$variable[y$srno %in% c(1,2)],
+       f.breaks,
+       add =TRUE, 
+       col=grey(0.5))
+  hist(y$variable[y$srno %in% c(1)],
+       f.breaks,
+       add =TRUE, 
+       col=grey(0.25))
+  qs <- cbind(quantile(y$variable,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE))
+  
+  lines(c(qs[1,1],qs[1,1]),c(0,my),col='red',lty=3)      #Confidence intervals
+  lines(c(qs[2,1],qs[2,1]),c(0,my*1.05),col='red',lty=2)
+  lines(c(qs[3,1],qs[3,1]),c(0,my),col='red')
+  lines(c(qs[4,1],qs[4,1]),c(0,my*1.05),col='red',lty=2)
+  lines(c(qs[5,1],qs[5,1]),c(0,my),col='red',lty=3)
+  text(qs[1,1],my,"5%",pos=3,col="red")
+  text(qs[2,1],my*1.05,"25%",pos=3,col="red")
+  text(qs[3,1],my,"50%",pos=3,col="red")
+  text(qs[4,1],my*1.05,"75%",pos=3,col="red")
+  text(qs[5,1],my,"95%",pos=3,col="red")
+  
+  legend(0.75*mx,my,c("Ricker","Beverton-Holt","Hockeystick"), fill=grey(0.25*1:3))
+}
+
+
 
 
 #' @title Get the name of the recruitment function

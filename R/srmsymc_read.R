@@ -424,27 +424,26 @@ srmsymc_read_ypr <- function(file="simparypr.dat",trim=TRUE,longformat=TRUE,doPl
 
 #' @title Combine the parameters from the three sr-functions
 #' 
-#' @description XXX
+#' @description Calculates weights
 #' 
 #' @export
 #' 
-#' @param srweights a vector of length 3 indicating the weights for each srmodel.
-#' If missing then equal weights applied to all models.
-
-srmsymc_combineParameterFiles <- function(srweights=NA) {
+#' @param trimming XXX
+srmsymc_combine_parameters <- function(trimming=NA) {
+  
   x1 <- srmsymc_read_par("ricker",longformat=FALSE)$stochastic
-  x1$srno <- srmsymc_read_par("ricker",longformat=FALSE)$srno
   x2 <- srmsymc_read_par("bevholt",longformat=FALSE)$stochastic
-  x2$srno <- srmsymc_read_par("bevholt",longformat=FALSE)$srno
   x3 <- srmsymc_read_par("segreg",longformat=FALSE)$stochastic
-  x3$srno <- srmsymc_read_par("segreg",longformat=FALSE)$srno
-  if(any(is.na(srweights))) {
-    dat <- rbind(x1,x2,x3)
-  } else {
-    dat <- rbind(x1[1:srweights[1],],
-                 x2[1:srweights[2],],
-                 x3[1:srweights[3],])
-  }
+  srautoweights <- srmsymc_calc_srweights(trimming=trimming)
+  
+  x1$wgt <- 0
+  x1$wgt[1:srautoweights[1]] <- 1
+  x2$wgt <- 0
+  x2$wgt[1:srautoweights[2]] <- 1
+  x3$wgt <- 0
+  x3$wgt[1:srautoweights[3]] <- 1  
+  
+  dat <- rbind(x1,x2,x3)
   return(dat)
 }
 
@@ -454,52 +453,31 @@ srmsymc_combineParameterFiles <- function(srweights=NA) {
 #' 
 #' @export
 #' 
-#' @param srautoweights XXX
-#' @param trimming XXX
-#' @param nits Number of iterations
-
-srmsymc_srweights <- function(srautoweights=TRUE,
-                              trimming=NA,
-                              nits=100)
+#' @param trimming proportion of the simulations to trim before taking harmonic mean.
+#' @param srweights XXX
+srmsymc_calc_srweights <- function(trimming=NA,srweights=NA)
 {
   simdata <- list()
   simdata[[1]] <- srmsymc_read_par("ricker",longformat=FALSE)$stochastic
   simdata[[2]] <- srmsymc_read_par("bevholt",longformat=FALSE)$stochastic
   simdata[[3]] <- srmsymc_read_par("segreg",longformat=FALSE)$stochastic
   
-  if (srautoweights) {  
-    lik <- sapply(simdata, function(x){sort(exp(-x$nll),na.last=FALSE)})   
-    if (is.na(trimming)) 
+  nits <- nrow(simdata[[1]])
+  
+  lik <- sapply(simdata, function(x){sort(exp(-x$nll),na.last=FALSE)})   
+  if (is.na(trimming)) 
     {
-      trim <- 0:(nits/4)
-      srwall <- sapply(trim, function(p){1/colMeans(1/lik[(p+1):nits,],na.rm=TRUE)} )*ifelse(is.na(srweights),1,0)
-      srwall[is.na(srwall)] <- 0
-      srwall <- t(t(srwall)/colSums(srwall))
-      rownames(srwall) <- c("Ricker","Beverton-Holt","Smooth hockeystick")
-      
-      #png(paste0(outputfolder, stockname, "_trim_diag.png"),800,600)
-      #plot(100*trim/nits,srwall["Ricker",],ylim=range(0,srwall), lty=1, type='l', 
-      #     ylab="Relative weight", xlab="Trimmed percentage", main = paste(stockname,"Trimming the harmonic mean",sep=" - "))
-      #lines(100*trim/nits,srwall["Beverton-Holt",],lty=2)
-      #lines(100*trim/nits,srwall["Smooth hockeystick",],lty=3)          
-      #legend("topright",pch=NA,lty=1:3,legend=srname)
-      #dev.off()
-      #write.csv(t(rbind(Percentage=100*trim/nits,srwall)),paste0(outputfolder,stockname,"_trim_diag.csv"),row.names=FALSE)
-      trimming <- 0
-    }
-    
-    srweightsexact <- sapply(round(trimming*nits), function(p){1/colMeans(1/lik[(p+1):nits,],na.rm=TRUE)} )*ifelse(is.na(srweights),1,0)
-    
-    srweightsexact[is.na(srweightsexact)] <- 0
-    srweightsexact <- srweightsexact/sum(srweightsexact)    
-    srweights <- round(srweightsexact*nits)
-  } else {
-    if (is.na(trimming)) 
-    {
-      warning("Trimming parameter ignored when applying manual weights")
-    }
-    srweightsexact <- srweights
-    srweights <- round(srweightsexact*nits)
-    return(srweights)
+    trim <- 0:(nits/4)
+    srwall <- sapply(trim, function(p) {1/colMeans(1/lik[(p+1):nits,],na.rm=TRUE)} )*ifelse(is.na(srweights),1,0)
+    srwall[is.na(srwall)] <- 0
+    srwall <- t(t(srwall)/colSums(srwall))
+    rownames(srwall) <- c("Ricker","Beverton-Holt","Smooth hockeystick")
+    trimming <- 0
   }
+  srweights <- sapply(round(trimming*nits), function(p){1/colMeans(1/lik[(p+1):nits,],na.rm=TRUE)} )*ifelse(is.na(srweights),1,0)
+  srweights[is.na(srweights)] <- 0
+  srweights <- srweights/sum(srweights)    
+  srweights <- as.vector(round(srweights*nits))
+  names(srweights) <- c("ricker","bevholt","segreg")
+  return(srweights)
 }
