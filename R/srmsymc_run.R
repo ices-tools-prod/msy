@@ -10,24 +10,19 @@
 
 srmsymc_compile <- function(windose=TRUE,compile=TRUE) 
 {
-  copytext <- ifelse(windose,"copy","cp")
   if(!(compile | windose)) stop("Must compile in non-Windows operating systems")
   
   if(compile)
   {
-    cmd <- paste(copytext,shQuote(paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/')),'.')
-    shell(cmd)
-
-    cmd <- paste(copytext,shQuote(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/')),'.')
-    shell(cmd)
-  
+    file.copy(paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/'),"srmsymc.tpl")
+    file.copy(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/'),"srmsymc2.tpl")    
     compile_admb("srmsymc")
     clean_admb("srmsymc")
     compile_admb("srmsymc2")
     clean_admb("srmsymc2")
   } else {
-    cmd <- paste(copytext,shQuote(paste(path.package("msy"),'bin/srmsymc*.exe',sep='/')),'.')
-    shell(cmd)
+    file.copy(paste(path.package("msy"),'bin/srmsymc.exe',sep='/'),"srmsymc.exe")
+    file.copy(paste(path.package("msy"),'bin/srmsymc2.exe',sep='/'),"srmsymc2.exe")
   }
 }
 
