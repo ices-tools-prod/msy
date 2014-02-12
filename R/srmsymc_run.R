@@ -16,10 +16,10 @@ srmsymc_compile <- function(windose=TRUE,compile=TRUE)
   if(compile)
   {
     cmd <- paste(copytext,shQuote(paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/')),'.')
-    system(cmd)
+    shell(cmd)
 
     cmd <- paste(copytext,shQuote(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/')),'.')
-    system(cmd)
+    shell(cmd)
   
     compile_admb("srmsymc")
     clean_admb("srmsymc")
@@ -27,7 +27,7 @@ srmsymc_compile <- function(windose=TRUE,compile=TRUE)
     clean_admb("srmsymc2")
   } else {
     cmd <- paste(copytext,shQuote(paste(path.package("msy"),'bin/srmsymc*.exe',sep='/')),'.')
-    system(cmd)
+    shell(cmd)
   }
 }
 
