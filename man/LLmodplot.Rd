@@ -2,19 +2,19 @@
 \alias{LLmodplot}
 \title{plots the fits for each model considered in \code{fitModels}}
 \usage{
-  LLmodplot(fit)
+LLmodplot(fit)
 }
 \arguments{
   \item{fit}{an fitted MCMC returned from \code{fitModels}}
 }
 \value{
-  NULL produces one or several plots
+NULL produces one or several plots
 }
 \description{
-  plots the fits for each model considered in
-  \code{fitModels}
+plots the fits for each model considered in
+\code{fitModels}
 }
 \author{
-  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

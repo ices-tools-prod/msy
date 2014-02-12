@@ -2,9 +2,8 @@
 \alias{FLS2srmsymc}
 \title{FLR to srmsymc}
 \usage{
-  FLS2srmsymc(stk, y = 3, name_stock, filename_age,
-    opt_sr_model, opt_land = TRUE, opt_sim = TRUE,
-    opt_age = TRUE, opt_pen = TRUE)
+FLS2srmsymc(stk, y = 3, name_stock, filename_age, opt_sr_model,
+  opt_land = TRUE, opt_sim = TRUE, opt_age = TRUE, opt_pen = TRUE)
 }
 \arguments{
   \item{stk}{FLStock object}
@@ -32,6 +31,6 @@
   (IS THIS ONLY FOR THE SEGMENTED REGRESSION??).}
 }
 \description{
-  XXX
+XXX
 }
 

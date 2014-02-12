@@ -2,8 +2,7 @@
 \alias{cat_age.dat}
 \title{Write age.dat to disk}
 \usage{
-  cat_age.dat(filename_age, n_fleets, pf, pm, sel, sel_cv,
-    w, w_cv, bio, bio_cv)
+cat_age.dat(filename_age, n_fleets, pf, pm, sel, sel_cv, w, w_cv, bio, bio_cv)
 }
 \arguments{
   \item{filename_age}{XXX}
@@ -27,9 +26,9 @@
   \item{bio_cv}{XXX}
 }
 \description{
-  XXX
+XXX
 }
 \author{
-  Einar Hjorleifsson
+Einar Hjorleifsson
 }
 

@@ -19,22 +19,34 @@
 #' @param    datfilename    A pre-calculated dat file - if provided, senfilename, indexfilename, varybiodata, srconstrain and pfpm are ignored in preference to values in the dat file.  Data from the sum file will be added to the plots if it can be found
 #' @param    silent         Supresses the majority of the output to screen. Default is TRUE
 #' @param    onlyYPR        Calculate only the yield per recruit reference points, for stocks where the SRR is unknown or uncertain. Default is FALSE
-#' @return mean(5:7) ##Some function
+#' @param    optLanding     Boolean indicating whether to optimise by landings (default) or total catch
+#' @return    Returns a list containing a summary of the data calculated, and produces a folder of files containing plots and data in outputfolder
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
 
-plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(NA, NA, NA), trimming = NA, nits = 100, nhair = 100, varybiodata = TRUE, stockname = "", fpa=NA, flim=NA, bpa=NA, blim=NA, outputfolder="", datfilename=NA, silent=TRUE, onlyYPR=FALSE)
+
+
+
+plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(NA,NA,NA), trimming = NA, nits = 100, nhair = 100, varybiodata = TRUE, stockname = "",
+                   fpa=NA, flim=NA, bpa=NA, blim=NA, outputfolder="", datfilename=NA, silent=TRUE, onlyYPR=FALSE, optLanding=TRUE)
 {
+  ## Subfunctions
+##  source("convertSumSen.r") #for convertSumSen() or convertDat()
   
-  boxplot2 <- function(x,...) 
+  boxplot2 <- function(x,add=FALSE,...) 
   { 
   #  browser()
+    if (sum(!is.na(x))==0) 
+    {
+      if (add) box()
+      return()
+    }
     bp = boxplot(x,plot=FALSE,...,na.rm=TRUE)
     bp$stats = as.matrix(quantile(x,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE))
     bp$out = c(x[x<bp$stats[1]],x[x>bp$stats[5]])
     bp$out <- bp$out[!is.na(bp$out)]
     bp$group = rep(1,length(bp$out))
-    bxp(bp,...)
+    bxp(bp,add=add,...)
   }
   
   
@@ -130,7 +142,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
   #Start of plotMSY function proper  
   cat("Stock:", stockname, "\n")
   graphics.off()   #So that graphics output can be sent to files
-  dir.create(outputfolder, showWarnings=FALSE, recursive=TRUE)
+  dir.create(outputfolder, show=FALSE, recursive=TRUE)
   outputfilename = paste(outputfolder, stockname, ".txt", sep="")  
   output = list()
   noredlines = simdatadet = simdata = simy = simSSB  = list()     
@@ -142,7 +154,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
     srno = sr[srname[sr]==srtype]
     if (is.na(datfilename))
     {
-      sumsen = convertSumSen(senfilename, indexfilename, pfpm, nits, srno, varybiodata, stockname,silent=TRUE,srconstrain=srconstrain)
+      sumsen = convertSumSen(senfilename, indexfilename, pfpm, nits, srno, varybiodata, stockname,silent=TRUE,srconstrain=srconstrain,optLanding=optLanding)
     } else {
       sumsen = convertDat(datfilename, srno) 
     }
@@ -288,7 +300,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
       {
        
         plot(c(0,sumsen$SSB), c(0,sumsen$Recruits), xlab=SSBtext, ylab=rectext,type='n')
-        #if (done_fit2) lines(b.cm.pred$stock.size,b.cm.pred$recruit,col="purple")
+        if (done_fit2) lines(b.cm.pred$stock.size,b.cm.pred$recruit,col="purple")
         title(paste(sumsen$stock, srname[srtype]))
         points(sumsen$SSB, sumsen$Recruits)  #Data points
         recruits = recruitment(SSB, simdatadet[[srtype]]$alpha[1], simdatadet[[srtype]]$beta[1], srtype)
@@ -545,7 +557,6 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         text(qs[5,2],my,"95%",pos=3,col="red")
      graphics.off()
      
-          
       if (srautoweights)
       {  
         lik <- sapply(simdata, function(x){sort(exp(-x$nll),na.last=FALSE)})   
@@ -566,6 +577,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
           trimming <- 0
           
         }
+#        browser()
          srweightsexact <- sapply(round(trimming*nits), function(p){1/colMeans(1/lik[(p+1):nits,],na.rm=TRUE)} )*ifelse(is.na(srweights),1,0)
 #        srweightsexact <- sapply(simdata,function(x){1/mean(1/exp(-x$nll),na.rm=TRUE)})*ifelse(is.na(srweights),1,0)
         srweightsexact[is.na(srweightsexact)] <- 0
@@ -581,18 +593,19 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         
       }
      
+      # browser()
       png(paste0(outputfolder, stockname, "_Fmsy2.png"),height=11.5,width=9,units="in",res=144) 
         #par(mfrow=c(2,1))
         allSimData = rbind(simdata[[1]][seq(length=srweights[1]),],
                            simdata[[2]][seq(length=srweights[2]),],
                            simdata[[3]][seq(length=srweights[3]),])
-        allSimData <- allSimData[!is.na(rowSums(allSimData)),]
+                           
+        allSimData <- allSimData[!is.na(rowSums(allSimData[,!(colnames(allSimData) %in% c("fmax","msypr","bmsypr"))])),]
         allSimSSB = rbind(simSSB[[1]][seq(length=srweights[1]+1),],
                           simSSB[[2]][seq(length=srweights[2]),],
                           simSSB[[3]][seq(length=srweights[3]),])
         allSimSSB <- allSimSSB[!is.na(rowSums(allSimSSB)),]        
         allSimDataHist = hist(allSimData$fmsy,f.breaks,plot=FALSE)
-
         qs = cbind(qs,quantile(allSimData$fmsy,c(0.05, 0.25, 0.50, 0.75, 0.95)), 
                    quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
                    quantile(allSimData$msy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
@@ -702,6 +715,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
 #     output$simData = simdata
      output$simData = list() 
      for (sr in srname) output$simData[[sr]] = rbind(simdatadet[[sr]],simdata[[sr]])
+     output$simData[["combined"]] = rbind(NA,allSimData)
      output$simSSB = simSSB
      output$simSSBpr = simSSBpr
      output$simY = simy
@@ -709,3 +723,4 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
      invisible(output)
 }
 
+paste0 <- function(...,sep='') paste(...,sep=sep)

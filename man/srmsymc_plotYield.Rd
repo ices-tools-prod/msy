@@ -2,8 +2,7 @@
 \alias{srmsymc_plotYield}
 \title{XXX}
 \usage{
-  srmsymc_plotYield(path = "ricker", rby, ylim, n = 100,
-    hair = FALSE)
+srmsymc_plotYield(path = "ricker", rby, ylim, n = 100, hair = FALSE)
 }
 \arguments{
   \item{path}{list}
@@ -17,6 +16,6 @@
   \item{hair}{XXX}
 }
 \description{
-  XXX
+XXX
 }
 

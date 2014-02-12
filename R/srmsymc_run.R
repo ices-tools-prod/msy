@@ -7,10 +7,10 @@
 
 srmsymc_compile <- function() 
 {
-  cmd <- paste('cp',paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/'),'.')
+  cmd <- paste('cp',shQuote(paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/')),'.')
   system(cmd)
   #system('admb srmsymc')
-  cmd <- paste('cp',paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/'),'.')
+  cmd <- paste('cp',shQuote(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/')),'.')
   system(cmd)
   #system('admb srmsymc2')
   compile_admb("srmsymc")

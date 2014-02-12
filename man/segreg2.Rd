@@ -2,7 +2,7 @@
 \alias{segreg2}
 \title{stock recruitment function}
 \usage{
-  segreg2(ab, ssb)
+segreg2(ab, ssb)
 }
 \arguments{
   \item{ab}{the model parameters}
@@ -10,12 +10,12 @@
   \item{ssb}{a vector of ssb}
 }
 \value{
-  log recruitment according to model
+log recruitment according to model
 }
 \description{
-  stock recruitment function
+stock recruitment function
 }
 \author{
-  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

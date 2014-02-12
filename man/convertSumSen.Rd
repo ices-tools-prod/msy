@@ -2,9 +2,9 @@
 \alias{convertSumSen}
 \title{Convert sum and sen files}
 \usage{
-  convertSumSen(senfilename = NA, indexfilename = NA,
-    pfpm = NA, nits = 0, sr = 2, varybiodata = FALSE,
-    stockname = "", silent = FALSE, srconstrain = TRUE)
+convertSumSen(senfilename = NA, indexfilename = NA, pfpm = NA, nits = 0,
+  sr = 2, varybiodata = FALSE, stockname = "", silent = FALSE,
+  srconstrain = TRUE, optLanding = TRUE)
 }
 \arguments{
   \item{senfilename}{is the name of the senfile, with a
@@ -34,12 +34,12 @@
   \item{srconstrain}{XXX}
 }
 \value{
-  something
+something
 }
 \description{
-  Convert sum and sen files
+Convert sum and sen files
 }
 \author{
-  Tim Earl \email{timothy.earl@cefas.co.uk}
+Tim Earl \email{timothy.earl@cefas.co.uk}
 }
 

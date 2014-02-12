@@ -2,7 +2,7 @@
 \alias{srmsymc_bevholt}
 \title{srmsymc_bevholt}
 \usage{
-  srmsymc_bevholt(ssb, alpha, beta)
+srmsymc_bevholt(ssb, alpha, beta)
 }
 \arguments{
   \item{ssb}{spawning stock biomass}
@@ -12,6 +12,6 @@
   \item{beta}{beta}
 }
 \description{
-  srmsymc_bevholt
+srmsymc_bevholt
 }
 

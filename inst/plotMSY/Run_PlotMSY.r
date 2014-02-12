@@ -22,7 +22,7 @@
 #
 #Settings
 #For full description of paramters, see "plotMSY instructions" document
-#
+#                        
 #location of sen and sum file (both same name) ('.\\' indicates relative to working directory
 senfile = ".\\data\\nsh\\nsh.sen"
 titlename = "NS Herring"

@@ -2,7 +2,7 @@
 \alias{fls2list}
 \title{XXX}
 \usage{
-  fls2list(stk, y, optLand = TRUE)
+fls2list(stk, y, optLand = TRUE)
 }
 \arguments{
   \item{stk}{FLStock object}
@@ -12,6 +12,6 @@
   \item{optLand}{Boolean, if TRUE (default) then ...}
 }
 \description{
-  From Tim
+From Tim
 }
 

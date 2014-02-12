@@ -2,7 +2,7 @@
 \alias{mygcv}
 \title{mygcv}
 \usage{
-  mygcv(dat, rho)
+mygcv(dat, rho)
 }
 \arguments{
   \item{dat}{XXX}
@@ -10,12 +10,12 @@
   \item{rho}{a parameter}
 }
 \value{
-  something
+something
 }
 \description{
-  mygcv
+mygcv
 }
 \author{
-  Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
+Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
 }
 

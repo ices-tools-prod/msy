@@ -2,7 +2,7 @@
 \alias{plot_type1}
 \title{Plot type 1}
 \usage{
-  plot_type1(p, d, xlim, ylim)
+plot_type1(p, d, xlim, ylim)
 }
 \arguments{
   \item{p}{XXX}
@@ -14,6 +14,6 @@
   \item{ylim}{XXX}
 }
 \description{
-  Plot type 1
+Plot type 1
 }
 

@@ -2,9 +2,8 @@
 \alias{Eqplot}
 \title{Plot summary of the equilibrium simulation}
 \usage{
-  Eqplot(sim, fit, Blim, Bpa = 1.4 * Blim,
-    ymax = c(NA, NA, NA), plot = TRUE, yield = "landings",
-    extreme.trim)
+Eqplot(sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA, NA, NA),
+  plot = TRUE, yield = "landings", extreme.trim)
 }
 \arguments{
   \item{sim}{A list obtained from function \code{EqSim}}
@@ -29,9 +28,9 @@
   \item{extreme.trim}{Call John Simmonds :-)}
 }
 \description{
-  Plot summary of the equilibrium simulation
+Plot summary of the equilibrium simulation
 }
 \author{
-  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

@@ -2,7 +2,7 @@
 \alias{bootscam}
 \title{function name}
 \usage{
-  bootscam(dat, y, np, scamfit, sp, nboot)
+bootscam(dat, y, np, scamfit, sp, nboot)
 }
 \arguments{
   \item{dat}{XXX}
@@ -18,12 +18,12 @@
   \item{nboot}{XXX}
 }
 \value{
-  something
+something
 }
 \description{
-  function name
+function name
 }
 \author{
-  Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
+Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
 }
 

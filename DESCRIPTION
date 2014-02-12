@@ -21,21 +21,3 @@ Depends:
 Suggests:
     knitr
 LazyData: yes
-Collate:
-    'myMH.R'
-    'SimulateRefPts.R'
-    'cod-data.R'
-    'ModelAverage.R'
-    'convertSumSen.r'
-    'NSR.R'
-    'plotMSY.r'
-    'readLow.r'
-    'msy-package.R'
-    'eqsim.R'
-    'srmsymc_read.R'
-    'srmsymc_run.R'
-    'utilities.R'
-    'eqsr.R'
-    'data.R'
-    'srmsymc_basePlots.R'
-    'srmsymc_converter.R'

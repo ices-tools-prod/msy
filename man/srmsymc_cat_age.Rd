@@ -2,8 +2,8 @@
 \alias{srmsymc_cat_age}
 \title{Write age.dat to disk}
 \usage{
-  srmsymc_cat_age(filename_age, n_fleets, pf, pm, sel,
-    sel_cv, w, w_cv, bio, bio_cv)
+srmsymc_cat_age(filename_age, n_fleets, pf, pm, sel, sel_cv, w, w_cv, bio,
+  bio_cv)
 }
 \arguments{
   \item{filename_age}{XXX}
@@ -27,9 +27,9 @@
   \item{bio_cv}{XXX}
 }
 \description{
-  XXX
+XXX
 }
 \author{
-  Einar Hjorleifsson
+Einar Hjorleifsson
 }
 

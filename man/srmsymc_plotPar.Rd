@@ -2,7 +2,7 @@
 \alias{srmsymc_plotPar}
 \title{XXX}
 \usage{
-  srmsymc_plotPar(path = "ricker", Fbar, Fpa, Flim)
+srmsymc_plotPar(path = "ricker", Fbar, Fpa, Flim)
 }
 \arguments{
   \item{path}{list}
@@ -14,6 +14,6 @@
   \item{Flim}{XXX}
 }
 \description{
-  XXX
+XXX
 }
 

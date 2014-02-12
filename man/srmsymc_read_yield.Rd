@@ -2,8 +2,8 @@
 \alias{srmsymc_read_yield}
 \title{Read the yield estimates the srmsymc program}
 \usage{
-  srmsymc_read_yield(path, file = "simpary.dat",
-    trim = TRUE, longformat = TRUE, doPlot = TRUE)
+srmsymc_read_yield(path, file = "simpary.dat", trim = TRUE,
+  longformat = TRUE, doPlot = TRUE)
 }
 \arguments{
   \item{path}{character containing the path to the file. If
@@ -23,13 +23,12 @@
   ggplot}
 }
 \description{
-  Reads the file \code{simpary.dat} generate by the
-  \code{srmsymc}. In the \code{simpary.dat} the first row
-  is the fishing mortality, the second row is the
-  deterministic estimates of yield and the remaining rows
-  represents the catch for each iterations. Returns a list
-  containing two data.frames, one containing the
-  deterministic estimate, the other containing the
-  stochastic simulations.
+Reads the file \code{simpary.dat} generate by the
+\code{srmsymc}. In the \code{simpary.dat} the first row is
+the fishing mortality, the second row is the deterministic
+estimates of yield and the remaining rows represents the
+catch for each iterations. Returns a list containing two
+data.frames, one containing the deterministic estimate, the
+other containing the stochastic simulations.
 }
 

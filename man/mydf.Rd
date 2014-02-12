@@ -2,7 +2,7 @@
 \alias{mydf}
 \title{mydf}
 \usage{
-  mydf(rho, data, nknots, my.df)
+mydf(rho, data, nknots, my.df)
 }
 \arguments{
   \item{rho}{smoothing parameter}
@@ -14,12 +14,12 @@
   \item{my.df}{XXX}
 }
 \value{
-  something
+something
 }
 \description{
-  mydf
+mydf
 }
 \author{
-  Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
+Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
 }
 

@@ -2,8 +2,7 @@
 \alias{read.Stockfile}
 \title{plotMSY}
 \usage{
-  read.Stockfile(filename, expand = FALSE, index = NA,
-    silent = FALSE)
+read.Stockfile(filename, expand = FALSE, index = NA, silent = FALSE)
 }
 \arguments{
   \item{filename}{XXX}
@@ -15,12 +14,12 @@
   \item{silent}{XXX}
 }
 \value{
-  something
+something
 }
 \description{
-  plotMSY
+plotMSY
 }
 \author{
-  Tim Earl \email{timothy.earl@cefas.co.uk}
+Tim Earl \email{timothy.earl@cefas.co.uk}
 }
 

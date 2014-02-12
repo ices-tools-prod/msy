@@ -19,21 +19,24 @@
 #' @return something
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
-convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2, varybiodata=FALSE,stockname="",silent=FALSE,srconstrain=TRUE)
+
+
+
+convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2, varybiodata=FALSE,stockname="",silent=FALSE,srconstrain=TRUE, optLanding=TRUE)
 {
 
   #filenames
-  #senfilename = tolower(senfilename)
-  #indexfilename = tolower(indexfilename)
-  if (is.na(senfilename)) senfilename = choose.files("*.sen", "Choose SEN file",multi=FALSE)
+  senfilename = tolower(senfilename)
+  indexfilename = tolower(indexfilename)
+  if (is.na(senfilename)) senfilename = tolower(choose.files("*.sen", "Choose SEN file",multi=FALSE)) 
   if (!file.exists(senfilename)) stop("SEN file not found")
   sumfilename = sub(".sen",".sum",senfilename,fixed=TRUE)
   if (!file.exists(sumfilename)) stop("SUM file not found")  
  # path = gsub("/","\\\\",senfilename) #converts "c:/" to "c:\\"  
  # path = paste(rev(rev(strsplit(senfilename, "\\\\")[[1]])[-1]),collapse="\\")
 
-  opfilename = "age.dat"
-  srfilename = "srmsymc.dat"
+  opfilename = ".\\out.dat"
+  srfilename = ".\\srmsymc.dat"
   
   # create temp file with commas replaced by spaces
   senf = scan(senfilename,"",sep="\n",quote=NULL,quiet=silent)
@@ -140,7 +143,12 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
     s=t(matrix(rep(senhead[5:7],times=length(ages)),3))
     opfile = file(opfilename,"w")
       cat('#fno, sno, f, m // fno=nr fleets; sno=fleet for ypr stats; f=F before spwn; m=M before spwn\n', file = opfile)
-      cat(nstocks,'1', pf, pm, '\n', file = opfile,append = TRUE,sep=" ")        ##Always maximises stock 1 i.e. Human consumption
+      if (optLanding) {
+        cat(nstocks,'1', pf, pm, '\n', file = opfile,append = TRUE,sep=" ")        ##Always maximises stock 1 i.e. Human consumption
+      } else {
+        cat(nstocks,'0', pf, pm, '\n', file = opfile,append = TRUE,sep=" ")        ##Always maximises stock 1 i.e. Human consumption      
+      }
+      
       cat('#sdat // col1=sel fleet 1 (landings); col2=sel fleet 2\n', file = opfile,append = TRUE,sep="")
       cat(paste(ifelse(s[,1]==1,Params[,"SH"],""),ifelse(s[,2]==1,Params[,"SD"],""),ifelse(s[,3]==1,Params[,"SI"],"")), file = opfile,append = TRUE,sep="\n")
       cat('#sdat cv // col1=sel fleet 1 (landings); col2=sel fleet 2\n', file = opfile,append = TRUE,sep="")
@@ -181,6 +189,8 @@ convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2,
   ##Return variables for debugging
   return(list(Year = sumData[,1],Recruits = sumData[,2],SSB=sumData[,3],recruitage=senhead[1],stock=stockname))
 }
+
+
 
 
 
@@ -228,3 +238,70 @@ convertDat = function(datfilename, srtype)
 
                         
                         
+
+
+
+
+extractSumSendata <- function(in.stock, y)
+{           
+  require(FLCore)                        
+  d.flag <- (sum(discards(in.stock)) >0)
+  ret <- vector("list",9)
+  names(ret) <- c("Hist","sH","sD","wH","wD","wS","M","MT","dims")
+  ret$Hist <- cbind(year=an(dimnames(in.stock@stock.n)$year), R= c(stock.n(in.stock)[1,]), ssb=c(ssb(in.stock)),
+                    F=c(fbar(in.stock)), yield=c(catch(in.stock)))
+  years <- rev(rev(dimnames(in.stock@stock.n)$year)[1:y])
+  ages <- dimnames(in.stock@stock.n)$age
+  my_sum <- function(x){r=cbind(mean=apply(x[,years,],1,mean),CV=apply(x[,years,],1,sd)/apply(x[,years,],1,mean));r[is.na(r)]<- 0; r}
+  
+  
+  if (d.flag) {
+    sC <- harvest(in.stock)[,years]
+    sH <- harvest(in.stock)[,years] * (landings.n(in.stock)/catch.n(in.stock))[,years]
+    sD <- harvest(in.stock)[,years] * (discards.n(in.stock)/catch.n(in.stock))[,years]    
+    for (yy in years) sH[,yy] <- sH[,yy]/mean(sC[range(in.stock)["minfbar"]:range(in.stock)["maxfbar"],yy])
+    for (yy in years) sD[,yy] <- sD[,yy]/mean(sC[range(in.stock)["minfbar"]:range(in.stock)["maxfbar"],yy])    
+    ret$sH <- my_sum(sH)  
+    ret$sD <- my_sum(sD)      
+  } else {
+    sH <- harvest(in.stock)[,years]
+    for (yy in years) sH[,yy] <- sH[,yy]/mean(sH[range(in.stock)["minfbar"]:range(in.stock)["maxfbar"],yy])
+    ret$sH <- my_sum(sH)
+    ret$sD <- ret$sH*0  
+  }
+  
+
+  ret$wH <- my_sum(landings.wt(in.stock))
+  ret$wD <- my_sum(discards.wt(in.stock))
+  ret$wD[is.na(ret$wD)] <- 0
+  ret$wS <- my_sum(stock.wt(in.stock))  
+  ret$M <- my_sum(m(in.stock)) 
+  ret$MT <- my_sum(mat(in.stock)) 
+  ret$MT[is.na(ret$MT)] <- 0 
+  ret$dims <- list(age=ages,year=years,fbarage=range(in.stock)["minfbar"]:range(in.stock)["maxfbar"])
+  return (ret)
+}
+
+writeSumSen <- function(stock.list,filename,stockname=filename)
+{
+  senfilename <- paste0(filename,".sen")
+  sumfilename <- paste0(filename,".sum")
+  cat(stockname, '\n', file=senfilename)
+  cat(range(an(stock.list$dim$age)),max(an(stock.list$dim$year)),0,'\n', append=TRUE,file=senfilename)
+  cat('1 1 0\n', append=TRUE,file=senfilename)
+  cat(paste(paste0("N",stock.list$dims$age),0,0,collapse='\n'),'\n', append=TRUE,file=senfilename)
+  for (x in names(stock.list)[2:8]) cat(paste(paste0(x,stock.list$dims$age),stock.list[[x]][,"mean"],stock.list[[x]][,"CV"],collapse='\n'),'\n', append=TRUE,file=senfilename)
+  
+  cat('Slightly stunted sum file\n12\n0\n0\n', file=sumfilename)
+  cat(range(stock.list[[1]][,"year"]),'\n', file=sumfilename, append=TRUE)  
+  cat("Recruitment\n", file=sumfilename, append=TRUE)
+  cat("Dummy line 7\n", file=sumfilename, append=TRUE)
+  cat("SSB\n", file=sumfilename, append=TRUE)
+  for (i in 9:13) cat("dummy line", i,'\n', file=sumfilename, append=TRUE)
+  cat("Yield\n", file=sumfilename, append=TRUE)
+  for (i in 15:20) cat("dummy line", i,'\n', file=sumfilename, append=TRUE)
+  cat(range(an(stock.list[["dims"]]$fbarage)),'\n', file=sumfilename, append=TRUE)  
+  for (i in 22:27) cat("dummy line", i,'\n', file=sumfilename, append=TRUE)  
+  cat(paste(stock.list$Hist[,"year"], stock.list$Hist[,"R"], stock.list$Hist[,"ssb"],0,0,stock.list$Hist[,"yield"],0,0,0,stock.list$Hist[,"F"],0,0,collapse='\n'), file=sumfilename, append=TRUE)  
+  
+}

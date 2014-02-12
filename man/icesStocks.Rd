@@ -4,13 +4,15 @@
 \title{icesStocks}
 \format{a list}
 \source{
-  NA
+NA
+}
+\usage{
+none
 }
 \description{
-  A list FLStock object for various stocks
+A list FLStock object for various stocks
 }
 \author{
-  NA
+NA
 }
-\keyword{datasets}
 

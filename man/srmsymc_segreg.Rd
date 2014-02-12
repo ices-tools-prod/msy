@@ -2,7 +2,7 @@
 \alias{srmsymc_segreg}
 \title{srmsymc_segreg}
 \usage{
-  srmsymc_segreg(ssb, alpha, beta)
+srmsymc_segreg(ssb, alpha, beta)
 }
 \arguments{
   \item{ssb}{spawning stock biomass}
@@ -12,6 +12,6 @@
   \item{beta}{beta}
 }
 \description{
-  srmsymc_segreg
+srmsymc_segreg
 }
 

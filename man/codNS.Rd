@@ -4,13 +4,15 @@
 \title{codNS}
 \format{an \code{FLStock}.}
 \source{
-  NA
+NA
+}
+\usage{
+codNS
 }
 \description{
-  Catch number, stocks weights etc for North Sea Cod.
+Catch number, stocks weights etc for North Sea Cod.
 }
 \author{
-  NA
+NA
 }
-\keyword{datasets}
 

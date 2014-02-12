@@ -2,9 +2,8 @@
 \alias{srmsymc_run}
 \title{Run srmsymc}
 \usage{
-  srmsymc_run(sr, opt_sen = 1, opt_pen = 1, nits = 100,
-    path, output = FALSE, do_clean = TRUE, echo = TRUE,
-    windose = TRUE)
+srmsymc_run(sr, opt_sen = 1, opt_pen = 1, nits = 100, path,
+  output = FALSE, do_clean = TRUE, echo = TRUE, windose = TRUE)
 }
 \arguments{
   \item{sr}{integer. containg the stock-recruitment model}
@@ -32,9 +31,9 @@
   \item{windose}{boolean - a quick fix for now}
 }
 \description{
-  Run the ADM srmsymc program
+Run the ADM srmsymc program
 }
 \author{
-  Einar Hjorleifsson <einar.hjorleifsson
+Einar Hjorleifsson <einar.hjorleifsson
 }
 
