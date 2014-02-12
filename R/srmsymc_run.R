@@ -12,6 +12,7 @@ srmsymc_compile <- function()
   #system('admb srmsymc')
   cmd <- paste('cp',shQuote(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/')),'.')
   system(cmd)
+  
   #system('admb srmsymc2')
   compile_admb("srmsymc")
   clean_admb("srmsymc")
