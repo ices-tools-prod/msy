@@ -1,23 +1,34 @@
 #' @title Compile the srmsymc ADMB code
+#' @param windose Whether in windows or not
+#' @param compile Compile binaries from source. TRUE requires ADMB to be installed, FALSE only works on Windows
+
 #' 
 #' @description The \code{plotMSY} approach uses a ADModel Builder code. ...
 #' 
 #' @export
 #' 
 
-srmsymc_compile <- function() 
+srmsymc_compile <- function(windose=TRUE,compile=TRUE) 
 {
-  cmd <- paste('cp',shQuote(paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/')),'.')
-  system(cmd)
-  #system('admb srmsymc')
-  cmd <- paste('cp',shQuote(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/')),'.')
-  system(cmd)
+  copytext <- ifelse(windose,"copy","cp")
+  if(!(compile | windose)) stop("Must compile in non-Windows operating systems")
   
-  #system('admb srmsymc2')
-  compile_admb("srmsymc")
-  clean_admb("srmsymc")
-  compile_admb("srmsymc2")
-  clean_admb("srmsymc2")
+  if(compile)
+  {
+    cmd <- paste(copytext,shQuote(paste(path.package("msy"),'tpl/srmsymc.tpl',sep='/')),'.')
+    system(cmd)
+
+    cmd <- paste(copytext,shQuote(paste(path.package("msy"),'tpl/srmsymc2.tpl',sep='/')),'.')
+    system(cmd)
+  
+    compile_admb("srmsymc")
+    clean_admb("srmsymc")
+    compile_admb("srmsymc2")
+    clean_admb("srmsymc2")
+  } else {
+    cmd <- paste(copytext,shQuote(paste(path.package("msy"),'bin/srmsymc*.exe',sep='/')),'.')
+    system(cmd)
+  }
 }
 
 #' @title Run srmsymc
