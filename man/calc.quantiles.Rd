@@ -2,7 +2,7 @@
 \alias{calc.quantiles}
 \title{Calculate quantiles}
 \usage{
-calc.quantiles(d, d.det, variable = "variable")
+  calc.quantiles(d, d.det, variable = "variable")
 }
 \arguments{
   \item{d}{xx}
@@ -12,6 +12,6 @@ calc.quantiles(d, d.det, variable = "variable")
   \item{variable}{xx}
 }
 \description{
-xxx
+  xxx
 }
 

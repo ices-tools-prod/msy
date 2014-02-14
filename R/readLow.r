@@ -152,7 +152,7 @@ read.Lowestoft = function(filename=NA,index=1:10,expand=TRUE,silent=FALSE)
 
 extractSenSum <- function(in.stock, y, optLand=TRUE)
 {           
-  require(FLCore)                        
+  #require(FLCore)                        
   d.flag <- (sum(discards(in.stock)) >0)
   ret <- vector("list",9)
   names(ret) <- c("Hist","sH","sD","wH","wD","wS","M","MT","dims")

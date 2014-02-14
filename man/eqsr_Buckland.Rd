@@ -2,8 +2,8 @@
 \alias{eqsr_Buckland}
 \title{stock recruitment function}
 \usage{
-eqsr_Buckland(data, nsamp = 5000, models = c("ricker", "segreg", "bevholt"),
-  ...)
+  eqsr_Buckland(data, nsamp = 5000,
+    models = c("ricker", "segreg", "bevholt"), ...)
 }
 \arguments{
   \item{data}{data.frame containing stock recruitment data}
@@ -15,12 +15,12 @@ eqsr_Buckland(data, nsamp = 5000, models = c("ricker", "segreg", "bevholt"),
   \item{...}{Additional arguements}
 }
 \value{
-log recruitment according to model
+  log recruitment according to model
 }
 \description{
-stock recruitment function
+  stock recruitment function
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

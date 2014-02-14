@@ -2,7 +2,7 @@
 \alias{SRplot}
 \title{plot simulated predictive distribution of recruitment}
 \usage{
-SRplot(fit, n = 5000)
+  SRplot(fit, n = 5000)
 }
 \arguments{
   \item{fit}{an fitted MCMC returned from \code{fitModels}}
@@ -10,12 +10,12 @@ SRplot(fit, n = 5000)
   \item{n}{Number of random recruitment draws to plot}
 }
 \value{
-NULL produces a plot
+  NULL produces a plot
 }
 \description{
-plot simulated predictive distribution of recruitment
+  plot simulated predictive distribution of recruitment
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

@@ -2,10 +2,11 @@
 \alias{EqSim}
 \title{simulates the equilibrium results for a population}
 \usage{
-EqSim(fit, bio.years = c(2007, 2012), bio.const = 0, sel.years = c(2005,
-  2010), sel.const = 0, Fscan = seq(0, 1, len = 20), Fcv = 0, Fphi = 0,
-  recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
-  process.error = TRUE, verbose = TRUE)
+  EqSim(fit, bio.years = c(2007, 2012), bio.const = 0,
+    sel.years = c(2005, 2010), sel.const = 0,
+    Fscan = seq(0, 1, len = 20), Fcv = 0, Fphi = 0,
+    recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
+    process.error = TRUE, verbose = TRUE)
 }
 \arguments{
   \item{fit}{A list returned from the function fitModels}
@@ -48,23 +49,24 @@ EqSim(fit, bio.years = c(2007, 2012), bio.const = 0, sel.years = c(2005,
   Useful to turn to FALSE when knitting documents.}
 }
 \value{
-A list containing the following objects: \itemize{ \item
-ssbs A matrix containing the 0.025, 0.050, 0.25, 0.50,
-0.75, 0.95, 0.975 percentiles of ssb for the scanned
-fishing mortalities (see Fscan below). \item cats A matrix
-containing the 0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975
-percentiles of catches for the scanned fishing mortalities
-(see Fscan below). \item recs A matrix containing the
-0.025, 0.050, 0.25, 0.50, 0.75, 0.95, 0.975 percentiles of
-rec for the scanned fishing mortalities (see Fscan below).
-\item ferr An array \item ssbsa \item catsa \item recsa
-\item Mat \item M \item Fprop \item Mprop \item west \item
-weca \item sel \item Fscan }
+  A list containing the following objects: \itemize{ \item
+  ssbs A matrix containing the 0.025, 0.050, 0.25, 0.50,
+  0.75, 0.95, 0.975 percentiles of ssb for the scanned
+  fishing mortalities (see Fscan below). \item cats A
+  matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75,
+  0.95, 0.975 percentiles of catches for the scanned
+  fishing mortalities (see Fscan below). \item recs A
+  matrix containing the 0.025, 0.050, 0.25, 0.50, 0.75,
+  0.95, 0.975 percentiles of rec for the scanned fishing
+  mortalities (see Fscan below). \item ferr An array \item
+  ssbsa \item catsa \item recsa \item Mat \item M \item
+  Fprop \item Mprop \item west \item weca \item sel \item
+  Fscan }
 }
 \description{
-XXX
+  XXX
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

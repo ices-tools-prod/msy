@@ -17,7 +17,26 @@ Depends:
     plyr,
     ggplot2,
     gridExtra,
-    R2admb
+    R2admb,
+    stringr
 Suggests:
     knitr
 LazyData: yes
+Collate:
+    'ModelAverage.R'
+    'NSR.R'
+    'SimulateRefPts.R'
+    'cod-data.R'
+    'convertSumSen.r'
+    'data.R'
+    'eqsim.R'
+    'eqsr.R'
+    'msy-package.R'
+    'myMH.R'
+    'plotMSY.r'
+    'readLow.r'
+    'srmsymc_basePlots.R'
+    'srmsymc_converter.R'
+    'srmsymc_read.R'
+    'srmsymc_run.R'
+    'utilities.R'

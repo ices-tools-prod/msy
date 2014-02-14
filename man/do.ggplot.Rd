@@ -2,7 +2,7 @@
 \alias{do.ggplot}
 \title{Do a ggplot}
 \usage{
-do.ggplot(x, d)
+  do.ggplot(x, d)
 }
 \arguments{
   \item{x}{xx}
@@ -10,6 +10,6 @@ do.ggplot(x, d)
   \item{d}{xx}
 }
 \description{
-xx
+  xx
 }
 

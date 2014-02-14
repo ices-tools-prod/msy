@@ -2,7 +2,7 @@
 \alias{eqsim_ggplot}
 \title{Plots of the results from eqsim}
 \usage{
-eqsim_ggplot(sim, Scale = 1000, plotit = TRUE)
+  eqsim_ggplot(sim, Scale = 1000, plotit = TRUE)
 }
 \arguments{
   \item{sim}{An object returned from the function
@@ -13,9 +13,9 @@ eqsim_ggplot(sim, Scale = 1000, plotit = TRUE)
   \item{plotit}{Boolean, if TRUE (default) returns a plot}
 }
 \description{
-XXX
+  XXX
 }
 \author{
-Einar Hjorleifsson \email{einar.hjorleifsson@gmail.com}
+  Einar Hjorleifsson \email{einar.hjorleifsson@gmail.com}
 }
 

@@ -2,7 +2,7 @@
 \alias{convertDat}
 \title{plotMSY}
 \usage{
-convertDat(datfilename, srtype)
+  convertDat(datfilename, srtype)
 }
 \arguments{
   \item{datfilename}{XXX}
@@ -10,12 +10,12 @@ convertDat(datfilename, srtype)
   \item{srtype}{XXX}
 }
 \value{
-something
+  something
 }
 \description{
-plotMSY
+  plotMSY
 }
 \author{
-Tim Earl \email{timothy.earl@cefas.co.uk}
+  Tim Earl \email{timothy.earl@cefas.co.uk}
 }
 

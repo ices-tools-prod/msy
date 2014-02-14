@@ -2,8 +2,8 @@
 \alias{srmsymc_read_par}
 \title{Read key parameter estimates from the srmsymc program}
 \usage{
-srmsymc_read_par(path, file = "simpar.dat", minSSB = 0, trim = TRUE,
-  longformat = TRUE)
+  srmsymc_read_par(path, file = "simpar.dat", minSSB = 0,
+    trim = TRUE, longformat = TRUE)
 }
 \arguments{
   \item{path}{character containing the path to the file. If
@@ -25,8 +25,8 @@ srmsymc_read_par(path, file = "simpar.dat", minSSB = 0, trim = TRUE,
   long format.}
 }
 \description{
-Reads the \code{simpar.dat} generate by the \code{srmsymc}.
-Returns a list containing the stochastic and the
-deterministic estimates.
+  Reads the \code{simpar.dat} generate by the
+  \code{srmsymc}. Returns a list containing the stochastic
+  and the deterministic estimates.
 }
 

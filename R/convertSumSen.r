@@ -16,13 +16,16 @@
 #' @param stockname XXX
 #' @param silent XXX
 #' @param srconstrain XXX
+#' @param optLanding XXX
 #' @return something
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
 
 
 
-convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, sr=2, varybiodata=FALSE,stockname="",silent=FALSE,srconstrain=TRUE, optLanding=TRUE)
+convertSumSen <- function(senfilename=NA,indexfilename=NA,pfpm=NA, nits=0, 
+                          sr=2, varybiodata=FALSE,stockname="",silent=FALSE,
+                          srconstrain=TRUE, optLanding=TRUE)
 {
 
   #filenames
@@ -244,7 +247,7 @@ convertDat = function(datfilename, srtype)
 
 extractSumSendata <- function(in.stock, y)
 {           
-  require(FLCore)                        
+  #require(FLCore)                        
   d.flag <- (sum(discards(in.stock)) >0)
   ret <- vector("list",9)
   names(ret) <- c("Hist","sH","sD","wH","wD","wS","M","MT","dims")

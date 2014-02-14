@@ -2,11 +2,12 @@
 \alias{plotMSY}
 \title{plotMSY}
 \usage{
-plotMSY(senfilename = NA, indexfilename = NA, pfpm = NA,
-  srweights = c(NA, NA, NA), trimming = NA, nits = 100, nhair = 100,
-  varybiodata = TRUE, stockname = "", fpa = NA, flim = NA, bpa = NA,
-  blim = NA, outputfolder = "", datfilename = NA, silent = TRUE,
-  onlyYPR = FALSE, optLanding = TRUE)
+  plotMSY(senfilename = NA, indexfilename = NA, pfpm = NA,
+    srweights = c(NA, NA, NA), trimming = NA, nits = 100,
+    nhair = 100, varybiodata = TRUE, stockname = "",
+    fpa = NA, flim = NA, bpa = NA, blim = NA,
+    outputfolder = "", datfilename = NA, silent = TRUE,
+    onlyYPR = FALSE, optLanding = TRUE)
 }
 \arguments{
   \item{senfilename}{is the name of the senfile, with a
@@ -74,14 +75,14 @@ plotMSY(senfilename = NA, indexfilename = NA, pfpm = NA,
   by landings (default) or total catch}
 }
 \value{
-Returns a list containing a summary of the data calculated,
-and produces a folder of files containing plots and data in
-outputfolder
+  Returns a list containing a summary of the data
+  calculated, and produces a folder of files containing
+  plots and data in outputfolder
 }
 \description{
-plotMSY
+  plotMSY
 }
 \author{
-Tim Earl \email{timothy.earl@cefas.co.uk}
+  Tim Earl \email{timothy.earl@cefas.co.uk}
 }
 

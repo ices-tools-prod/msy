@@ -2,7 +2,7 @@
 \alias{eqsim_plot}
 \title{Plots of the results from eqsim}
 \usage{
-eqsim_plot(sim, ymax.multiplier = 1.2, catch = TRUE)
+  eqsim_plot(sim, ymax.multiplier = 1.2, catch = TRUE)
 }
 \arguments{
   \item{sim}{An object returned from the function
@@ -20,9 +20,9 @@ eqsim_plot(sim, ymax.multiplier = 1.2, catch = TRUE)
   landings.}
 }
 \description{
-XXX
+  XXX
 }
 \author{
-Einar Hjorleifsson \email{einar.hjorleifsson@gmail.com}
+  Einar Hjorleifsson \email{einar.hjorleifsson@gmail.com}
 }
 

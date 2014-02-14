@@ -2,11 +2,12 @@
 \alias{eqsim_run}
 \title{simulates the equilibrium results for a population}
 \usage{
-eqsim_run(fit, bio.years = c(2008, 2012), bio.const = FALSE,
-  sel.years = c(2008, 2012), sel.const = FALSE, Fscan = seq(0, 1, len =
-  20), Fcv = 0, Fphi = 0, Blim, Bpa, recruitment.trim = c(3, -3),
-  Btrigger = 0, Nrun = 200, process.error = TRUE, verbose = TRUE,
-  extreme.trim)
+  eqsim_run(fit, bio.years = c(2008, 2012),
+    bio.const = FALSE, sel.years = c(2008, 2012),
+    sel.const = FALSE, Fscan = seq(0, 1, len = 20),
+    Fcv = 0, Fphi = 0, Blim, Bpa,
+    recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
+    process.error = TRUE, verbose = TRUE, extreme.trim)
 }
 \arguments{
   \item{fit}{A list returned from the function fitModels}
@@ -55,9 +56,9 @@ eqsim_run(fit, bio.years = c(2008, 2012), bio.const = FALSE,
   \item{extreme.trim}{Call John Simmonds :-)}
 }
 \description{
-XXX
+  XXX
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

@@ -33,7 +33,7 @@ FLS2srmsymc <- function(stk,y=3,name_stock,filename_age,opt_sr_model,
                        w=cbind(x$wH[,1],x$wD[,1]),
                        w_cv=cbind(x$wH[,2],x$wD[,2]),
                        bio=cbind(x$M[,1],x$MT[,1],x$wS[,1]),
-                       bio_cv=cbind(x$M[,2],x$MT[,2],x$wS[,1]))
+                       bio_cv=cbind(x$M[,2],x$MT[,2],x$wS[,2]))
 }
 
 #' @title XXX

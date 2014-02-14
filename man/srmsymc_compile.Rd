@@ -2,7 +2,7 @@
 \alias{srmsymc_compile}
 \title{Compile the srmsymc ADMB code}
 \usage{
-srmsymc_compile(windose = TRUE, compile = TRUE)
+  srmsymc_compile(windose = TRUE, compile = TRUE)
 }
 \arguments{
   \item{windose}{Whether in windows or not}
@@ -12,7 +12,7 @@ srmsymc_compile(windose = TRUE, compile = TRUE)
   Windows}
 }
 \description{
-The \code{plotMSY} approach uses a ADModel Builder code.
-...
+  The \code{plotMSY} approach uses a ADModel Builder code.
+  ...
 }
 

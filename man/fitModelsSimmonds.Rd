@@ -2,8 +2,9 @@
 \alias{fitModelsSimmonds}
 \title{stock recruitment function}
 \usage{
-fitModelsSimmonds(data, runid, delta = 1.3, nburn = 10000, nsamp = 5000,
-  models = c("ricker", "segreg", "bevholt"), ...)
+  fitModelsSimmonds(data, runid, delta = 1.3,
+    nburn = 10000, nsamp = 5000,
+    models = c("ricker", "segreg", "bevholt"), ...)
 }
 \arguments{
   \item{data}{data.frame containing stock recruitment data}
@@ -23,12 +24,12 @@ fitModelsSimmonds(data, runid, delta = 1.3, nburn = 10000, nsamp = 5000,
   \item{...}{Additional arguments}
 }
 \value{
-log recruitment according to model
+  log recruitment according to model
 }
 \description{
-stock recruitment function
+  stock recruitment function
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

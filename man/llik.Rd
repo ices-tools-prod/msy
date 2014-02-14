@@ -2,7 +2,7 @@
 \alias{llik}
 \title{the log-likelihood of the rectuit function}
 \usage{
-llik(param, data, model, logpar = FALSE)
+  llik(param, data, model, logpar = FALSE)
 }
 \arguments{
   \item{param}{the model parameters}
@@ -14,12 +14,12 @@ llik(param, data, model, logpar = FALSE)
   \item{logpar}{are the parameters on the log scale}
 }
 \value{
-the log-likelihood
+  the log-likelihood
 }
 \description{
-the log-likelihood of the rectuit function
+  the log-likelihood of the rectuit function
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 

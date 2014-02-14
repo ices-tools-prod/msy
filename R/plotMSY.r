@@ -723,4 +723,12 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
      invisible(output)
 }
 
-paste0 <- function(...,sep='') paste(...,sep=sep)
+#' @title XXX
+#' 
+#' @description XXX
+#' 
+#' @export
+#' 
+#' @param sep XXX
+
+paste0 <- function(... , sep='') paste(... , sep=sep)

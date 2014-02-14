@@ -2,7 +2,7 @@
 \alias{srmsymc_plotbox}
 \title{srmsymc boxplot}
 \usage{
-srmsymc_plotbox(x, ...)
+  srmsymc_plotbox(x, ...)
 }
 \arguments{
   \item{x}{XXX}
@@ -10,6 +10,6 @@ srmsymc_plotbox(x, ...)
   \item{...}{XXX}
 }
 \description{
-srmsymc boxplot
+  srmsymc boxplot
 }
 

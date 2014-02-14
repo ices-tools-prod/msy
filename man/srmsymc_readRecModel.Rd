@@ -2,12 +2,12 @@
 \alias{srmsymc_readRecModel}
 \title{Recruitment model}
 \usage{
-srmsymc_readRecModel(path)
+  srmsymc_readRecModel(path)
 }
 \arguments{
   \item{path}{XXX}
 }
 \description{
-Read recruitment model from the srmsymc.dat file
+  Read recruitment model from the srmsymc.dat file
 }
 

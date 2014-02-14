@@ -2,8 +2,8 @@
 \alias{srmsymc_read_ypr}
 \title{Read the yield per recruit estimates the srmsymc program}
 \usage{
-srmsymc_read_ypr(file = "simparypr.dat", trim = TRUE, longformat = TRUE,
-  doPlot = TRUE)
+  srmsymc_read_ypr(file = "simparypr.dat", trim = TRUE,
+    longformat = TRUE, doPlot = TRUE)
 }
 \arguments{
   \item{file}{the file name, should not be anything else
@@ -19,13 +19,13 @@ srmsymc_read_ypr(file = "simparypr.dat", trim = TRUE, longformat = TRUE,
   ggplot}
 }
 \description{
-Reads the file \code{simparypr.dat} generate by the
-\code{srmsymc}. In the \code{simparypr.dat} the first row
-is the fishing mortality, the second row is the
-deterministic estimates of ssb and the remaining rows
-represents the catch for each iterations. Returns a list
-containing two data.frames, one containing the
-deterministic estimate, the other containing the stochastic
-simulations.
+  Reads the file \code{simparypr.dat} generate by the
+  \code{srmsymc}. In the \code{simparypr.dat} the first row
+  is the fishing mortality, the second row is the
+  deterministic estimates of ssb and the remaining rows
+  represents the catch for each iterations. Returns a list
+  containing two data.frames, one containing the
+  deterministic estimate, the other containing the
+  stochastic simulations.
 }
 

@@ -2,8 +2,9 @@
 \alias{srmsymc_cat_srmsymc}
 \title{Write srmsymc.dat to disk}
 \usage{
-srmsymc_cat_srmsymc(name_stock, filename_age, y1, y2, aR, aP, opt_sr_model,
-  opt_sim, opt_age, opt_pen, r, ssb, year)
+  srmsymc_cat_srmsymc(name_stock, filename_age, y1, y2, aR,
+    aP, opt_sr_model, opt_sim, opt_age, opt_pen, r, ssb,
+    year)
 }
 \arguments{
   \item{name_stock}{Name of the stock. May later down the
@@ -40,9 +41,9 @@ srmsymc_cat_srmsymc(name_stock, filename_age, y1, y2, aR, aP, opt_sr_model,
   comments).}
 }
 \description{
-The function is used to write srmsymc.dat to the disk.
+  The function is used to write srmsymc.dat to the disk.
 }
 \author{
-Einar Hjorleifsson
+  Einar Hjorleifsson
 }
 

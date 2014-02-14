@@ -2,7 +2,7 @@
 \alias{plot_type2}
 \title{Plot type 2}
 \usage{
-plot_type2(sto, det, n, xlim, ylim)
+  plot_type2(sto, det, n, xlim, ylim)
 }
 \arguments{
   \item{sto}{XXX}
@@ -16,6 +16,6 @@ plot_type2(sto, det, n, xlim, ylim)
   \item{ylim}{XXX}
 }
 \description{
-Plot type 2
+  Plot type 2
 }
 

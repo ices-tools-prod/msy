@@ -4,15 +4,13 @@
 \title{codWB}
 \format{an \code{FLStock}.}
 \source{
-NA
-}
-\usage{
-codWB
+  NA
 }
 \description{
-Catch number, stocks weights etc for Western Baltic Cod.
+  Catch number, stocks weights etc for Western Baltic Cod.
 }
 \author{
-NA
+  NA
 }
+\keyword{datasets}
 

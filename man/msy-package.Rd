@@ -4,31 +4,32 @@
 \alias{msy-package}
 \title{Estimation of equilibrium reference points for fish stocks}
 \description{
-Estimation of equilibrium reference points for fish stocks
+  Estimation of equilibrium reference points for fish
+  stocks
 }
 \details{
-\tabular{ll}{ Package: \tab msy \cr Type: \tab Package \cr
-Version: \tab 0.1.1 \cr Date: \tab 2013-10-03 \cr License:
-\tab GPL (>= 2) \cr LazyLoad: \tab yes \cr }
+  \tabular{ll}{ Package: \tab msy \cr Type: \tab Package
+  \cr Version: \tab 0.1.1 \cr Date: \tab 2013-10-03 \cr
+  License: \tab GPL (>= 2) \cr LazyLoad: \tab yes \cr }
 }
 \examples{
 x <- 1
 cat(x)
 }
 \author{
-Colin Millar \email{colinpmillar@gmail.com}
+  Colin Millar \email{colinpmillar@gmail.com}
 
-Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
+  Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
 
-Tim Earl \email{timothy.earl@cefas.co.uk}
+  Tim Earl \email{timothy.earl@cefas.co.uk}
 
-Jose D'Oliveira \email{jose.deoliveira@cefas.co.uk}
+  Jose D'Oliveira \email{jose.deoliveira@cefas.co.uk}
 }
 \references{
-Simmonds, Cadigan, Steve Smith
+  Simmonds, Cadigan, Steve Smith
 }
 \seealso{
-\code{\link{paste}}
+  \code{\link{paste}}
 }
 \keyword{package}
 

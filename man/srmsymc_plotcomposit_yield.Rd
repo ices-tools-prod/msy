@@ -2,8 +2,8 @@
 \alias{srmsymc_plotcomposit_yield}
 \title{XXX}
 \usage{
-srmsymc_plotcomposit_yield(path = "ricker", ylim, rby, n = 40, Fbar, Fpa,
-  Flim)
+  srmsymc_plotcomposit_yield(path = "ricker", ylim, rby,
+    n = 40, Fbar, Fpa, Flim)
 }
 \arguments{
   \item{path}{list}
@@ -21,6 +21,6 @@ srmsymc_plotcomposit_yield(path = "ricker", ylim, rby, n = 40, Fbar, Fpa,
   \item{Flim}{XXX}
 }
 \description{
-XXX
+  XXX
 }
 

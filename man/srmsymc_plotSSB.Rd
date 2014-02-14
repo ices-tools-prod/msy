@@ -2,7 +2,8 @@
 \alias{srmsymc_plotSSB}
 \title{XXX}
 \usage{
-srmsymc_plotSSB(path = "ricker", rby, n = 100, hair = FALSE, ylim)
+  srmsymc_plotSSB(path = "ricker", rby, n = 100,
+    hair = FALSE, ylim)
 }
 \arguments{
   \item{path}{list}
@@ -16,6 +17,6 @@ srmsymc_plotSSB(path = "ricker", rby, n = 100, hair = FALSE, ylim)
   \item{ylim}{XXX}
 }
 \description{
-XXX
+  XXX
 }
 

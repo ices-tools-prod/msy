@@ -2,7 +2,8 @@
 \alias{eqsr_plot}
 \title{plot simulated predictive distribution of recruitment}
 \usage{
-eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4, ggPlot = FALSE)
+  eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4,
+    ggPlot = FALSE)
 }
 \arguments{
   \item{fit}{an fitted MCMC returned from \code{eqsr_fit}}
@@ -19,12 +20,12 @@ eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4, ggPlot = FALSE)
   graphics, if true do a ggplot}
 }
 \value{
-NULL produces a plot
+  NULL produces a plot
 }
 \description{
-plot simulated predictive distribution of recruitment
+  plot simulated predictive distribution of recruitment
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+  Colin Millar \email{colin.millar@jrc.ec.europa.eu}
 }
 
