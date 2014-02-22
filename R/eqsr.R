@@ -33,23 +33,20 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"),
   dms <- dims(stk)
   rage <- dms $ min
   if (rage == 0)
-  {
-    rby <- data.frame(rec = stock.n(stk)[1,drop=TRUE],
-                      ssb = ssb(stk)[drop=TRUE],
-                      year = with(dms, 1:year + minyear - 1),
-                      catch=catch(stk)[drop=TRUE],
-                      landings=landings(stk)[drop=TRUE],
-                      fbar=fbar(stk)[drop=TRUE]) 
-  } else
-  {
-    rby <- data.frame(rec = stock.n(stk)[1,-seq(rage),drop=TRUE],
-                      ssb = ssb(stk)[1,seq(dms$year - rage),drop=TRUE],
-                      year = with(dms, (rage+1):year + minyear - 1),
-                      catch=catch(stk)[1,seq(dms$year - rage),drop=TRUE],
-                      landings=landings(stk)[1,seq(dms$year - rage),drop=TRUE],
-                      fbar = fbar(stk)[1,seq(dms$year - rage),drop=TRUE])
+  { x = stock.n(stk)[1,drop=TRUE]
+  } else {
+    x = c(stock.n(stk)[1,-seq(rage),drop=TRUE],rep(NA,rage))
   }
   
+  rby <- data.frame(year = with(dms, minyear:maxyear),
+                      rec = x,
+                      ssb = ssb(stk)[drop=TRUE],
+                      fbar = fbar(stk)[drop=TRUE],
+                      landings=landings(stk)[drop=TRUE],
+                      catch=catch(stk)[drop=TRUE])
+
+  row.names(rby) <- NULL
+  rby <- rby[!is.na(rby$rec),]
   # This is for stuff later down the pipes
   data <- rby[,1:3] 
   

@@ -30,6 +30,7 @@ fitModels <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt")
                method = "Buckland",
                runid = NULL, remove.years = NULL, delta = 1.3, nburn = 10000) 
 {
+  message("NOTE: THIS FUNCTION IS NO LONGER MAINTAINED, USE FUNCTION eqsr_fit")
   dms <- dims(stk)
   rage <- dms $ min
   if (rage == 0)

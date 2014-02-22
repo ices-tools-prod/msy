@@ -53,7 +53,8 @@ eqsim_run <- function(fit,
   btyr2 <- bio.years[2]
   slyr1 <- sel.years[1]
   slyr2 <- sel.years[2]
-  
+  # Keep at most 50 simulation years (which will be the last 50 of the Nrun 
+  #  forward simulated years)
   keep <- min(Nrun, 50)
   
   SR <- fit $ sr.sto
@@ -96,9 +97,12 @@ eqsim_run <- function(fit,
     landings[]  <- apply(landings, 1, mean)
     catch[]  <- apply(catch, 1, mean)
   }
+  
+  # 22.2.2014 Added weight of landings per comment from Carmen
   if (bio.const==TRUE){ # take means of wts Mat and M and ratio of landings to catch
     west[] <- apply(west, 1, mean)
     weca[] <- apply(weca, 1, mean)
+    wela[] <- apply(wela, 1, mean)
     Mat[] <- apply(Mat, 1, mean)
     M[] <- apply(M, 1, mean) #me
   }
@@ -118,6 +122,13 @@ eqsim_run <- function(fit,
   
   ssby <- Ferr <- array(0, c(Nrun,Nmod))
   Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <- array(0, c(ages, Nrun, Nmod))
+  # TODO per note from Carmen:
+  #  NOTE: If we want Ferr to be a stationary AR(1) process, it would make
+  #        more sense to initialise Ferr as a Normal dist with zero mean and
+  #        standard deviation of AR(1) marginal distribution, i.e. standard 
+  #        deviation of initial Ferr = Fcv/sqrt(1- Fphi^2), instead of just
+  #        initialising Ferr=0
+  
   rsam <- array(sample(1:ncol(weca), Nrun * Nmod, TRUE), c(Nrun, Nmod))
   rsamsel <- array(sample(1:ncol(sel), Nrun * Nmod, TRUE), c(Nrun, Nmod))
   Wy[] <- c(weca[, c(rsam)])
@@ -126,37 +137,71 @@ eqsim_run <- function(fit,
   # initial recruitment
   R <- mean( data $ rec)
   ssbs <- cats <- lans <- recs <- array(0, c(7, NF))
-  pssb1 <- pssb2 <- array(0, NF)
+  
   ferr <- ssbsa <- catsa <- lansa <- recsa <- array(0, c(NF, keep, Nmod))
   begin <- Nrun - keep + 1
   
   # New from Simmonds' 29.1.2014
-  resids= array(rnorm(Nmod*(Nrun+1), 0, SR$cv),c(Nmod, Nrun+1))     # set up random
+  #   Residuals of SR fits (1 value per SR fit and per simulation year 
+  #     but the same residual value for all Fscan values):
+  resids= array(rnorm(Nmod*(Nrun+1), 0, SR$cv),c(Nmod, Nrun+1))
+  
+  # Limit how extreme the Rec residuals can get:
   lims = t(array(SR$cv,c(Nmod,2))) * recruitment.trim
   for (k in 1:Nmod) { resids[k,resids[k,]>lims[1,k]]=lims[1,k]}
   for (k in 1:Nmod) { resids[k,resids[k,]<lims[2,k]]=lims[2,k]}
   # end New from Simmonds 29.1.2014
   
   if (verbose) loader(0)
+  
+  # Looping over each F value in Fscan. For each of the Nmod SR fits 
+  # (replicates), do a forward simulation during Nrun years
+  # There are Rec residuals for each SR fit and year, which take the same
+  # values for all Fscan 
   for (i in 1:NF) {
     
     # The F value to test
     Fbar <- Fscan[i]
     
-    # the selection patterns for the first year
+    ############################################################################
+    # Population in simulation year 1:
+    
+    # Zpre: Z that occurs before spawning
     Zpre <- ( sel[,rsamsel[1,]]*Fbar * Fprop + M[,rsam[1,]] * Mprop)
+    
+    # Zpos: Z that occurs after spawning
+    # Zpos not used anywhere
     Zpos <- (Fbar * (1-Fprop) * sel[,rsamsel[1,]] + M[,rsam[1,]] * (1-Mprop))
+    
     # run Z out to age 50 ...
+    # TODO:
+    # Comments from Carmen: Zcum is a cumulative sum, but it is done in a strange way:
+    #  There is a matrix of F-at-age and a matrix of M-at-age (each has 49 ages, Nmod replicates)
+    #  The F and M matrices are summed, giving Z-at-age (49 ages, Nmod replicates)
+    #  But then a cumsum is taken considering the Z-at-age matrix as a vector (i.e. not column-wise) ????
+    #  This is strange, by applying "cumsum" treating Z-at-age as a vector, really only the first 50 values of
+    #  the resulting "Zcum" make sense (all other values seem "wrong", or at least, meaningless)
     Zcum <- c(0, cumsum(Fbar * sel[c(1:ages, rep(ages, 49 - ages)), rsamsel[1,]] + M[c(1:ages, rep(ages, 49 - ages)), rsam[1,]]))
+    # Carmen: Following from "Zcum", only first 50 elements of N1 make sense ????
     N1 <- R * exp(- unname(Zcum))
     
     # set up age structure in first year for all simulations
+    # Comments from Carmen:
+    #   Ny has dimension = (no. ages, no. simulation yrs "Nrun", no. SR fits "Nmod")
+    #   With this code, we seem to be getting always the same population-at-age value for year 1
+    #   instead of Nmod different values, as might have been intended ????
+    #   (the whole problem is coming from Zcum ==> N1 ==> Ny[,1,] )
     Ny[,1,] <- c(N1[1:(ages-1)], sum(N1[ages:50]))
     
     # calculate ssb in first year using a different stock.wt and Mat selection and M for each simulation
+    # Comments from Carmen:
+    #   ssby has dimension = (no. simul yrs "Nrun", no. SR fits "Nmod")
+    #   SSB in year 1:
+    #   although Ny[,1,] has dim no.ages x Nmod, all Nmod values of Ny[,1,] are
+    #   the same (because of Zcum issue)
     ssby[1,] <- colSums(Mat[,rsam[1,]] * Ny[,1,] * west[,rsam[1,]] / exp(Zpre)[])
     
-    # loop over years
+    # Years 2 to Nrun:
     for (j in 2:Nrun) {
       # get ssb from previous year
       SSB <- ssby[j-1,]
@@ -172,14 +217,39 @@ eqsim_run <- function(fit,
       } else {
         allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB)))
       }
+      
+      # Comment from Carmen:
+      #  For each of the Nmod replicates, this selects the appropriate SR model
+      #   type to use in that replicate
+      #  Note that the order of SR model types that comes out in "select" is
+      #   not necessarily the same order in which the SR model types were
+      #   entered as inputs -- I presume the **next 2 lines** of code have
+      #   been checked to avoid potential bugs due to this reordering  ???? 
       select <- cbind(seq(Nmod), as.numeric(factor(SR $ mod, levels = unique(SR $ mod))))
       Ny[1,j,] <- allrecs[select]
       
+      # Comment from Carmen:
+      #   Note: it seems that Rec is coded as occurring always at age 1
+      #   (i.e. based on SSB in previous year)
+      #   Some stocks have Rec at ages other than 1 (e.g. age 0) 
+      #    -- is this a problem ????
+      
       # apply HCR
+      # (intended) Fbar to be applied in year j-1 (depends on SSB in year j-1):
       Fnext <- Fbar * pmin(1, SSB/Btrigger)
       
       # apply some noise to the F
+      # Notes from Carmen:
+      #  Assessment and/or implementation error (modifies intended F to get
+      #  realised F)
+      #  Error: AR(1) process on log(F) with autocorrel = Fphi, and
+      #  conditional stand deviation = Fcv
+      #  Might make more sense to have the "Ferr" matrix calculated before
+      #  the Fscan loop starts so that the same errors in F are applied to
+      #  all Fscan values ???? (as for Rec residuals)
       Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv)
+      
+      # realised Fbar in year j-1:
       Fnext <- exp(Ferr[j,]) * Fnext
       
       # get a selection pattern for each simulation and apply this to get N
