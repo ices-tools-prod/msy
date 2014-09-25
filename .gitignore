@@ -6,3 +6,5 @@ plotMSY_test/*
 vignettes/
 vignettes/cache/*
 vignettes/figure/*
+.RData
+.Rhistory

@@ -413,6 +413,7 @@ eqsim_run <- function(fit,
   
   return(list(ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, 
                         west = west, weca = weca, sel = sel),
+              #rbya=list(Fy=Fy),
               rby=fit$rby, rbp=rbp, Blim=Blim, Bpa=Bpa, Refs = Refs,
               pProfile=pProfile,id.sim=fit$id.sr))
   
@@ -563,25 +564,7 @@ eqsim_plot <- function(sim, ymax.multiplier=1.2, catch=TRUE)
   lines(c(0,Flim), c(0.05,0.05), lty = 2, col = "red")
   text(x = 0.1, y = 0.075, "5%", cex = 0.75, col = "red")
   
-  #lines(rep(vcum,2), c(0,1), lty = 1, col = 4)
-  #lines(c(Fscan[maxcatm],Fscan[maxcatm]), c(0,1), col = 5)
-  
-  
-  #out <- c(Blim, Bpa)
-  #if (yield =="landings") {
-  #  outF <- c(flim, flim10, flim50, vcum, Fscan[maxlanm], FCrash5, FCrash50)
-  #  outC <- approx(Fscan, lans[4,], xout = outF) $ y
-  #}
-  #if (yield =="catch") {
-  #  outF <- c(flim, flim10, flim50, vcum, Fscan[maxcatm], FCrash5, FCrash50)
-  #  outC <- approx(Fscan, cats[4,], xout = outF) $ y
-  #}
-  #outB <- approx(Fscan, ssbs[4,], xout = outF) $ y
-  #outTable <- rbind(outF, outB, outC)
-  #rownames(outTable) <- c("F","SSB",yield)
-  #colnames(outTable) <- c("Flim","Flim10","Flim50","MSY:median","Maxmeanland","FCrash5","FCrash50")
-  
-  #list(Blim = Blim, Bpa = Bpa, Refs = outTable)
+
 }  # end of eqsim_plot
 
 
@@ -600,7 +583,7 @@ eqsim_plot <- function(sim, ymax.multiplier=1.2, catch=TRUE)
 #' @param Scale A value, the scaling on the yaxis
 #' @param plotit Boolean, if TRUE (default) returns a plot
 
-eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE) 
+eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE) 
 {
   
   # dummy
@@ -615,6 +598,8 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   refs <- sim$Refs
   refs[3:6,] <- refs[3:6,]/Scale
   
+  sim$Blim <- sim$Blim/Scale
+  sim$Bpa <- sim$Bpa/Scale
   pProfile <- sim$pProfile
   
   i <- rbp$variable %in% "Recruitment"
@@ -622,12 +607,11 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
     theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
-    geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
-    geom_vline(xintercept=refs[1,5],col="yellow",lwd=1) +
+    geom_line(aes(y=Mean),linetype=2) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1]*0.975,y=5,label=colnames(refs)[1],hjust=0,angle=90,col="red") +
-    geom_vline(xintercept=refs[2,4],col="darkgreen",linetype=2) +
-    geom_vline(xintercept=refs[2,5],col="yellow",linetype=2) +
+    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     facet_wrap(~ variable) +
     labs(y = "",x="") +
     geom_point(data=rby,aes(fbar,rec)) +
@@ -639,11 +623,12 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
     theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
-    geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
-    geom_vline(xintercept=refs[1,5],col="yellow",lwd=1) +
+    geom_hline(yintercept=sim$Blim,col="red",lwd=1) +
+    annotate("text",x=0,y=sim$Blim,label="Blim",col="red",hjust=0,vjust=0) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    geom_vline(xintercept=refs[2,4],col="darkgreen",linetype=2) +
-    geom_vline(xintercept=refs[2,5],col="yellow",linetype=2) +
+    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_point(data=rby,aes(fbar,ssb)) +
     facet_wrap(~ variable) +
     coord_cartesian(ylim=c(0,rby$ssb * 1.2),xlim=c(0,rby$fbar * 1.2)) +
@@ -654,11 +639,11 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
     theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
-    geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
-    geom_vline(xintercept=refs[1,5],col="yellow",lwd=1) +
+    geom_line(aes(y=Mean),linetype=2) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    geom_vline(xintercept=refs[2,4],col="darkgreen",linetype=2) +
-    geom_vline(xintercept=refs[2,5],col="yellow",linetype=2) +
+    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_point(data=rby,aes(fbar,catch)) +
     facet_wrap(~ variable) +
     coord_cartesian(ylim=c(0,rby$catch * 1.2),xlim=c(0,rby$fbar * 1.2)) +
@@ -669,11 +654,11 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
     theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
-    geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
-    geom_vline(xintercept=refs[1,5],col="yellow",lwd=1) +
+    geom_line(aes(y=Mean),linetype=2) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    geom_vline(xintercept=refs[2,4],col="darkgreen",linetype=2) +
-    geom_vline(xintercept=refs[2,5],col="yellow",linetype=2) +
+    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    geom_vline(xintercept=refs[2,5],col="darkgreen",lwd=1) +
+    annotate("text",x=refs[2,5],y=0,label="Fmsl",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_point(data=rby,aes(fbar,landings)) +
     facet_wrap(~ variable) +
     coord_cartesian(ylim=c(0,rby$landings * 1.2),xlim=c(0,rby$fbar * 1.2)) +
@@ -691,39 +676,68 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   d1$dummy <- "Yield"
   plotYield <- ggplot(d1,aes(Ftarget)) + 
     theme_bw() +
-    geom_ribbon(aes(ymin=p05,ymax=p95,fill=variable),alpha=0.2) +
-    geom_line(aes(y=p05,colour=variable)) + 
-    geom_line(aes(y=p95,colour=variable)) + 
+    geom_ribbon(aes(ymin=p05,ymax=p95,fill=variable),alpha=0.15) +
+    #geom_line(aes(y=p05,colour=variable)) + 
+    #geom_line(aes(y=p95,colour=variable)) + 
     geom_line(aes(y=p50,colour=variable)) + 
-    geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
-    geom_vline(xintercept=refs[1,5],col="yellow",lwd=1) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    geom_vline(xintercept=refs[2,4],col="darkgreen",linetype=2) +
-    geom_vline(xintercept=refs[2,5],col="yellow",linetype=2) +
+    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
+    geom_vline(xintercept=refs[2,5],col="blue",lwd=1,linetype=2) +
+    annotate("text",x=refs[2,5],y=0,label="Fmsl",col="blue",hjust=0,vjust=0,angle=90) +
     geom_point(data=d2,aes(Ftarget,value,colour=variable)) +
     facet_wrap(~ dummy) +
     coord_cartesian(ylim=c(0,max(rby$catch) * 1.2),xlim=c(0,max(rby$fbar) * 1.2)) +
     labs(y = "",x="") +
-    theme(legend.position=c(0.9,0.85))
+    theme(legend.position="none") +
+    scale_colour_manual(values=c("Catch"="darkgreen","Landings"="blue")) +
+    scale_fill_manual(values=c("Catch"="darkgreen","Landings"="blue")) +
+    annotate("text",x=max(rby$fbar) * 1.2,y=max(rby$catch) * 1.1,label="Catch",colour="darkgreen",hjust=1) +
+    annotate("text",x=max(rby$fbar) * 1.2,y=max(rby$landings) * 1.1,label="Landings",colour="blue",hjust=1)
   
   
   
   pProfile$dummy <- "Probability plot"
+  df <- data.frame(x=rep(max(rby$fbar),4),
+                   y=c(0.80,0.75,0.70,0.65),
+                   variable=c("p(SSB<Blim)","p(SSB<Bpa)","Fmsy","Fmsy - landings"))
   plotProbs <- 
     ggplot(pProfile,aes(Ftarget,value,colour=variable)) + 
+    scale_colour_manual(values=c("pFmsyCatch"="darkgreen",
+                                 "pFmsyLandings"="blue",
+                                 "Blim"="red",
+                                 "Bpa"="orange",
+                                 "p(SSB<Blim)"="red",
+                                 "p(SSB<Bpa)"="orange",
+                                 "Fmsy"="darkgreen",
+                                 "Fmsy - landings"="blue")) + 
     theme_bw() +
-    geom_line() + 
-    geom_hline(yintercept=0.05,colour="red") +
+    geom_line(lwd=1) + 
+    geom_text(data=df,aes(x,y,label=variable,colour=variable)) +
+    geom_hline(yintercept=0.05,colour="black") +
     coord_cartesian(xlim=c(0,rby$fbar * 1.2)) +
     labs(x="",y="") + facet_wrap(~ dummy) +
-    theme(legend.position=c(0.1,0.80),
-          legend.text=element_text(size = rel(0.5)),
-          legend.title=element_text(size=rel(0.5)))
-  
+    theme(legend.position="none") 
+
   if(plotit) {
-    grid.arrange(plotR,plotSSB,plotYield,plotProbs, ncol=2)
-  }
-  
-  return(list(plotR=plotR,plotSSB=plotSSB,plotCatch=plotCatch,
+    vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(2, 2)))
+    print(plotSSB + theme(panel.margin = unit(c(0,0,0,0), "cm"),
+                          plot.margin = unit(c(0,0.25,0,0), "cm")),
+          vp = vplayout(1, 1))
+    print(plotR + theme(panel.margin = unit(c(0,0,0,0), "cm"),
+                        plot.margin = unit(c(0,0.25,0,0), "cm")),
+          vp=vplayout(1,2))
+    print(plotYield + theme(panel.margin = unit(c(0,0,0,0), "cm"),
+                            plot.margin = unit(c(0,0.25,0,0), "cm")),
+          vp=vplayout(2,1))
+    print(plotProbs + theme(panel.margin = unit(c(0,0,0,0), "cm"),
+                            plot.margin = unit(c(0,0.25,0,0), "cm")),
+          vp=vplayout(2,2))
+  } else {
+    return(list(plotR=plotR,plotSSB=plotSSB,plotCatch=plotCatch,
               plotLandings=plotLandings,plotYield=plotYield,plotProbs=plotProbs))
+  }
 }

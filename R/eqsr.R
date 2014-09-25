@@ -148,7 +148,7 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevh
 #' @return NULL produces a plot
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE) 
+eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE, Scale=1) 
 {
   #x.mult <- 1.1
   #y.mult <- 1.4
@@ -222,7 +222,21 @@ eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE)
     names(modelLines) <- c("ssb",paste(x$model,x$prop))
     modelLines <- melt(modelLines,id.var="ssb",variable.name="Model",value.name="rec")
     
+    out$ssb <- out$ssb/Scale
+    out$rec <- out$rec/Scale
+    out$mid.grp <- out$mid.grp/Scale
+    Percentiles$ssb <- Percentiles$ssb/Scale
+    Percentiles$p50 <- Percentiles$p50
+    Percentiles$p05 <- Percentiles$p05
+    Percentiles$p95 <- Percentiles$p95
+    
+    modelLines$ssb <- modelLines$ssb/Scale
+    modelLines$rec <- modelLines$rec/Scale
+    
+    fit$rby$ssb <- fit$rby$ssb/Scale
+    fit$rby$rec <- fit$rby$rec/Scale
     i <- sample(nrow(out),n)
+    
     ggplot(out[i,]) + 
       theme_bw() +
       geom_point(aes(x=ssb,y=rec,colour=Model),size=1) +
@@ -233,7 +247,7 @@ eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE)
       coord_cartesian(ylim=c(0,quantile(out$rec[i],0.99))) +
       geom_path(data=fit$rby,aes(ssb,rec),col="black",linetype=2) +
       geom_text(data=fit$rby,aes(ssb,rec,label=substr(year,3,4)),size=4,col="black",angle=45) +
-      theme(legend.position = c(0.15,0.80)) +
+      theme(legend.position = c(0.20,0.85)) +
       labs(x="Spawning stock biomass",y="Recruitment",colour="Model")
     
   }
