@@ -32,7 +32,7 @@ srmsymc_compile <- function(windose=TRUE,compile=TRUE)
 #' 
 #' @export
 #' 
-#' @author Einar Hjorleifsson <einar.hjorleifsson@gmail.com>
+#' @author Einar Hjorleifsson <einar.hjorleifsson@@gmail.com>
 #' 
 #' @param sr integer. containg the stock-recruitment model
 #' @param opt_sen XXX
