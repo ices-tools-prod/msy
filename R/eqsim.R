@@ -607,7 +607,7 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   Ftarget <- p05 <- p95 <- p50 <- variable <- value <- year <- NULL
   
   rby <- sim$rby
-  for (i in c(1,2,4,5)) rby[,i] <- rby[,i]/Scale
+  for (i in c(2,3,5,6)) rby[,i] <- rby[,i]/Scale
   
   rbp <- sim$rbp
   for(i in 3:9) rbp[,i] <- rbp[,i]/Scale
@@ -619,11 +619,13 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   
   i <- rbp$variable %in% "Recruitment"
   plotR <- ggplot(rbp[i,],aes(Ftarget)) + 
+    theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
     geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
     geom_vline(xintercept=refs[1,5],col="yellow",lwd=1) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
+    annotate("text",x=refs[1,1]*0.975,y=5,label=colnames(refs)[1],hjust=0,angle=90,col="red") +
     geom_vline(xintercept=refs[2,4],col="darkgreen",linetype=2) +
     geom_vline(xintercept=refs[2,5],col="yellow",linetype=2) +
     facet_wrap(~ variable) +
@@ -634,6 +636,7 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   
   i <- rbp$variable %in% "Spawning stock biomass"
   plotSSB <- ggplot(rbp[i,],aes(Ftarget)) + 
+    theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
     geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
@@ -648,6 +651,7 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   
   i <- rbp$variable %in% "Catch"
   plotCatch <- ggplot(rbp[i,],aes(Ftarget)) + 
+    theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
     geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
@@ -662,6 +666,7 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   
   i <- rbp$variable %in% "Landings"
   plotLandings <- ggplot(rbp[i,],aes(Ftarget)) + 
+    theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
     geom_line(aes(y=p50)) + 
     geom_vline(xintercept=refs[1,4],col="darkgreen",lwd=1) +
@@ -685,6 +690,7 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   d1 <- rbp[i,]
   d1$dummy <- "Yield"
   plotYield <- ggplot(d1,aes(Ftarget)) + 
+    theme_bw() +
     geom_ribbon(aes(ymin=p05,ymax=p95,fill=variable),alpha=0.2) +
     geom_line(aes(y=p05,colour=variable)) + 
     geom_line(aes(y=p95,colour=variable)) + 
@@ -705,6 +711,7 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   pProfile$dummy <- "Probability plot"
   plotProbs <- 
     ggplot(pProfile,aes(Ftarget,value,colour=variable)) + 
+    theme_bw() +
     geom_line() + 
     geom_hline(yintercept=0.05,colour="red") +
     coord_cartesian(xlim=c(0,rby$fbar * 1.2)) +
@@ -718,5 +725,5 @@ eqsim_ggplot <- function(sim, Scale=1e3, plotit=TRUE)
   }
   
   return(list(plotR=plotR,plotSSB=plotSSB,plotCatch=plotCatch,
-              plotLandings=plotLandings,plotProbs=plotProbs))
+              plotLandings=plotLandings,plotYield=plotYield,plotProbs=plotProbs))
 }

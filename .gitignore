@@ -3,5 +3,6 @@
 notes/*
 tmp/*
 plotMSY_test/*
+vignettes/
 vignettes/cache/*
 vignettes/figure/*
