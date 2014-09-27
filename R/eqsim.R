@@ -120,8 +120,9 @@ eqsim_run <- function(fit,
   NF <- length(Fscan)
   ages <- dims(stk) $ age
   
-  ssby <- Ferr <- array(0, c(Nrun,Nmod))
-  Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <- array(0, c(ages, Nrun, Nmod))
+  ssby <- Ferr <- array(0, c(Nrun,Nmod),dimnames=list(year=1:Nrun,iter=1:Nmod))
+  Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <- array(0, c(ages, Nrun, Nmod),
+                                                          dimnames=list(age=(range(stk)[1]:range(stk)[2]),year=1:Nrun,iter=1:Nmod))
   # TODO per note from Carmen:
   #  NOTE: If we want Ferr to be a stationary AR(1) process, it would make
   #        more sense to initialise Ferr as a Normal dist with zero mean and
@@ -413,7 +414,7 @@ eqsim_run <- function(fit,
   
   return(list(ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, 
                         west = west, weca = weca, sel = sel),
-              #rbya=list(Fy=Fy),
+              rbya=list(ferr=ferr),
               rby=fit$rby, rbp=rbp, Blim=Blim, Bpa=Bpa, Refs = Refs,
               pProfile=pProfile,id.sim=fit$id.sr))
   

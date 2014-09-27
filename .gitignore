@@ -8,3 +8,4 @@ vignettes/cache/*
 vignettes/figure/*
 .RData
 .Rhistory
+tmp.RData
