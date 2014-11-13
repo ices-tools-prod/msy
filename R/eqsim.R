@@ -408,7 +408,7 @@ eqsim_run <- function(fit,
   
   Refs <- rbind(catF, lanF, catC, lanC, catB, lanB)
   rownames(Refs) <- c("catF","lanF","catch","landings","catB","lanB")
-  colnames(Refs) <- c("Flim","Flim10","Flim50","medianMSY","meanMSY","FCrash05","FCrash50")
+  colnames(Refs) <- c("F05","F10","F50","medianMSY","meanMSY","FCrash05","FCrash50")
   
   #TODO: id.sim - user specified.
   
@@ -450,7 +450,7 @@ eqsim_plot <- function(sim, ymax.multiplier=1.2, catch=TRUE)
     with(rbp,lines(Ftarget,p05, lty = 4))
     points(dat[,1],dat[,2],pch=21,cex=0.75,bg=1)
     abline(v=Flim,col="red")
-    text(0.98*Flim,0,"Flim",srt=90,pos=3,col="red",cex=0.75)
+    text(0.98*Flim,0,"F05",srt=90,pos=3,col="red",cex=0.75)
   }
                            
                            
@@ -610,7 +610,7 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
     geom_line(aes(y=p50)) + 
     geom_line(aes(y=Mean),linetype=2) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
     geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
     annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     facet_wrap(~ variable) +
@@ -627,7 +627,7 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
     geom_hline(yintercept=sim$Blim,col="red",lwd=1) +
     annotate("text",x=0,y=sim$Blim,label="Blim",col="red",hjust=0,vjust=0) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
     geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
     annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_point(data=rby,aes(fbar,ssb)) +
@@ -642,7 +642,7 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
     geom_line(aes(y=p50)) + 
     geom_line(aes(y=Mean),linetype=2) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
     geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
     annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_point(data=rby,aes(fbar,catch)) +
@@ -657,7 +657,7 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
     geom_line(aes(y=p50)) + 
     geom_line(aes(y=Mean),linetype=2) +
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
     geom_vline(xintercept=refs[2,5],col="darkgreen",lwd=1) +
     annotate("text",x=refs[2,5],y=0,label="Fmsl",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_point(data=rby,aes(fbar,landings)) +
@@ -682,7 +682,7 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
     #geom_line(aes(y=p95,colour=variable)) + 
     geom_line(aes(y=p50,colour=variable)) + 
     geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="Flim",col="red",hjust=0,vjust=0,angle=90) +
+    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
     geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
     annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
     geom_vline(xintercept=refs[2,5],col="blue",lwd=1,linetype=2) +
