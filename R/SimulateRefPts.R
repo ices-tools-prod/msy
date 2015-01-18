@@ -496,7 +496,7 @@ Eqplot <- function (sim, fit, Blim, Bpa = 1.4 * Blim, ymax = c(NA,NA,NA),
   outB <- approx(Fscan, ssbs[4,], xout = outF) $ y
   outTable <- rbind(outF, outB, outC)
   rownames(outTable) <- c("F","SSB",yield)
-  colnames(outTable) <- c("Flim","Flim10","Flim50","MSY:median","Maxmeanland","FCrash5","FCrash50")
+  colnames(outTable) <- c("F05","F10","F50","MSY:median","Maxmeanland","FCrash5","FCrash50")
   
   list(Blim = Blim, Bpa = Bpa, Refs = outTable)
 }

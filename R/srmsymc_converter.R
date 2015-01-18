@@ -199,7 +199,7 @@ srmsymc_cat_age <- function(filename_age,n_fleets,pf,pm,sel,sel_cv,w,w_cv,bio,bi
 #' @description Some details, including link to the function a) running the
 #' program and creating the data input
 #' 
-#' @author Einar Hjorleifsson <einar.hjorleifsson@gmail.com>
+#' @author Einar Hjorleifsson <einar.hjorleifsson@@gmail.com>
 #' 
 #' @export
 #' 
