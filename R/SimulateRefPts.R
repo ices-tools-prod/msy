@@ -19,9 +19,7 @@ initial <- function(model, data)
   if (model == "segreg") {
     c(log(median(data$rec/data$ssb, na.rm = TRUE)), b = log(median(data$ssb)), 0)
   } else if (model == "bevholt") {
-    c(log(max(quantile(data$rec, 0.75, na.rm = TRUE))),
-      log(max(quantile(data$rec/data$ssb, 0.9, na.rm = TRUE))),
-      0)
+    c(0,0,0)
   } else {
     c(0,0,0)
   }
