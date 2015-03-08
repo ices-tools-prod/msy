@@ -17,8 +17,8 @@ initial <- function(model, data)
 {
   if (model == "segreg") {
     c(log(median(data$rec/data$ssb, na.rm = TRUE)), b = log(median(data$ssb)), 0)
-  } else if (model == "bevholt") {
-    c(0,0,0)
+  } else if (model == "smooth_hockey") {
+    c(log(median(data$rec/data$ssb, na.rm = TRUE)), b = log(median(data$ssb)), 0)
   } else {
     c(0,0,0)
   }
@@ -86,7 +86,17 @@ bevholt2 <- function(ab, ssb) {
   log(ab$a * ssb / (ab$b + ssb))
 }
 
-
+#' stock recruitment function
+#'
+#'
+#' @param ab the model parameters
+#' @param ssb a vector of ssb
+#' @return log recruitment according to model
+#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @export
+smooth_hockey <- function(ab, ssb, gamma = 0.1) {
+  log(ab$a * (ssb + sqrt(ab$b^2 + gamma^2/4) - sqrt((ssb - ab$b)^2 + gamma^2/4)))
+}
 
 
 
