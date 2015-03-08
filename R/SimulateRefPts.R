@@ -5,26 +5,6 @@
 
 
 
-#' Get starting values for models
-#'
-#' a quick fix!!
-#'
-#' @param model XXX
-#' @param data XXX
-#' @return vector of starting values
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-#' @export
-initial <- function(model, data)
-{
-  if (model == "segreg") {
-    c(log(median(data$rec/data$ssb, na.rm = TRUE)), b = log(median(data$ssb)), 0)
-  } else if (model == "bevholt") {
-    c(0,0,0)
-  } else {
-    c(0,0,0)
-  }
-}
-
 #' A function only available for R 2.15.1
 #'
 #' for back compatibility
