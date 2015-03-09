@@ -5,15 +5,16 @@ Version: 0.1.13
 Date: 2015-03-09
 Authors@R: as.person(c(
     "Colin Millar <colinpmillar@gmail.com> [aut,cre]",
-    "Noel Cadigan [aut]",
     "Timothy Earl [aut]",
     "Einar Hjorleifsson  [aut]",
-    "John Simmonds [aut]"))
-Maintainer: Colin Millar <colinpmillar@gmail.com>
+    "John Simmonds [ctb]",
+    "Noel Cadigan [ctb]"))
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
-VignetteBuilder: knitr
+LazyData: true
 Depends:
+    R (>= 3.0.0)
+Imports:
     FLCore,
     MASS,
     mgcv,
@@ -26,4 +27,4 @@ Depends:
     stringr
 Suggests:
     knitr
-LazyData: yes
+VignetteBuilder: knitr
