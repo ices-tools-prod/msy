@@ -1,4 +1,4 @@
-[![Build Status](https://magnum.travis-ci.com/wgmg/msy.svg?branch=master)](https://magnum.travis-ci.com/wgmg/msy)
+[![Build Status](https://travis-ci.com/wgmg/msy.svg?branch=master)](https://travis-ci.com/wgmg/msy)
 
 msy
 ===
