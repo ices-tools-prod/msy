@@ -25,3 +25,10 @@ Useage
     FIT <- eqsr_fit(ple4, nsamp = 1000, models = c('smooth_hockey', 'segreg'))
     eqsr_plot(FIT, n=2e4)
 
+Contact
+-------
+
+You are welcome to:
+
+* submit suggestions and bug-reports at: https://github.com/wgmg/msy/issues
+* send a pull request on: https://github.com/wgmg/msy
