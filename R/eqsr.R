@@ -111,7 +111,7 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevh
   #--------------------------------------------------------
   # get posterior distribution of estimated recruitment
   #--------------------------------------------------------
-  pred <- t(sapply(seq(nsamp), function(j) exp(match.fun(fit $ model[j]) (fit[j,], sort(data $ ssb))) ))
+  pred <- t(sapply(seq(nsamp), function(j) exp(get(fit $ model[j], , pos = "package:msy", mode = "function") (fit[j,], sort(data $ ssb))) ))
   
   
   #--------------------------------------------------------

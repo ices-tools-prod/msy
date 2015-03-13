@@ -1,8 +1,8 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.13
-Date: 2015-03-09
+Version: 0.1.14
+Date: 2015-03-13
 Authors@R: as.person(c(
     "Colin Millar <colinpmillar@gmail.com> [aut,cre]",
     "Timothy Earl [aut]",
