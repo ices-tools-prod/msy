@@ -91,6 +91,7 @@ bevholt2 <- function(ab, ssb) {
 #'
 #' @param ab the model parameters
 #' @param ssb a vector of ssb
+#' @param gamma a smoother parameter
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export

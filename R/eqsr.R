@@ -32,20 +32,20 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"),
                      method = "Buckland",
                      id.sr = NULL, remove.years = NULL, delta = 1.3, nburn = 10000) 
 {
-  dms <- dims(stk)
+  dms <- FLCore::dims(stk)
   rage <- dms $ min
   if (rage == 0)
-  { x = stock.n(stk)[1,drop=TRUE]
+  { x = FLCore::stock.n(stk)[1,drop=TRUE]
   } else {
-    x = c(stock.n(stk)[1,-seq(rage),drop=TRUE],rep(NA,rage))
+    x = c(FLCore::stock.n(stk)[1,-seq(rage),drop=TRUE],rep(NA,rage))
   }
   
   rby <- data.frame(year = with(dms, minyear:maxyear),
                       rec = x,
-                      ssb = ssb(stk)[drop=TRUE],
-                      fbar = fbar(stk)[drop=TRUE],
-                      landings=landings(stk)[drop=TRUE],
-                      catch=catch(stk)[drop=TRUE])
+                      ssb = FLCore::ssb(stk)[drop=TRUE],
+                      fbar = FLCore::fbar(stk)[drop=TRUE],
+                      landings=FLCore::landings(stk)[drop=TRUE],
+                      catch=FLCore::catch(stk)[drop=TRUE])
 
   row.names(rby) <- NULL
   rby <- rby[!is.na(rby$rec),]
@@ -62,7 +62,7 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"),
   #--------------------------------------------------------
   data <- data[complete.cases(data),]
   
-  if (is.null(id.sr)) id.sr <- name(stk)
+  if (is.null(id.sr)) id.sr <- FLCore::name(stk)
   
   method <- match.arg(method, c("Buckland","Simmonds","King","Cadigan"))
   if (!is.character(models)) stop("models arg should be character vector giving names of stock recruit models")
@@ -90,6 +90,8 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"),
 eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevholt"), ...)
 {
   
+  ## dummy
+  model <- 0
   #--------------------------------------------------------
   # Fit models
   #--------------------------------------------------------
@@ -147,6 +149,7 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevh
 #' @param y.mult max.x (rec) as a multiplier of maismum observed rec
 #' @param ggPlot Flag, if FALSE (default) plot base graphics, if true
 #' do a ggplot
+#' @param Scale Numeric value for scaling varibles in plot. 
 #' @return NULL produces a plot
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
@@ -154,8 +157,8 @@ eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE, Scal
 {
   #x.mult <- 1.1
   #y.mult <- 1.4
-  # dummy stuff
-  Ftarget <- p05 <- p95 <- p50 <- variable <- value <- year <- Model <- NULL
+  ## dummy stuff
+  Ftarget <- p05 <- p95 <- p50 <- variable <- value <- year <- Model <- aes <- rec <- 0
   
   modset <- fit$sr.sto
   data <- fit$rby[,1:3]
@@ -182,7 +185,7 @@ eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE, Scal
   out $ mid.grp <- with(out, (grp + 0.5) / 10 * (max(ssb) - min(ssb)) + min(ssb))
   tmp <- fit$sr.det
   tmp$Model <- paste(tmp$model,tmp$prop)
-  out <- join(out,tmp[,c("model","Model")],by="model")
+  out <- plyr::join(out,tmp[,c("model","Model")],by="model")
   # calculate the recruitment median and 5th and 95th percentile within each
   # ssb group and then plot the distribution
   summ <- with(out, 
@@ -222,7 +225,7 @@ eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE, Scal
     z <- sapply(1:nrow(x), function(i) rec <- exp(match.fun(as.character(x$model[i])) (x[i,], ssb)))
     modelLines <- as.data.frame(cbind(ssb,z))
     names(modelLines) <- c("ssb",paste(x$model,x$prop))
-    modelLines <- melt(modelLines,id.var="ssb",variable.name="Model",value.name="rec")
+    modelLines <- reshape2::melt(modelLines,id.var="ssb",variable.name="Model",value.name="rec")
     
     out$ssb <- out$ssb/Scale
     out$rec <- out$rec/Scale
@@ -239,18 +242,18 @@ eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE, Scal
     fit$rby$rec <- fit$rby$rec/Scale
     i <- sample(nrow(out),n)
     
-    ggplot(out[i,]) + 
-      theme_bw() +
-      geom_point(aes(x=ssb,y=rec,colour=Model),size=1) +
-      geom_line(data=Percentiles,aes(x=ssb,y=p05),colour="yellow") +
-      geom_line(data=Percentiles,aes(x=ssb,y=p95),colour="yellow") +
-      geom_line(data=Percentiles,aes(ssb,p50),col="yellow",lwd=2) +
-      geom_line(data=modelLines,aes(ssb,rec,colour=Model),lwd=1) +
-      coord_cartesian(ylim=c(0,quantile(out$rec[i],0.99))) +
-      geom_path(data=fit$rby,aes(ssb,rec),col="black",linetype=2) +
-      geom_text(data=fit$rby,aes(ssb,rec,label=substr(year,3,4)),size=4,col="black",angle=45) +
-      theme(legend.position = c(0.20,0.85)) +
-      labs(x="Spawning stock biomass",y="Recruitment",colour="Model")
+    ggplot2::ggplot(out[i,]) + 
+      ggplot2::theme_bw() +
+      ggplot2::geom_point(aes(x=ssb,y=rec,colour=Model),size=1) +
+      ggplot2::geom_line(data=Percentiles,aes(x=ssb,y=p05),colour="yellow") +
+      ggplot2::geom_line(data=Percentiles,aes(x=ssb,y=p95),colour="yellow") +
+      ggplot2::geom_line(data=Percentiles,aes(ssb,p50),col="yellow",lwd=2) +
+      ggplot2::geom_line(data=modelLines,aes(ssb,rec,colour=Model),lwd=1) +
+      ggplot2::coord_cartesian(ylim=c(0,quantile(out$rec[i],0.99))) +
+      ggplot2::geom_path(data=fit$rby,aes(ssb,rec),col="black",linetype=2) +
+      ggplot2::geom_text(data=fit$rby,aes(ssb,rec,label=substr(year,3,4)),size=4,col="black",angle=45) +
+      ggplot2::theme(legend.position = c(0.20,0.85)) +
+      ggplot2::labs(x="Spawning stock biomass",y="Recruitment",colour="Model")
     
   }
 }

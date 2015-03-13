@@ -4,12 +4,14 @@
 \alias{bootscam}
 \title{function name}
 \usage{
-bootscam(dat, y, np, scamfit, sp, nboot)
+bootscam(dat, y, n, np, scamfit, sp, nboot)
 }
 \arguments{
 \item{dat}{XXX}
 
 \item{y}{XXX}
+
+\item{n}{XXX}
 
 \item{np}{XXX}
 

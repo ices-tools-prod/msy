@@ -9,7 +9,7 @@
 #' @param my.df XXX
 #' @return something
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
-#' @export
+
 mydf <- function(rho, data, nknots, my.df) 
 {
   temp <- scam(log.recruit ~ s(stock.size, k = nknots, bs = "mpd", m = 2) + offset(offset),
@@ -26,10 +26,11 @@ mydf <- function(rho, data, nknots, my.df)
 #'
 #' @param dat XXX
 #' @param rho a parameter
+#' @param n XXX
 #' @return something
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
-#' @export
-mygcv <- function(dat, rho)
+
+mygcv <- function(dat, rho, n)
 {
   temp <- scam(log.recruit ~ s(stock.size, k = nknots, bs = "mpd", m = 2) + offset(offset),
                family = gaussian(link = "identity"), 
@@ -47,14 +48,15 @@ mygcv <- function(dat, rho)
 #'
 #' @param dat XXX
 #' @param y XXX
+#' @param n XXX
 #' @param np XXX
 #' @param scamfit XXX
 #' @param sp XXX
 #' @param nboot XXX
 #' @return something
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
-#' @export
-bootscam <- function(dat, y, np, scamfit, sp, nboot)
+
+bootscam <- function(dat, y, n, np, scamfit, sp, nboot)
 {
   ret <- matrix(NA, length(dat $ stock.size), nboot)
   ind <- dat $ wt == 1

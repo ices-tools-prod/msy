@@ -18,6 +18,8 @@ eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4, ggPlot = FALSE,
 
 \item{ggPlot}{Flag, if FALSE (default) plot base graphics, if true
 do a ggplot}
+
+\item{Scale}{Numeric value for scaling varibles in plot.}
 }
 \value{
 NULL produces a plot
