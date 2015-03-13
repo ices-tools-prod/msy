@@ -14,6 +14,9 @@
 #' @param Fscan F values to scan over
 #' @param Fcv Assessment error in the advisory year
 #' @param Fphi Autocorrelation in assessment error in the advisory year
+#' @param SSBcv Spawning stock biomass error in the advisory year
+#' @param rhologRec A flag for recruitment autocorrelation. If FALSE (default) 
+#' then not applied.
 #' @param Blim This we know
 #' @param Bpa This we know
 #' @param recruitment.trim A numeric vector with two log-value clipping the extreme
@@ -36,6 +39,8 @@ eqsim_run <- function(fit,
                       Fscan = seq(0, 1, len = 20), # F values to scan over
                       Fcv = 0,
                       Fphi = 0,
+                      SSBcv = 0,
+                      rhologRec = FALSE,
                       Blim,
                       Bpa,
                       recruitment.trim = c(3, -3),
@@ -129,6 +134,13 @@ eqsim_run <- function(fit,
   #        standard deviation of AR(1) marginal distribution, i.e. standard 
   #        deviation of initial Ferr = Fcv/sqrt(1- Fphi^2), instead of just
   #        initialising Ferr=0
+  #  2014-03-12: Changed per note form Carmen/John
+  Ferr[1,] <- rnorm(n=Nmod, mean=0, sd=1)*Fcv/sqrt(1-Fphi^2)
+  for(j in 2:Nrun) { Ferr[j,] <- Fphi*Ferr[j-1,] + Fcv*rnorm(n=Nmod, mean=0, sd=1) }
+  
+  # 2014-03-12: Changed per note form Carmen/John
+  #  Errors in SSB: this is used when the ICES MSY HCR is applied for F
+  SSBerr <- matrix(rnorm(n=Nrun*Nmod, mean=0, sd=1), ncol=Nmod) * SSBcv
   
   rsam <- array(sample(1:ncol(weca), Nrun * Nmod, TRUE), c(Nrun, Nmod))
   rsamsel <- array(sample(1:ncol(sel), Nrun * Nmod, TRUE), c(Nrun, Nmod))
@@ -146,6 +158,19 @@ eqsim_run <- function(fit,
   #   Residuals of SR fits (1 value per SR fit and per simulation year 
   #     but the same residual value for all Fscan values):
   resids= array(rnorm(Nmod*(Nrun+1), 0, SR$cv),c(Nmod, Nrun+1))
+  
+  # 2014-03-12: Changed per note form Carmen/John
+  #  Autocorrelation in Recruitment Residuals:    
+  if(rhologRec){
+    fittedlogRec <-  do.call(cbind, lapply( c(1:nrow(fit$sr.sto)), function(i){     
+      FUN <- match.fun(fit$sr.sto$model[i])
+      FUN(fit$sr.sto[i, ], fit$rby$ssb) } )  ) 
+    # Calculate lag 1 autocorrelation of residuals: 
+    rhologRec <- apply(log(fit$rby$rec)-fittedlogRec, 2, function(x){cor(x[-length(x)],x[-1])})
+    # Draw residuals according to AR(1) process:
+    for(j in 2:(Nrun+1)){ resids[,j] <- rhologRec * resids[,j-1] + resids[,j]*sqrt(1 - rhologRec^2) }
+  }    
+  
   
   # Limit how extreme the Rec residuals can get:
   lims = t(array(SR$cv,c(Nmod,2))) * recruitment.trim
@@ -237,7 +262,9 @@ eqsim_run <- function(fit,
       
       # apply HCR
       # (intended) Fbar to be applied in year j-1 (depends on SSB in year j-1):
-      Fnext <- Fbar * pmin(1, SSB/Btrigger)
+      # 2014-03-12: Changed per note form Carmen/John
+      # Fnext <- Fbar * pmin(1, SSB/Btrigger)
+      Fnext <- Fbar * pmin(1, SSB * exp(SSBerr[j,]) / Btrigger)      
       
       # apply some noise to the F
       # Notes from Carmen:
@@ -248,7 +275,10 @@ eqsim_run <- function(fit,
       #  Might make more sense to have the "Ferr" matrix calculated before
       #  the Fscan loop starts so that the same errors in F are applied to
       #  all Fscan values ???? (as for Rec residuals)
-      Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv)
+      
+      # Outcommented 2014-03-12 because F-error already been drawn outside the
+      #   loop, so this line here is no longer needed:
+      # Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv)
       
       # realised Fbar in year j-1:
       Fnext <- exp(Ferr[j,]) * Fnext
@@ -318,17 +348,29 @@ eqsim_run <- function(fit,
     catm <- apply(catsa, 1, mean)
     lanm <- apply(lansa, 1, mean)
   } else {
-    x <- catsa
-    i <- x > quantile(x,extreme.trim[2]) |
-      x < quantile(x,extreme.trim[1])
-    x[i] <- NA
-    catm <- apply(x, 1, mean, na.rm=TRUE)
     
-    x <- lansa
-    i <- x > quantile(x,extreme.trim[2]) |
-      x < quantile(x,extreme.trim[1])
-    x[i] <- NA
-    lanm <- apply(x, 1, mean, na.rm=TRUE)
+    # 2014-03-12 Outcommented per note from Carmen/John - see below
+    #x <- catsa
+    #i <- x > quantile(x,extreme.trim[2]) |
+    #  x < quantile(x,extreme.trim[1])
+    #x[i] <- NA
+    #catm <- apply(x, 1, mean, na.rm=TRUE)
+    #
+    #x <- lansa
+    #i <- x > quantile(x,extreme.trim[2]) |
+    #  x < quantile(x,extreme.trim[1])
+    #x[i] <- NA
+    #lanm <- apply(x, 1, mean, na.rm=TRUE)
+    
+    # 2014-03-12: Above replaced with the following per note from Carmen/John
+    #  If we want to remove whole SR models, we could use the following code. But it is too extreme, it ends up getting rid of most models:
+    # auxi2 <- array( apply(catsa, 1, function(x){auxi<-rep(TRUE,Nmod); auxi[x > quantile(x, extreme.trim[2]) | x < quantile(x, extreme.trim[1])] <- FALSE; x <- auxi } ), dim=c(keep,Nmod,NF))
+    # auxi2 <- (1:Nmod)[apply(auxi2, 2, function(x){length(unique(as.vector(x)))})==1]
+    # apply(catsa[,,auxi2],1,mean)
+    
+    # So I think the alternative is not to get rid of whole SR models, but of different SR models depending on the value of F:
+    catm <- apply(catsa, 1, function(x){mean(x[x <= quantile(x, extreme.trim[2]) & x >= quantile(x, extreme.trim[1])])})
+    lanm <- apply(lansa, 1, function(x){mean(x[x <= quantile(x, extreme.trim[2]) & x >= quantile(x, extreme.trim[1])])})
   }
   
   # end Einar amended 30.1.2014
@@ -412,14 +454,107 @@ eqsim_run <- function(fit,
   
   #TODO: id.sim - user specified.
   
+  # 2014-03-12 Ammendments per note from Carmen/John
+  # CALCULATIONS:
+  
+  # Fmsy: value that maximises median LT catch or median LT landings 
+  auxi <- approx(Fscan, cats[4, ],xout=seq(min(Fscan),max(Fscan),length=200))
+  FmsyMedianC <- auxi$x[which.max(auxi$y)]   
+  MSYMedianC <- max(auxi$y)
+  # Value of F that corresponds to 0.95*MSY:
+  FmsylowerMedianC <- auxi$x[ min( (1:length(auxi$y))[auxi$y/MSYMedianC >= 0.95] ) ]
+  FmsyupperMedianC <- auxi$x[ max( (1:length(auxi$y))[auxi$y/MSYMedianC >= 0.95] ) ]
+  
+  auxi <- approx(Fscan, lans[4, ],xout=seq(min(Fscan),max(Fscan),length=200))
+  FmsyMedianL <- auxi$x[which.max(auxi$y)]
+  MSYMedianL <- max(auxi$y)
+  
+  # Value of F that corresponds to 0.95*MSY:
+  FmsylowerMedianL <- auxi$x[ min( (1:length(auxi$y))[auxi$y/MSYMedianL >= 0.95] ) ]
+  FmsyupperMedianL <- auxi$x[ max( (1:length(auxi$y))[auxi$y/MSYMedianL >= 0.95] ) ]
+  
+  F5percRiskBlim <- flim
+  
+  RefsMODIFIED <- data.frame(FmsyMedianC = FmsyMedianC,
+                             FmsylowerMedianC = FmsylowerMedianC,
+                             FmsyupperMedianC = FmsyupperMedianC,
+                             FmsyMedianL = FmsyMedianL,
+                             FmsylowerMedianL = FmsylowerMedianL,
+                             FmsyupperMedianL = FmsyupperMedianL,
+                             F5percRiskBlim = F5percRiskBlim,
+                             Btrigger = Btrigger)
+  
+  # END 2014-03-12 Ammendments per note from Carmen/John
+  
   return(list(ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, 
                         west = west, weca = weca, sel = sel),
               rbya=list(ferr=ferr),
-              rby=fit$rby, rbp=rbp, Blim=Blim, Bpa=Bpa, Refs = Refs,
-              pProfile=pProfile,id.sim=fit$id.sr))
+              rby=fit$rby,
+              rbp=rbp,
+              Blim=Blim,
+              Bpa=Bpa,
+              Refs = Refs,
+              pProfile=pProfile,
+              id.sim=fit$id.sr,
+              RefsMODIFIED=RefsMODIFIED))
   
 }
 
+#' @title Plots Fmsy range
+#' 
+#' @description Per WKMSYREF3
+#' 
+#' @export
+#' 
+#' @param sim An object returned from the function eqsim_run
+
+eqsim_plot_range <- function(sim) 
+{
+  
+  # 2014-03-12 Added per note from Carmen/John
+  
+  par(mfrow=c(2,2))
+  
+  auxi <- rbp$p50[rbp$variable=="Catch"]
+  plot(Fscan, auxi, type="l", main=paste("Median long-term catch, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+  abline(v=FmsyMedianC, col=4,lwd=2)
+  abline(v=FmsylowerMedianC, col=4,lwd=2,lty=2)
+  abline(v=FmsyupperMedianC, col=4,lwd=2,lty=2)
+  abline(h=max(auxi)*0.95, col=4, lty=2)
+  abline(v=F5percRiskBlim, col=2,lwd=2)
+  
+  auxi <- rbp$p50[rbp$variable=="Landings"]
+  plot(Fscan, auxi, type="l", main=paste("Median long-term landings, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+  abline(v=FmsyMedianL, col=3,lwd=2)
+  abline(v=FmsylowerMedianL, col=3,lwd=2,lty=2)
+  abline(v=FmsyupperMedianL, col=3,lwd=2,lty=2)
+  abline(h=max(auxi)*0.95, col=3, lty=2)
+  abline(v=F5percRiskBlim, col=2,lwd=2)
+  
+  auxi <- approx(Fscan, rbp$p50[rbp$variable=="Spawning stock biomass"],xout=seq(min(Fscan),max(Fscan),length=200))
+  plot(auxi$x, auxi$y, type="l", main=paste("SSB: Median and 5th percentile, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+  abline(v=FmsyMedianL, col=3,lwd=2)
+  abline(v=FmsylowerMedianL, col=3,lwd=2,lty=2)
+  abline(v=FmsyupperMedianL, col=3,lwd=2,lty=2)
+  abline(v=F5percRiskBlim, col=2,lwd=2)
+  abline(v=0)
+  
+  auxi <- approx(Fscan, rbp$p05[rbp$variable=="Spawning stock biomass"],xout=seq(min(Fscan),max(Fscan),length=200))
+  lines(auxi$x, auxi$y, lwd=2, col=2)
+  if(!missing(Blim)){abline(h=Blim, col=2, lty=2, lwd=2)}
+  #abline(h=Bpa, col=4, lty=2, lwd=2)
+  
+  auxi <- approx(Fscan, rbp$p50[rbp$variable=="Recruitment"],xout=seq(min(Fscan),max(Fscan),length=200))
+  plot(auxi$x, auxi$y, type="l", main=paste("Rec: Median and 5th percentile, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+  abline(v=FmsyMedianL, col=3,lwd=2)
+  abline(v=FmsylowerMedianL, col=3,lwd=2,lty=2)
+  abline(v=FmsyupperMedianL, col=3,lwd=2,lty=2)
+  abline(v=F5percRiskBlim, col=2,lwd=2)
+  abline(v=0)
+  
+  auxi <- approx(Fscan, rbp$p05[rbp$variable=="Recruitment"],xout=seq(min(Fscan),max(Fscan),length=200))
+  lines(auxi$x, auxi$y, lwd=2, col=2)
+}
 
 #' @title Plots of the results from eqsim
 #'
