@@ -126,9 +126,9 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevh
                      with(nlminb(initial(mod, data), nllik, data = data, model = mod, logpar = TRUE), 
                           data.frame(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), model = mod))))
   
-  tmp <- plyr::ddply(fit,c("model"),summarise,n=length(model))
+  tmp <- plyr::ddply(fit,c("model"), plyr::summarise, n=length(model))
   tmp$prop <- tmp$n/sum(tmp$n)
-  fits <- join(fits,tmp,by="model")
+  fits <- plyr::join(fits,tmp,by="model")
   
   dimnames(pred) <- list(model=fit$model,ssb=data$ssb)
   
