@@ -1,21 +1,24 @@
 ---
-title: "Using the msy package"
+title: "Using the eqsim routines in the msy package"
 author: "John Simmond, Colin Millar and Einar Hjörleifsson"
 date: '`r Sys.Date()`'
-output: html_document
+output:
+  html_document:
+    fig_height: 6
+    fig_width: 8.5
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{VignetteTitle}
+  %\VignetteEngine{knitr::rmarkdown} 
   \usepackage[utf8]{inputenc}
 ---
 
 # Preamble
 
-This document is as much as the msy-package itself still in developement.
+This document is as much as the `msy`-package itself still in developement.
 
 The origin of this package is from an intial coding by John Simmonds which was restructured by Colin Millar into an R-package with additional development, including coding the Buckland method. Einar Hjörleifsson compartmentalized the structure of the code as well as providing the output of the analysis in a more structured format.
 
-At this moment there is no person responsible for the maintainance of the package, including the above mentioned names.
+At this moment there is no person responsible for the maintenance of the package, including the above mentioned names.
 
 # Installation
 
@@ -49,30 +52,175 @@ Besides functions the package comes with the following data:
 * codNS: `FLStock` object of the North Sea cod
 * codWB: `FLStock` object of the Western Baltic cod
 * codWS: `FLStock` object of the West of Scotland cod
-* saiFO: `FLStock` object of the Faroe saithe
+* saiFO: `FLStock` object of the Faeroe saithe
 * saiIS: `FLStock` object of the Icelandic saithe
 * solKA: `FLStock` object of the Kattegat sole
 
 These are all stored in the icesStocks list object.
 
-The current version of the `msy` implements two methods that go under the working names EqSim and plotMSY. Only usage of functions for the EqSim approaches are described in the following sections.
+The current version of the `msy` implements two methods that go under the working names `eqsim` and `plotMSY`. Only usage of functions for the `eqsim`  approaches are described in the following sections.
 
-# Minimum code
+
+# eqsim
+
+`eqsim` is a stochastic equilibrium software that may be used to explore MSY reference points. Productivity parameters (i.e. year vectors for natural mortality, weights-at-age and maturities) as well as selection are re-sampled at random from user specified range of years from the assessment. Fixing these parameters to an average over specified years can also be set by the user. Recruitments are re-sampled from their predictive distribution. Uncertainty in the stock-recruitment model is taken into account by applying model averaging using smooth AIC weights (Buckland et al. 1997). In addition assessment errors can be emulated by applying a user-specified error (CV and autocorrelation) to the intended target fishing mortality.
+
+The current version of `eqsim` only takes `FLStock` objects as inputs.
+
+## A quick start
+
+In the following subsections we will simulate the north sea cod stock into the future under some basic assumptions.  For the simulations we need to choose which years we will use to generate noise in the quantities: weight at age, maturity at age, natural mortality at age, and selection pattern.  We also need to choose a set of Fbar values to simulate over in order estimate F reference points.
+
+The eqsim approach consists of three components:
+
+1. Estimate the stock recruitment relationship
+2. Simulate a stock to equilibrium and continue simulating for some years
+3. Calculate reference points from the simulated stock at equilibrium (last 50 years of the runs are used)
+
+This can be done in one go with the following code:
 
 ```{r}
 FIT <- eqsr_fit(icesStocks$codNS,
-                nsamp = 500, 
-                models = c("ricker", "segreg", "bevholt"))
-eqsr_plot(FIT, n=1e4)
-
-SIM <- eqsim_run(FIT,
-                 Fcv=0.25, 
-                 Fphi=0.30,
-                 Blim=70000,
-                 Bpa=150000,
+                nsamp = 1000, 
+                models = c("ricker", "smooth_hockey", "bevholt"))
+SIM <- eqsim_run(FIT, Fcv=0.25, Fphi=0.30,
+                 Blim=70000,Bpa=150000,
                  Fscan = seq(0,1.2,len=40),
-                 verbose=FALSE,
-                 extreme.trim=c(0.05,0.95))
+                 verbose=FALSE,extreme.trim=c(0.05,0.95))
+```
+
+The stock recruitment function can be plotted by:
+```{r}
+eqsr_plot(FIT,n=2e4)
+```
+
+Summary of the key results can be obtained by:
+```{r, comment=''}
+SIM$Refs
+```
+
+Summary plots conditioned on maximizing __catch__ are obtained by:
+```{r}
 eqsim_plot(SIM,catch=TRUE)
+```
+
+Summary plots of __Fmsy range__ (WKMSYREF3) are obtained by:
+```{r}
 eqsim_plot_range(SIM)
 ```
+
+## The recruitment model
+
+Model fitting is done by maximum likelihood using the `nlminb` optimiser in R. By refitting to non-parametric bootstrap resamples of the stock and recruit pairs, samples from the approximate joint distribution of the model parameters can be made.  This is done by invoking the `eqrs_fit` function.  The function first sets up the stock and recruit pairs based on the information in the `FLStock` object and removes any incomplete pairs, before dispatching on the model fitting / averaging algorithm chosen.  Currently only a bootstrap based model averaging method called smooth AIC is implemented fully.  The details can be found in `eqrs_Buckland` function.  The algorithm implemented is:
+
+1. Take a resample with replacement from the stock and recruit pairs
+2. Fit every stock-recruit model under consideration and store the AIC of each
+3. Retain the parameter estimates from the best model
+4. Repeat
+
+This process provides a robust way to average over several models, as long as the bootstrap resampling procedure provides an adequate approximation to the empirical distribution of the stock and recruit pairs.
+
+The arguments to the fitting function are
+```{r comment=""}
+args(eqsr_fit)
+```
+
+Here:
+
+* `stk` is an `FLStock` object
+* `nsamp` is the number of simulations to run (often referred to as iterations)
+* `models` is the models to average over (any of the combination of these can be supplied, including only a single model)
+* `method` the method used (only Buckland as of now)
+* `id.sr` placeholder if one wants to name the fit
+* `remove.years` is used to remove years from the fit
+* `delta` and `nburn` are related to an MCMC based fitting procedure (not implemented)
+
+
+The results from the fitting process are returned to the user as a list:
+```{r comment=''}
+str(FIT, 2, give.attr=FALSE)
+```
+
+where:
+
+* `sr.sto` is the the (joint) stochastic distribution of the estimated model and parameters. The number of rows of the data frame is equivalent to the value supplied to `nsamp` in the `eqsr_fit` function.
+* `sr.det` is the conventional determinimstic predictive estimate. The `n` indicates the number of times a particular function is drawn in the stochastic sample and the `prop` the proportion, given `nsamp`.
+* `pRec` contains the fitted parameters to the observed data
+* `stk` retains the original `FLStock` object passed to the function.
+* `rby` (results by year) contains a summary of the ssb and rec data used in the fitting as well as other stock summary information used later down the line
+* id.rs` is the user specified id
+
+The contribution of each of the models can be obtained by printing out the `sr.det`:
+```{r, comment=''}
+FIT$sr.det
+```
+
+Here the a, b and cv are the estimated parameters from the deterministic fit for each model. The `n` and `prop` is a summary of the number and proportion that each model contributes to the final fit.
+
+Again to obtain a plot one simply calls:
+```{r}
+eqsr_plot(FIT,n=2e4)
+```
+
+The `n` supplied to the `eqsr_plot` stands here for the number of stochastic recruitment points desired to include in the plot. The various black dashed lines represent the best fit of the different recruitment models and the yellow and blue lines the median and 5% and 95% percentiles of the distributions of the stochastic recruits drawn from the models. The input data are represented by red points.
+
+An alternative to the `base` plot is a `ggplot2` version (with too many fancy colours :-):
+```{r}
+eqsr_plot(FIT,n=2e4,ggPlot=TRUE,Scale=1e3)
+```
+
+Here the model fits are represented in different colours with the yellow lines indicating the 5%, 50% and 95% percentiles of the stochastic recruitment distribution. The input data are represented by text indicating year class. The weight of each model in the final stochastic recruitment draw is indicated as a proportion in the legends and by different colours for the stochastic draws.
+
+# The simulation
+
+Simulating forward is done using the `eqsim_run` function.  The function takes as input the output from the `eqsr_fit` function. Simulations are run independently for each sample from the distribution of model and parameters.  This is done for a range of $F_{advisory}$ values. For example if we scanned over 10 values of $F_{advisory}$ and had taken 2000 samples from the stock-recruit relationship then 20000 simulations would be run in total.  These simulations are run for 200 years (default, specified with `Nrun`), and the last 50 years are retained to calculate summaries, like the proportion of times the stock crashes at a given $F_{advisory}$.  It is important to note that each simulation is conditioned on a single stock recruit relationship with fixed parameters and cv.
+
+Error is introduced within the simulations by generating process error about the constant stock-recruit fit, and by using variation in maturity, natural mortality, weight at age and selection estimates.  Note that if there is no variability in these quantities in the stock object then no variability will be taken in to the simulations. The user can also specify using average values for these parameters.
+
+The arguments to the simulation function are:
+```{r comment=''}
+args(eqsim_run)
+```
+
+where:
+
+* `fit` is the output list from `eqsr_fit`
+* `bio.years` is the start and end year from which to generate noise in maturity, M and weights. 
+* `bio.const` is a flag indicating if the average maturity, M and weights over the specified years should be used (`TRUE`) or not (`FALSE`).
+* `sel.years` is the start and end year from which to generated noise in the selection at age
+* `sel.const` is a flag indicating if the average selection over the specified years should be used (`TRUE`) or not (`FALSE`).
+* `Fscan` is the range of $F_{advisory}$ values to scan over
+* `Btrigger` is the location of a modifier of a HCR upon which $F_{advisory}$ becomes linearily reduced. If `Btrigger` is 0 (default) this is equivalent to a constant F-rule.
+* `Fcv` The assessment error of fishing mortality in the advisory year.
+* `Fphi` The autocorrelation of fishing mortality in assessment error
+* `SSBcv` The assessment error in the spawning stock in the advisory year
+* `rhologRec`  Use or not use autocorrelation in recruitment residuals.
+* `Blim` $B_{lim}$
+* `Bpa`  $B_{pa}$
+* `Nrun` is the number of years to simulate forward (fixed for now is that the last 50 years from those are used for summarising equilibrium conditions)
+* `process.error} allows the simulations to be run using the predictive distribition of recruitment or the mean recruitment
+* `verbose` controls if progress bar is displayed during the simulation
+* `extreme.trim` A numerical vector of length 2 containing the lower and upper percentiles. If specified, recruitement values outside this range are trimmed (ignored).
+
+The results from the simulation process are returned to the user as a list
+```{r comment=''}
+str(SIM, 2, give.attr = FALSE)
+```
+
+where 
+
+* `ibya` (input by year and age) contains the biological and fisheries input data.
+* `rby` (results by year) contains the stock summary data.
+* `rbp` (results by probability) contains the 0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975 percentiles of the simulations of SSB, catch, landings and recruitment for each Fscan value.
+* `Blim` $B_{lim}$ input value
+* `Bpa` $B_{pa}$ input value
+* `Refs` Calculated reference points
+* `pProfile` The probability profiles for a given target F for $B_{lim}$, $B_{pa}$ and $F_{msy}$ (both for catch and landings).
+* `refs_interval` The $F_{msy}$ interval and 5% percentile risk of going below $B_{lim}$ (per [WKFMSYREF3](http://www.ices.dk))
+
+The calculation associated with the $F_{msy}$ range values can be accessed simply by:
+
+```{r}
+t(SIM$refs_interval)
+```
+
