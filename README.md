@@ -8,7 +8,7 @@ The `msy` R package is a collection of methods to estimate equilibrium reference
 Install
 -------
 
-To install the latest version of wqbc:
+To install the latest version of msy:
 
     # install.packages("devtools")
     library(devtools)
@@ -16,14 +16,27 @@ To install the latest version of wqbc:
     install_github("wgmg/msy")
     library(msy)
 
+Sometimes a more recent developmental version of msy can be obtained from:
+
+    # install.packages("devtools")
+    library(devtools)
+    install_github("einarhjorleifsson/msy")
+    library(msy)
 
 Useage
 ------
 
-    # load your data as an FLStock - here we use Plaice in ICES area 4 as an example
-    data(ple4)
-    FIT <- eqsr_fit(ple4, nsamp = 1000, models = c('smooth_hockey', 'segreg'))
-    eqsr_plot(FIT, n=2e4)
+FIT <- eqsr_fit(icesStocks$codNS,
+                nsamp = 1000, 
+                models = c("ricker", "smooth_hockey", "bevholt"))
+eqsr_plot(FIT,n=2e4)
+SIM <- eqsim_run(FIT, Fcv=0.25, Fphi=0.30,
+                 Blim=70000,Bpa=150000,
+                 Fscan = seq(0,1.2,len=40),
+                 verbose=FALSE)
+SIM$Refs
+eqsim_plot(SIM,catch=TRUE)
+eqsim_plot_range(SIM)
 
 Contact
 -------
