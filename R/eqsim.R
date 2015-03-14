@@ -476,7 +476,7 @@ eqsim_run <- function(fit,
   
   F5percRiskBlim <- flim
   
-  RefsMODIFIED <- data.frame(FmsyMedianC = FmsyMedianC,
+  refs_interval <- data.frame(FmsyMedianC = FmsyMedianC,
                              FmsylowerMedianC = FmsylowerMedianC,
                              FmsyupperMedianC = FmsyupperMedianC,
                              FmsyMedianL = FmsyMedianL,
@@ -497,7 +497,7 @@ eqsim_run <- function(fit,
               Refs = Refs,
               pProfile=pProfile,
               id.sim=fit$id.sr,
-              RefsMODIFIED=RefsMODIFIED))
+              refs_interval=refs_interval))
   
 }
 
@@ -527,12 +527,12 @@ eqsim_plot_range <- function(sim)
   
   i <- sim$rbp$variable %in% "Catch"
   plot(sim$rbp$Ftarget[i], sim$rbp$p50[i], type="l",
-       main=paste("Median long-term catch, Btrigger=",sim$RefsMODIFIED$Btrigger,sep=""),lwd=2,xlab="F",ylab="")
-  abline(v=sim$RefsMODIFIED$FmsyMedianC, col=4,lwd=2)
-  abline(v=sim$RefsMODIFIED$FmsylowerMedianC, col=4,lwd=2,lty=2)
-  abline(v=sim$RefsMODIFIED$FmsyupperMedianC, col=4,lwd=2,lty=2)
+       main=paste("Median long-term catch, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+  abline(v=sim$refs_interval$FmsyMedianC, col=4,lwd=2)
+  abline(v=sim$refs_interval$FmsylowerMedianC, col=4,lwd=2,lty=2)
+  abline(v=sim$refs_interval$FmsyupperMedianC, col=4,lwd=2,lty=2)
   abline(h=max(sim$rbp$p50[i])*0.95, col=4, lty=2)
-  abline(v=sim$RefsMODIFIED$F5percRiskBlim, col=2,lwd=2)
+  abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
   
   # original from Carmen
   #auxi <- rbp$p50[rbp$variable=="Landings"]
@@ -545,12 +545,12 @@ eqsim_plot_range <- function(sim)
 
   i <- sim$rbp$variable %in% "Landings"
   plot(sim$rbp$Ftarget[i], sim$rbp$p50[i], type="l",
-       main=paste("Median long-term landings, Btrigger=",sim$RefsMODIFIED$Btrigger,sep=""),lwd=2,xlab="F",ylab="")
-  abline(v=sim$RefsMODIFIED$FmsyMedianL, col=4,lwd=2)
-  abline(v=sim$RefsMODIFIED$FmsylowerMedianL, col=4,lwd=2,lty=2)
-  abline(v=sim$RefsMODIFIED$FmsyupperMedianL, col=4,lwd=2,lty=2)
+       main=paste("Median long-term landings, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+  abline(v=sim$refs_interval$FmsyMedianL, col=4,lwd=2)
+  abline(v=sim$refs_interval$FmsylowerMedianL, col=4,lwd=2,lty=2)
+  abline(v=sim$refs_interval$FmsyupperMedianL, col=4,lwd=2,lty=2)
   abline(h=max(sim$rbp$p50[i])*0.95, col=4, lty=2)
-  abline(v=sim$RefsMODIFIED$F5percRiskBlim, col=2,lwd=2)
+  abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
   
   # Carmen original
   #auxi <- approx(Fscan, rbp$p50[rbp$variable=="Spawning stock biomass"],xout=seq(min(Fscan),max(Fscan),length=200))
@@ -568,11 +568,11 @@ eqsim_plot_range <- function(sim)
   
   i <- sim$rbp$variable %in% "Spawning stock biomass"
   auxi <- approx(sim$rbp$Ftarget[i], sim$rbp$p50[i],xout=seq(min(sim$rbp$Ftarget[i]),max(sim$rbp$Ftarget[i]),length=200))
-  plot(auxi$x, auxi$y, type="l", main=paste("SSB: Median and 5th percentile, Btrigger=",sim$RefsMODIFIED$Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
-  abline(v=sim$RefsMODIFIED$FmsyMedianL, col=3,lwd=2)
-  abline(v=sim$RefsMODIFIED$FmsylowerMedianL, col=3,lwd=2,lty=2)
-  abline(v=sim$RefsMODIFIED$FmsyupperMedianL, col=3,lwd=2,lty=2)
-  abline(v=sim$RefsMODIFIED$F5percRiskBlim, col=2,lwd=2)
+  plot(auxi$x, auxi$y, type="l", main=paste("SSB: Median and 5th percentile, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+  abline(v=sim$refs_interval$FmsyMedianL, col=3,lwd=2)
+  abline(v=sim$refs_interval$FmsylowerMedianL, col=3,lwd=2,lty=2)
+  abline(v=sim$refs_interval$FmsyupperMedianL, col=3,lwd=2,lty=2)
+  abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
   abline(v=0)
   lines(auxi$x, auxi$y, lwd=2, col=2)
   if(!is.null(sim$Blim)) {abline(h=sim$Blim, col=2, lty=2, lwd=2)}
@@ -591,11 +591,11 @@ eqsim_plot_range <- function(sim)
   
   i <- sim$rbp$variable %in% "Recruitment"
   auxi <- approx(sim$rbp$Ftarget[i], sim$rbp$p50[i],xout=seq(min(sim$rbp$Ftarget[i]),max(sim$rbp$Ftarget[i]),length=200))
-  plot(auxi$x, auxi$y, type="l", main=paste("Rec: Median and 5th percentile, Btrigger=",sim$RefsMODIFIED$Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
-  abline(v=sim$RefsMODIFIED$FmsyMedianL, col=3,lwd=2)
-  abline(v=sim$RefsMODIFIED$FmsylowerMedianL, col=3,lwd=2,lty=2)
-  abline(v=sim$RefsMODIFIED$FmsyupperMedianL, col=3,lwd=2,lty=2)
-  abline(v=sim$RefsMODIFIED$F5percRiskBlim, col=2,lwd=2)
+  plot(auxi$x, auxi$y, type="l", main=paste("Rec: Median and 5th percentile, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+  abline(v=sim$refs_interval$FmsyMedianL, col=3,lwd=2)
+  abline(v=sim$refs_interval$FmsylowerMedianL, col=3,lwd=2,lty=2)
+  abline(v=sim$refs_interval$FmsyupperMedianL, col=3,lwd=2,lty=2)
+  abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
   abline(v=0)
   lines(auxi$x, auxi$y, lwd=2, col=2)
 
