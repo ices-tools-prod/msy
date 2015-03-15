@@ -1343,7 +1343,7 @@ eqsim_plot_range <- function (sim, interval=0.95, type="median")
     abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
     abline(v=0)
     lines(auxi$x, auxi$y, lwd=2, col=2)
-    return(invisble(NULL))
+    return(invisible(NULL))
   }
   
   
