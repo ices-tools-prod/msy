@@ -80,13 +80,18 @@ The eqsim approach consists of three components:
 This can be done in one go with the following code:
 
 ```{r}
-FIT <- eqsr_fit(icesStocks$codNS,
+FIT <- eqsr_fit(icesStocks$saiNS,
                 nsamp = 1000, 
-                models = c("ricker", "smooth_hockey", "bevholt"))
-SIM <- eqsim_run(FIT, Fcv=0.25, Fphi=0.30,
-                 Blim=70000,Bpa=150000,
+                models = c("ricker", "segreg"))
+SIM <- eqsim_run(FIT,
+                 bio.years = c(2004:2013),
+                 sel.years = c(2004:2013),
+                 Fcv=0.24,
+                 Fphi=0.42,
+                 Blim=106000,
+                 Bpa=200000,
                  Fscan = seq(0,1.2,len=40),
-                 verbose=FALSE,extreme.trim=c(0.05,0.95))
+                 verbose=FALSE)
 ```
 
 The stock recruitment function can be plotted by:
@@ -106,7 +111,9 @@ eqsim_plot(SIM,catch=TRUE)
 
 Summary plots of __Fmsy range__ (WKMSYREF3) are obtained by:
 ```{r}
-eqsim_plot_range(SIM)
+eqsim_plot_range(SIM, type="mean")
+eqsim_plot_range(SIM, type="median")
+eqsim_plot_range(SIM, type="ssb")
 ```
 
 ## The recruitment model

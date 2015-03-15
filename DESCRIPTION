@@ -1,7 +1,7 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.14
+Version: 0.1.15
 Date: 2015-03-13
 Authors@R: as.person(c(
     "Colin Millar <colinpmillar@gmail.com> [aut,cre]",
@@ -12,6 +12,8 @@ Authors@R: as.person(c(
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
 LazyData: true
+URL: http://github.com/wgmg/msy
+BugReports: http://github.com/wgmg/msy/issues
 Depends:
     R (>= 3.0.0)
 Imports:
