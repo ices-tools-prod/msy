@@ -32,6 +32,17 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"),
                      method = "Buckland",
                      id.sr = NULL, remove.years = NULL, delta = 1.3, nburn = 10000) 
 {
+  
+  if(any(models %in% c("ricker","segreg","bevholt"))) {
+    return(cat("Please note that the msy stock-recruitment functions have been renamed:
+   ricker -> Ricker
+   bevholt -> Bevholt
+   segreg ->  Segreg
+   smooth_hockey -> Smooth_hockey
+   This was done to resolve conflicts with same named functions in the FLCore-package.
+   ERGO: use a capital in the first letter if you want to call these functions"))
+  }
+  
   dms <- FLCore::dims(stk)
   rage <- dms $ min
   if (rage == 0)

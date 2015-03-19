@@ -6,8 +6,10 @@ Date: 2015-03-19
 Authors@R: as.person(c(
     "Colin Millar <colinpmillar@gmail.com> [aut,cre]",
     "Timothy Earl [aut]",
-    "Einar Hjorleifsson  [aut]",
-    "John Simmonds [ctb]",
+    "Einar Hjörleifsson <einar.hjorleifsson@gmail.com> [aut]",
+    "John Simmonds <e.j.simmonds1@gmail.com> [ctb]",
+    "Jose De Oliveira <jose.deoliveira@cefas.co.uk>, [ctb]",
+    "Carmen Fernandez <cferllxx@gmail.com> [ctb]",
     "Noel Cadigan [ctb]"))
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
