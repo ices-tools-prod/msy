@@ -4,7 +4,7 @@
 \alias{eqsr_fit}
 \title{Stock recruitment fit}
 \usage{
-eqsr_fit(stk, nsamp = 5000, models = c("ricker", "segreg", "bevholt"),
+eqsr_fit(stk, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"),
   method = "Buckland", id.sr = NULL, remove.years = NULL, delta = 1.3,
   nburn = 10000)
 }
@@ -14,7 +14,7 @@ eqsr_fit(stk, nsamp = 5000, models = c("ricker", "segreg", "bevholt"),
 \item{nsamp}{Number of samples (iterations)}
 
 \item{models}{A character vector containing sr-models to use. User can set
-any combination of "ricker","segreg","bevholt".}
+any combination of "Ricker", "Segreg", "Bevholt", "Smooth_hockey".}
 
 \item{method}{A character vector. Currently only "Buckland" is implemented.}
 

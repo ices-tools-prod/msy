@@ -6,7 +6,7 @@
 #' @param stk FLStock object
 #' @param nsamp Number of samples (iterations)
 #' @param models A character vector containing sr-models to use. User can set
-#' any combination of "ricker","segreg","bevholt".
+#' any combination of "Ricker", "Segreg", "Bevholt", "Smooth_hockey".
 #' @param method A character vector. Currently only "Buckland" is implemented.
 #' @param id.sr A character vector specifying an id for the stock recruitment
 #' model. If not specified (default) the slot "name" in the FLStock is used.
@@ -28,7 +28,7 @@
 #' }
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-eqsr_fit <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"), 
+eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"), 
                      method = "Buckland",
                      id.sr = NULL, remove.years = NULL, delta = 1.3, nburn = 10000) 
 {
@@ -87,7 +87,7 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"),
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevholt"), ...)
+eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"), ...)
 {
   
   ## dummy
@@ -115,7 +115,8 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("ricker","segreg","bevh
   #--------------------------------------------------------
   # get posterior distribution of estimated recruitment
   #--------------------------------------------------------
-  pred <- t(sapply(seq(nsamp), function(j) exp(get(fit $ model[j], , pos = "package:msy", mode = "function") (fit[j,], sort(data $ ssb))) ))
+  pred <- t(sapply(seq(nsamp), function(j) exp(match.fun(fit $ model[j]) (fit[j,], sort(data $ ssb))) ))
+  #pred <- t(sapply(seq(nsamp), function(j) exp(get(fit $ model[j], , pos = "package:msy", mode = "function") (fit[j,], sort(data $ ssb))) ))
   
   
   #--------------------------------------------------------

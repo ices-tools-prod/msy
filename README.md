@@ -29,7 +29,7 @@ Useage
 ```
 FIT <- eqsr_fit(icesStocks$codNS,
                 nsamp = 1000, 
-                models = c("ricker", "smooth_hockey", "bevholt"))
+                models = c("Ricker", "Smooth_hockey", "bevholt"))
 eqsr_plot(FIT,n=2e4)
 SIM <- eqsim_run(FIT, Fcv=0.25, Fphi=0.30,
                  Blim=70000,Bpa=150000,

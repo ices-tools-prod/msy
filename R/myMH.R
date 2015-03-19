@@ -15,9 +15,9 @@
 #' @export
 initial <- function(model, data)
 {
-  if (model == "segreg") {
+  if (model == "Segreg") {
     c(log(median(data$rec/data$ssb, na.rm = TRUE)), b = log(median(data$ssb)), 0)
-  } else if (model == "smooth_hockey") {
+  } else if (model == "Smooth_hockey") {
     c(log(median(data$rec/data$ssb, na.rm = TRUE)), b = log(median(data$ssb)), 0)
   } else {
     c(0,0,0)
@@ -33,7 +33,7 @@ initial <- function(model, data)
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-ricker <- function(ab, ssb) {
+Ricker <- function(ab, ssb) {
   log(ab$a) + log(ssb) - ab$b * ssb
 }
 
@@ -45,7 +45,7 @@ ricker <- function(ab, ssb) {
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-segreg <- function(ab, ssb) {
+Segreg <- function(ab, ssb) {
   log(ifelse(ssb >= ab$b, ab$a * ab$b, ab$a * ssb))
 }
 
@@ -57,7 +57,7 @@ segreg <- function(ab, ssb) {
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
 #' @export
-bevholt <- function(ab, ssb) {
+Bevholt <- function(ab, ssb) {
   log(ab$a * ssb / (1 + ab$b * ssb))
 }
 

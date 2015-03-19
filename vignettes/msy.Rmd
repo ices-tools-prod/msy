@@ -82,7 +82,7 @@ This can be done in one go with the following code:
 ```{r}
 FIT <- eqsr_fit(icesStocks$saiNS,
                 nsamp = 1000, 
-                models = c("ricker", "segreg"))
+                models = c("Ricker", "Segreg"))
 SIM <- eqsim_run(FIT,
                  bio.years = c(2004:2013),
                  sel.years = c(2004:2013),
