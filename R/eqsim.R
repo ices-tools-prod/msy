@@ -14,6 +14,9 @@
 #' @param Fscan F values to scan over
 #' @param Fcv Assessment error in the advisory year
 #' @param Fphi Autocorrelation in assessment error in the advisory year
+#' @param SSBcv Spawning stock biomass error in the advisory year
+#' @param rhologRec A flag for recruitment autocorrelation. If FALSE (default) 
+#' then not applied.
 #' @param Blim This we know
 #' @param Bpa This we know
 #' @param recruitment.trim A numeric vector with two log-value clipping the extreme
@@ -36,6 +39,8 @@ eqsim_run <- function(fit,
                       Fscan = seq(0, 1, len = 20), # F values to scan over
                       Fcv = 0,
                       Fphi = 0,
+                      SSBcv = 0,
+                      rhologRec = FALSE,
                       Blim,
                       Bpa,
                       recruitment.trim = c(3, -3),
@@ -62,8 +67,8 @@ eqsim_run <- function(fit,
   stk <- fit $ stk
   
   # forecast settings (mean wt etc)
-  stk.win <- window(stk, start = btyr1, end = btyr2)
-  stk.winsel <- window(stk, start = slyr1  , end = slyr2)
+  stk.win <- FLCore::window(stk, start = btyr1, end = btyr2)
+  stk.winsel <- FLCore::window(stk, start = slyr1  , end = slyr2)
   
   littleHelper <- function(x,i) {
     x2 <- x
@@ -73,23 +78,23 @@ eqsim_run <- function(fit,
     return(x)
   }
   
-  west <- matrix(stock.wt(stk.win), ncol = btyr2 - btyr1 + 1)
+  west <- matrix(FLCore::stock.wt(stk.win), ncol = btyr2 - btyr1 + 1)
   i <- west == 0
   if(any(i)) west <- littleHelper(west,i)
-  weca <- matrix(catch.wt(stk.win), ncol = btyr2 - btyr1 + 1)
+  weca <- matrix(FLCore::catch.wt(stk.win), ncol = btyr2 - btyr1 + 1)
   i <- weca == 0
   if(any(i)) weca <- littleHelper(weca,i)
-  wela <- matrix(landings.wt(stk.win), ncol = btyr2 - btyr1 + 1)
+  wela <- matrix(FLCore::landings.wt(stk.win), ncol = btyr2 - btyr1 + 1)
   if(any(i)) wela <- littleHelper(wela,i)
   
-  Mat <- matrix(mat(stk.win), ncol = btyr2 - btyr1 + 1)
-  M <- matrix(m(stk.win), ncol = btyr2 - btyr1 + 1)
-  landings <- matrix(landings.n(stk.winsel), ncol = slyr2 - slyr1 + 1)
+  Mat <- matrix(FLCore::mat(stk.win), ncol = btyr2 - btyr1 + 1)
+  M <- matrix(FLCore::m(stk.win), ncol = btyr2 - btyr1 + 1)
+  landings <- matrix(FLCore::landings.n(stk.winsel), ncol = slyr2 - slyr1 + 1)
   # if zero, use 0.10 of minimum value
   
-  catch <- matrix(catch.n(stk.winsel), ncol = slyr2 - slyr1 + 1)
-  sel <- matrix(harvest(stk.winsel), ncol = slyr2 - slyr1 + 1)
-  Fbar <- matrix(fbar(stk.winsel), ncol = slyr2 - slyr1  + 1)
+  catch <- matrix(FLCore::catch.n(stk.winsel), ncol = slyr2 - slyr1 + 1)
+  sel <- matrix(FLCore::harvest(stk.winsel), ncol = slyr2 - slyr1 + 1)
+  Fbar <- matrix(FLCore::fbar(stk.winsel), ncol = slyr2 - slyr1  + 1)
   sel <- sweep(sel, 2, Fbar, "/")
   
   if (sel.const == TRUE) { # take means of selection
@@ -112,13 +117,13 @@ eqsim_run <- function(fit,
   i <- is.na(land.cat)
   if(any(i)) land.cat[i] <- 1
   
-  Fprop <- apply(harvest.spwn(stk.winsel), 1, mean)[drop=TRUE] # vmean(harvest.spwn(stk.win))
-  Mprop <- apply(m.spwn(stk.win), 1, mean)[drop=TRUE] # mean(m.spwn(stk.win))
+  Fprop <- apply(FLCore::harvest.spwn(stk.winsel), 1, mean)[drop=TRUE] # vmean(harvest.spwn(stk.win))
+  Mprop <- apply(FLCore::m.spwn(stk.win), 1, mean)[drop=TRUE] # mean(m.spwn(stk.win))
   
   # get ready for the simulations
   Nmod <- nrow(SR)
   NF <- length(Fscan)
-  ages <- dims(stk) $ age
+  ages <- FLCore::dims(stk) $ age
   
   ssby <- Ferr <- array(0, c(Nrun,Nmod),dimnames=list(year=1:Nrun,iter=1:Nmod))
   Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <- array(0, c(ages, Nrun, Nmod),
@@ -129,6 +134,13 @@ eqsim_run <- function(fit,
   #        standard deviation of AR(1) marginal distribution, i.e. standard 
   #        deviation of initial Ferr = Fcv/sqrt(1- Fphi^2), instead of just
   #        initialising Ferr=0
+  #  2014-03-12: Changed per note form Carmen/John
+  Ferr[1,] <- rnorm(n=Nmod, mean=0, sd=1)*Fcv/sqrt(1-Fphi^2)
+  for(j in 2:Nrun) { Ferr[j,] <- Fphi*Ferr[j-1,] + Fcv*rnorm(n=Nmod, mean=0, sd=1) }
+  
+  # 2014-03-12: Changed per note form Carmen/John
+  #  Errors in SSB: this is used when the ICES MSY HCR is applied for F
+  SSBerr <- matrix(rnorm(n=Nrun*Nmod, mean=0, sd=1), ncol=Nmod) * SSBcv
   
   rsam <- array(sample(1:ncol(weca), Nrun * Nmod, TRUE), c(Nrun, Nmod))
   rsamsel <- array(sample(1:ncol(sel), Nrun * Nmod, TRUE), c(Nrun, Nmod))
@@ -146,6 +158,19 @@ eqsim_run <- function(fit,
   #   Residuals of SR fits (1 value per SR fit and per simulation year 
   #     but the same residual value for all Fscan values):
   resids= array(rnorm(Nmod*(Nrun+1), 0, SR$cv),c(Nmod, Nrun+1))
+  
+  # 2014-03-12: Changed per note form Carmen/John
+  #  Autocorrelation in Recruitment Residuals:    
+  if(rhologRec){
+    fittedlogRec <-  do.call(cbind, lapply( c(1:nrow(fit$sr.sto)), function(i){     
+      FUN <- match.fun(fit$sr.sto$model[i])
+      FUN(fit$sr.sto[i, ], fit$rby$ssb) } )  ) 
+    # Calculate lag 1 autocorrelation of residuals: 
+    rhologRec <- apply(log(fit$rby$rec)-fittedlogRec, 2, function(x){cor(x[-length(x)],x[-1])})
+    # Draw residuals according to AR(1) process:
+    for(j in 2:(Nrun+1)){ resids[,j] <- rhologRec * resids[,j-1] + resids[,j]*sqrt(1 - rhologRec^2) }
+  }    
+  
   
   # Limit how extreme the Rec residuals can get:
   lims = t(array(SR$cv,c(Nmod,2))) * recruitment.trim
@@ -213,6 +238,7 @@ eqsim_run <- function(fit,
         # new random draws each time
         # allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB) + rnorm(Nmod, 0, SR $ cv)))
         # same random draws used for each F
+        ###### 2014-03-13  TMP COMMENT - ERROR OCCURS HERE
         allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod)(SR, SSB) + resids[,j]))
         # end Changes 29.1.2014
       } else {
@@ -237,7 +263,9 @@ eqsim_run <- function(fit,
       
       # apply HCR
       # (intended) Fbar to be applied in year j-1 (depends on SSB in year j-1):
-      Fnext <- Fbar * pmin(1, SSB/Btrigger)
+      # 2014-03-12: Changed per note form Carmen/John
+      # Fnext <- Fbar * pmin(1, SSB/Btrigger)
+      Fnext <- Fbar * pmin(1, SSB * exp(SSBerr[j,]) / Btrigger)      
       
       # apply some noise to the F
       # Notes from Carmen:
@@ -248,7 +276,10 @@ eqsim_run <- function(fit,
       #  Might make more sense to have the "Ferr" matrix calculated before
       #  the Fscan loop starts so that the same errors in F are applied to
       #  all Fscan values ???? (as for Rec residuals)
-      Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv)
+      
+      # Outcommented 2014-03-12 because F-error already been drawn outside the
+      #   loop, so this line here is no longer needed:
+      # Ferr[j,] <- Fphi * Ferr[j-1,] + rnorm(Nmod, 0, Fcv)
       
       # realised Fbar in year j-1:
       Fnext <- exp(Ferr[j,]) * Fnext
@@ -318,17 +349,29 @@ eqsim_run <- function(fit,
     catm <- apply(catsa, 1, mean)
     lanm <- apply(lansa, 1, mean)
   } else {
-    x <- catsa
-    i <- x > quantile(x,extreme.trim[2]) |
-      x < quantile(x,extreme.trim[1])
-    x[i] <- NA
-    catm <- apply(x, 1, mean, na.rm=TRUE)
     
-    x <- lansa
-    i <- x > quantile(x,extreme.trim[2]) |
-      x < quantile(x,extreme.trim[1])
-    x[i] <- NA
-    lanm <- apply(x, 1, mean, na.rm=TRUE)
+    # 2014-03-12 Outcommented per note from Carmen/John - see below
+    #x <- catsa
+    #i <- x > quantile(x,extreme.trim[2]) |
+    #  x < quantile(x,extreme.trim[1])
+    #x[i] <- NA
+    #catm <- apply(x, 1, mean, na.rm=TRUE)
+    #
+    #x <- lansa
+    #i <- x > quantile(x,extreme.trim[2]) |
+    #  x < quantile(x,extreme.trim[1])
+    #x[i] <- NA
+    #lanm <- apply(x, 1, mean, na.rm=TRUE)
+    
+    # 2014-03-12: Above replaced with the following per note from Carmen/John
+    #  If we want to remove whole SR models, we could use the following code. But it is too extreme, it ends up getting rid of most models:
+    # auxi2 <- array( apply(catsa, 1, function(x){auxi<-rep(TRUE,Nmod); auxi[x > quantile(x, extreme.trim[2]) | x < quantile(x, extreme.trim[1])] <- FALSE; x <- auxi } ), dim=c(keep,Nmod,NF))
+    # auxi2 <- (1:Nmod)[apply(auxi2, 2, function(x){length(unique(as.vector(x)))})==1]
+    # apply(catsa[,,auxi2],1,mean)
+    
+    # So I think the alternative is not to get rid of whole SR models, but of different SR models depending on the value of F:
+    catm <- apply(catsa, 1, function(x){mean(x[x <= quantile(x, extreme.trim[2]) & x >= quantile(x, extreme.trim[1])])})
+    lanm <- apply(lansa, 1, function(x){mean(x[x <= quantile(x, extreme.trim[2]) & x >= quantile(x, extreme.trim[1])])})
   }
   
   # end Einar amended 30.1.2014
@@ -412,13 +455,58 @@ eqsim_run <- function(fit,
   
   #TODO: id.sim - user specified.
   
-  return(list(ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, 
+  # 2014-03-12 Ammendments per note from Carmen/John
+  # CALCULATIONS:
+  
+  # Fmsy: value that maximises median LT catch or median LT landings 
+  auxi <- approx(Fscan, cats[4, ],xout=seq(min(Fscan),max(Fscan),length=200))
+  FmsyMedianC <- auxi$x[which.max(auxi$y)]   
+  MSYMedianC <- max(auxi$y)
+  # Value of F that corresponds to 0.95*MSY:
+  FmsylowerMedianC <- auxi$x[ min( (1:length(auxi$y))[auxi$y/MSYMedianC >= 0.95] ) ]
+  FmsyupperMedianC <- auxi$x[ max( (1:length(auxi$y))[auxi$y/MSYMedianC >= 0.95] ) ]
+  
+  auxi <- approx(Fscan, lans[4, ],xout=seq(min(Fscan),max(Fscan),length=200))
+  FmsyMedianL <- auxi$x[which.max(auxi$y)]
+  MSYMedianL <- max(auxi$y)
+  
+  # Value of F that corresponds to 0.95*MSY:
+  FmsylowerMedianL <- auxi$x[ min( (1:length(auxi$y))[auxi$y/MSYMedianL >= 0.95] ) ]
+  FmsyupperMedianL <- auxi$x[ max( (1:length(auxi$y))[auxi$y/MSYMedianL >= 0.95] ) ]
+  
+  F5percRiskBlim <- flim
+  
+  refs_interval <- data.frame(FmsyMedianC = FmsyMedianC,
+                             FmsylowerMedianC = FmsylowerMedianC,
+                             FmsyupperMedianC = FmsyupperMedianC,
+                             FmsyMedianL = FmsyMedianL,
+                             FmsylowerMedianL = FmsylowerMedianL,
+                             FmsyupperMedianL = FmsyupperMedianL,
+                             F5percRiskBlim = F5percRiskBlim,
+                             Btrigger = Btrigger)
+  
+  # END 2014-03-12 Ammendments per note from Carmen/John
+  
+  sim <- list(ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop, 
                         west = west, weca = weca, sel = sel),
               rbya=list(ferr=ferr),
-              rby=fit$rby, rbp=rbp, Blim=Blim, Bpa=Bpa, Refs = Refs,
-              pProfile=pProfile,id.sim=fit$id.sr))
+              rby=fit$rby,
+              rbp=rbp,
+              Blim=Blim,
+              Bpa=Bpa,
+              Refs = Refs,
+              pProfile=pProfile,
+              id.sim=fit$id.sr,
+              refs_interval=refs_interval)
+  
+  sim <- eqsim_range(sim)
+  
+  return(sim)
   
 }
+
+
+
 
 
 #' @title Plots of the results from eqsim
@@ -588,7 +676,8 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
 {
   
   # dummy
-  Ftarget <- p05 <- p95 <- p50 <- variable <- value <- year <- NULL
+  Ftarget <- p05 <- p95 <- p50 <- variable <- value <- year <- 
+    Mean <- fbar <- rec <- ssb <- catch <- landings <- x <- y <- 0
   
   rby <- sim$rby
   for (i in c(2,3,5,6)) rby[,i] <- rby[,i]/Scale
@@ -604,98 +693,103 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
   pProfile <- sim$pProfile
   
   i <- rbp$variable %in% "Recruitment"
-  plotR <- ggplot(rbp[i,],aes(Ftarget)) + 
-    theme_bw() +
-    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
-    geom_line(aes(y=p50)) + 
-    geom_line(aes(y=Mean),linetype=2) +
-    geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
-    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
-    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
-    facet_wrap(~ variable) +
-    labs(y = "",x="") +
-    geom_point(data=rby,aes(fbar,rec)) +
-    coord_cartesian(ylim=c(0,rby$rec * 1.2),xlim=c(0,rby$fbar * 1.2)) 
+  plotR <- 
+    ggplot2::ggplot(rbp[i,],ggplot2::aes(Ftarget)) + 
+    ggplot2::theme_bw() +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin=p05,ymax=p95),fill="grey90") +
+    ggplot2::geom_line(ggplot2::aes(y=p50)) + 
+    ggplot2::geom_line(ggplot2::aes(y=Mean),linetype=2) +
+    ggplot2::geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
+    ggplot2::facet_wrap(~ variable) +
+    ggplot2::labs(y = "",x="") +
+    ggplot2::geom_point(data=rby,ggplot2::aes(fbar,rec)) +
+    ggplot2::coord_cartesian(ylim=c(0,rby$rec * 1.2),xlim=c(0,rby$fbar * 1.2)) 
   
   
   i <- rbp$variable %in% "Spawning stock biomass"
-  plotSSB <- ggplot(rbp[i,],aes(Ftarget)) + 
-    theme_bw() +
-    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
-    geom_line(aes(y=p50)) + 
-    geom_hline(yintercept=sim$Blim,col="red",lwd=1) +
-    annotate("text",x=0,y=sim$Blim,label="Blim",col="red",hjust=0,vjust=0) +
-    geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
-    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
-    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
-    geom_point(data=rby,aes(fbar,ssb)) +
-    facet_wrap(~ variable) +
-    coord_cartesian(ylim=c(0,rby$ssb * 1.2),xlim=c(0,rby$fbar * 1.2)) +
-    labs(y = "",x="")
+  plotSSB <- 
+    ggplot2::ggplot(rbp[i,],ggplot2::aes(Ftarget)) + 
+    ggplot2::theme_bw() +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin=p05,ymax=p95),fill="grey90") +
+    ggplot2::geom_line(ggplot2::aes(y=p50)) + 
+    ggplot2::geom_hline(yintercept=sim$Blim,col="red",lwd=1) +
+    ggplot2::annotate("text",x=0,y=sim$Blim,label="Blim",col="red",hjust=0,vjust=0) +
+    ggplot2::geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_point(data=rby,ggplot2::aes(fbar,ssb)) +
+    ggplot2::facet_wrap(~ variable) +
+    ggplot2::coord_cartesian(ylim=c(0,rby$ssb * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    ggplot2::labs(y = "",x="")
   
   i <- rbp$variable %in% "Catch"
-  plotCatch <- ggplot(rbp[i,],aes(Ftarget)) + 
-    theme_bw() +
-    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
-    geom_line(aes(y=p50)) + 
-    geom_line(aes(y=Mean),linetype=2) +
-    geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
-    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
-    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
-    geom_point(data=rby,aes(fbar,catch)) +
-    facet_wrap(~ variable) +
-    coord_cartesian(ylim=c(0,rby$catch * 1.2),xlim=c(0,rby$fbar * 1.2)) +
-    labs(y = "",x="")
+  plotCatch <- 
+    ggplot2::ggplot(rbp[i,],ggplot2::aes(Ftarget)) + 
+    ggplot2::theme_bw() +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin=p05,ymax=p95),fill="grey90") +
+    ggplot2::geom_line(ggplot2::aes(y=p50)) + 
+    ggplot2::geom_line(ggplot2::aes(y=Mean),linetype=2) +
+    ggplot2::geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_point(data=rby,ggplot2::aes(fbar,catch)) +
+    ggplot2::facet_wrap(~ variable) +
+    ggplot2::coord_cartesian(ylim=c(0,rby$catch * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    ggplot2::labs(y = "",x="")
   
   i <- rbp$variable %in% "Landings"
-  plotLandings <- ggplot(rbp[i,],aes(Ftarget)) + 
-    theme_bw() +
-    geom_ribbon(aes(ymin=p05,ymax=p95),fill="grey90") +
-    geom_line(aes(y=p50)) + 
-    geom_line(aes(y=Mean),linetype=2) +
-    geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
-    geom_vline(xintercept=refs[2,5],col="darkgreen",lwd=1) +
-    annotate("text",x=refs[2,5],y=0,label="Fmsl",col="darkgreen",hjust=0,vjust=0,angle=90) +
-    geom_point(data=rby,aes(fbar,landings)) +
-    facet_wrap(~ variable) +
-    coord_cartesian(ylim=c(0,rby$landings * 1.2),xlim=c(0,rby$fbar * 1.2)) +
-    labs(y = "",x="")
+  plotLandings <- 
+    ggplot2::ggplot(rbp[i,],ggplot2::aes(Ftarget)) + 
+    ggplot2::theme_bw() +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin=p05,ymax=p95),fill="grey90") +
+    ggplot2::geom_line(ggplot2::aes(y=p50)) + 
+    ggplot2::geom_line(ggplot2::aes(y=Mean),linetype=2) +
+    ggplot2::geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_vline(xintercept=refs[2,5],col="darkgreen",lwd=1) +
+    ggplot2::annotate("text",x=refs[2,5],y=0,label="Fmsl",col="darkgreen",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_point(data=rby,ggplot2::aes(fbar,landings)) +
+    ggplot2::facet_wrap(~ variable) +
+    ggplot2::coord_cartesian(ylim=c(0,rby$landings * 1.2),xlim=c(0,rby$fbar * 1.2)) +
+    ggplot2::labs(y = "",x="")
   
   
   d2 <- rby[,c("fbar","catch","landings")]
   names(d2) <- c("Ftarget","Catch","Landings")
-  d2 <- melt(d2,id.vars="Ftarget")
+  d2 <- reshape2::melt(d2,id.vars="Ftarget")
   d2$dummy <- "Yield"
   d2$Ftarget <- as.numeric(d2$Ftarget)
   
   i <- rbp$variable %in% c("Catch","Landings")
   d1 <- rbp[i,]
   d1$dummy <- "Yield"
-  plotYield <- ggplot(d1,aes(Ftarget)) + 
-    theme_bw() +
-    geom_ribbon(aes(ymin=p05,ymax=p95,fill=variable),alpha=0.15) +
-    #geom_line(aes(y=p05,colour=variable)) + 
-    #geom_line(aes(y=p95,colour=variable)) + 
-    geom_line(aes(y=p50,colour=variable)) + 
-    geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
-    annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
-    geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
-    annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
-    geom_vline(xintercept=refs[2,5],col="blue",lwd=1,linetype=2) +
-    annotate("text",x=refs[2,5],y=0,label="Fmsl",col="blue",hjust=0,vjust=0,angle=90) +
-    geom_point(data=d2,aes(Ftarget,value,colour=variable)) +
-    facet_wrap(~ dummy) +
-    coord_cartesian(ylim=c(0,max(rby$catch) * 1.2),xlim=c(0,max(rby$fbar) * 1.2)) +
-    labs(y = "",x="") +
-    theme(legend.position="none") +
-    scale_colour_manual(values=c("Catch"="darkgreen","Landings"="blue")) +
-    scale_fill_manual(values=c("Catch"="darkgreen","Landings"="blue")) +
-    annotate("text",x=max(rby$fbar) * 1.2,y=max(rby$catch) * 1.1,label="Catch",colour="darkgreen",hjust=1) +
-    annotate("text",x=max(rby$fbar) * 1.2,y=max(rby$landings) * 1.1,label="Landings",colour="blue",hjust=1)
+  plotYield <- 
+    ggplot2::ggplot(d1,ggplot2::aes(Ftarget)) + 
+    ggplot2::theme_bw() +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin=p05,ymax=p95,fill=variable),alpha=0.15) +
+    #geom_line(ggplot2::aes(y=p05,colour=variable)) + 
+    #geom_line(ggplot2::aes(y=p95,colour=variable)) + 
+    ggplot2::geom_line(ggplot2::aes(y=p50,colour=variable)) + 
+    ggplot2::geom_vline(xintercept=refs[1,1],col="red",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,1],y=0,label="F05",col="red",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_vline(xintercept=refs[1,5],col="darkgreen",lwd=1) +
+    ggplot2::annotate("text",x=refs[1,5],y=0,label="Fmsy",col="darkgreen",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_vline(xintercept=refs[2,5],col="blue",lwd=1,linetype=2) +
+    ggplot2::annotate("text",x=refs[2,5],y=0,label="Fmsl",col="blue",hjust=0,vjust=0,angle=90) +
+    ggplot2::geom_point(data=d2,ggplot2::aes(Ftarget,value,colour=variable)) +
+    ggplot2::facet_wrap(~ dummy) +
+    ggplot2::coord_cartesian(ylim=c(0,max(rby$catch) * 1.2),xlim=c(0,max(rby$fbar) * 1.2)) +
+    ggplot2::labs(y = "",x="") +
+    ggplot2::theme(legend.position="none") +
+    ggplot2::scale_colour_manual(values=c("Catch"="darkgreen","Landings"="blue")) +
+    ggplot2::scale_fill_manual(values=c("Catch"="darkgreen","Landings"="blue")) +
+    ggplot2::annotate("text",x=max(rby$fbar) * 1.2,y=max(rby$catch) * 1.1,label="Catch",colour="darkgreen",hjust=1) +
+    ggplot2::annotate("text",x=max(rby$fbar) * 1.2,y=max(rby$landings) * 1.1,label="Landings",colour="blue",hjust=1)
   
   
   
@@ -704,8 +798,8 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
                    y=c(0.80,0.75,0.70,0.65),
                    variable=c("p(SSB<Blim)","p(SSB<Bpa)","Fmsy","Fmsy - landings"))
   plotProbs <- 
-    ggplot(pProfile,aes(Ftarget,value,colour=variable)) + 
-    scale_colour_manual(values=c("pFmsyCatch"="darkgreen",
+    ggplot2::ggplot(pProfile,ggplot2::aes(Ftarget,value,colour=variable)) + 
+    ggplot2::scale_colour_manual(values=c("pFmsyCatch"="darkgreen",
                                  "pFmsyLandings"="blue",
                                  "Blim"="red",
                                  "Bpa"="orange",
@@ -713,32 +807,545 @@ eqsim_ggplot <- function(sim, Scale=1, plotit=TRUE)
                                  "p(SSB<Bpa)"="orange",
                                  "Fmsy"="darkgreen",
                                  "Fmsy - landings"="blue")) + 
-    theme_bw() +
-    geom_line(lwd=1) + 
-    geom_text(data=df,aes(x,y,label=variable,colour=variable)) +
-    geom_hline(yintercept=0.05,colour="black") +
-    coord_cartesian(xlim=c(0,rby$fbar * 1.2)) +
-    labs(x="",y="") + facet_wrap(~ dummy) +
-    theme(legend.position="none") 
+    ggplot2::theme_bw() +
+    ggplot2::geom_line(lwd=1) + 
+    ggplot2::geom_text(data=df,ggplot2::aes(x,y,label=variable,colour=variable)) +
+    ggplot2::geom_hline(yintercept=0.05,colour="black") +
+    ggplot2::coord_cartesian(xlim=c(0,rby$fbar * 1.2)) +
+    ggplot2::labs(x="",y="") + 
+    ggplot2::facet_wrap(~ dummy) +
+    ggplot2::theme(legend.position="none") 
 
   if(plotit) {
-    vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(2, 2)))
-    print(plotSSB + theme(panel.margin = unit(c(0,0,0,0), "cm"),
-                          plot.margin = unit(c(0,0.25,0,0), "cm")),
+    vplayout <- function(x, y) grid::viewport(layout.pos.row = x, layout.pos.col = y)
+    grid::grid.newpage()
+    grid::pushViewport(grid::viewport(layout = grid::grid.layout(2, 2)))
+    print(plotSSB + ggplot2::theme(panel.margin = grid::unit(c(0,0,0,0), "cm"),
+                          plot.margin = grid::unit(c(0,0.25,0,0), "cm")),
           vp = vplayout(1, 1))
-    print(plotR + theme(panel.margin = unit(c(0,0,0,0), "cm"),
-                        plot.margin = unit(c(0,0.25,0,0), "cm")),
+    print(plotR + ggplot2::theme(panel.margin = grid::unit(c(0,0,0,0), "cm"),
+                        plot.margin = grid::unit(c(0,0.25,0,0), "cm")),
           vp=vplayout(1,2))
-    print(plotYield + theme(panel.margin = unit(c(0,0,0,0), "cm"),
-                            plot.margin = unit(c(0,0.25,0,0), "cm")),
+    print(plotYield + ggplot2::theme(panel.margin = grid::unit(c(0,0,0,0), "cm"),
+                            plot.margin = grid::unit(c(0,0.25,0,0), "cm")),
           vp=vplayout(2,1))
-    print(plotProbs + theme(panel.margin = unit(c(0,0,0,0), "cm"),
-                            plot.margin = unit(c(0,0.25,0,0), "cm")),
+    print(plotProbs + ggplot2::theme(panel.margin = grid::unit(c(0,0,0,0), "cm"),
+                            plot.margin = grid::unit(c(0,0.25,0,0), "cm")),
           vp=vplayout(2,2))
   } else {
     return(list(plotR=plotR,plotSSB=plotSSB,plotCatch=plotCatch,
               plotLandings=plotLandings,plotYield=plotYield,plotProbs=plotProbs))
   }
 }
+
+
+#' @title Calculate Fmsy range
+#' 
+#' @description XXX
+#' 
+#' @export
+#' 
+#' @param sim XXX
+#' @param interval XXX
+eqsim_range <-function (sim, interval=0.95)
+  {
+  
+  data.95 <- sim$rbp
+  x.95 <- data.95[data.95$variable == "Landings",]$Ftarget
+  y.95 <- data.95[data.95$variable == "Landings",]$Mean
+  x.95 <- x.95[2:length(x.95)]
+  y.95 <- y.95[2:length(y.95)]
+  
+  # Plot curve with 95% line
+  #windows(width = 10, height = 7)
+  #par(mfrow = c(1,1), mar = c(5,4,2,1), mgp = c(3,1,0))
+  #plot(x.95, y.95, ylim = c(0, max(y.95, na.rm = TRUE)),
+  #     xlab = "Total catch F", ylab = "Mean landings")
+  yield.p95 <- interval * max(y.95, na.rm = TRUE)
+  #abline(h = yield.p95, col = "blue", lty = 1)
+  
+  # Fit loess smoother to curve
+  x.lm <- loess(y.95 ~ x.95, span = 0.2)
+  lm.pred <- data.frame(x = seq(min(x.95), max(x.95), length = 1000),
+                        y = rep(NA, 1000))
+  lm.pred$y <- predict(x.lm, newdata = lm.pred$x) 
+  #lines(lm.pred$x, lm.pred$y, lty = 1, col = "red")
+  #points(x = sim$Refs["lanF","meanMSY"], 
+  #      y = predict(x.lm, newdata = sim$Refs["lanF","meanMSY"]),
+  #       pch = 16, col = "blue")
+  
+  # Limit fitted curve to values greater than the 95% cutoff
+  lm.pred.95 <- lm.pred[lm.pred$y >= yield.p95,]
+  fmsy.lower <- min(lm.pred.95$x)
+  fmsy.upper <- max(lm.pred.95$x)
+  #abline(v = c(fmsy.lower, fmsy.upper), lty = 8, col = "blue")
+  #abline(v = sim$Refs["lanF","meanMSY"], lty = 1, col = "blue")
+  #legend(x = "bottomright", bty = "n", cex = 1.0, 
+  #       title = "F(msy)", title.col = "blue",
+  #       legend = c(paste0("lower = ", round(fmsy.lower,3)),
+  #                  paste0("mean = ", round(sim$Refs["lanF","meanMSY"],3)), 
+  #                  paste0("upper = ", round(fmsy.upper,3))))
+  
+  fmsy.lower.mean <- fmsy.lower
+  fmsy.upper.mean <- fmsy.upper
+  landings.lower.mean <- lm.pred.95[lm.pred.95$x == fmsy.lower.mean,]$y	
+  landings.upper.mean <- lm.pred.95[lm.pred.95$x == fmsy.upper.mean,]$y
+  
+  # Repeat for 95% of yield at F(05):
+  f05 <- sim$Refs["catF","F05"]
+  yield.f05 <- predict(x.lm, newdata = f05)
+  #points(f05, yield.f05, pch = 16, col = "green")
+  yield.f05.95 <- interval * yield.f05
+  #abline(h = yield.f05.95, col = "green")
+  lm.pred.f05.95 <- lm.pred[lm.pred$y >= yield.f05.95,]
+  f05.lower <- min(lm.pred.f05.95$x)
+  f05.upper <- max(lm.pred.f05.95$x)
+  #abline(v = c(f05.lower,f05.upper), lty = 8, col = "green")
+  #abline(v = f05, lty = 1, col = "green")
+  #legend(x = "right", bty = "n", cex = 1.0, 
+  #       title = "F(5%)", title.col = "green",
+  #       legend = c(paste0("lower = ", round(f05.lower,3)),
+  #                  paste0("estimate = ", round(f05,3)),
+  #                  paste0("upper = ", round(f05.upper,3))))
+  
+  ################################################
+  # Extract yield data (landings) - median version
+  
+  data.95 <- sim$rbp
+  x.95 <- data.95[data.95$variable == "Landings",]$Ftarget
+  y.95 <- data.95[data.95$variable == "Landings",]$p50
+  
+  # Plot curve with 95% line
+  #windows(width = 10, height = 7)
+  #par(mfrow = c(1,1), mar = c(5,4,2,1), mgp = c(3,1,0))
+  #plot(x.95, y.95, ylim = c(0, max(y.95, na.rm = TRUE)),
+  #     xlab = "Total catch F", ylab = "Median landings")
+  yield.p95 <- interval * max(y.95, na.rm = TRUE)
+  #abline(h = yield.p95, col = "blue", lty = 1)
+  
+  # Fit loess smoother to curve
+  x.lm <- loess(y.95 ~ x.95, span = 0.2)
+  lm.pred <- data.frame(x = seq(min(x.95), max(x.95), length = 1000),
+                        y = rep(NA, 1000))
+  lm.pred$y <- predict(x.lm, newdata = lm.pred$x) 
+  #lines(lm.pred$x, lm.pred$y, lty = 1, col = "red")
+  
+  # Find maximum of fitted curve - this will be the new median (F(msy)
+  Fmsymed <- lm.pred[which.max(lm.pred$y),]$x
+  Fmsymed.landings <- lm.pred[which.max(lm.pred$y),]$y
+  
+  # Overwrite Refs table
+  sim$Refs2 <- sim$Refs
+  sim$Refs2[,"medianMSY"] <- NA
+  sim$Refs2["lanF","medianMSY"] <- Fmsymed
+  sim$Refs2["landings","medianMSY"] <- Fmsymed.landings
+  
+  # Add maximum of medians to plot
+  #points(x = sim$Refs["lanF","medianMSY"], 
+  #       y = predict(x.lm, newdata = sim$Refs["lanF","medianMSY"]),
+  #       pch = 16, col = "blue")
+  
+  # Limit fitted curve to values greater than the 95% cutoff
+  lm.pred.95 <- lm.pred[lm.pred$y >= yield.p95,]
+  fmsy.lower <- min(lm.pred.95$x)
+  fmsy.upper <- max(lm.pred.95$x)
+  #abline(v = c(fmsy.lower, fmsy.upper), lty = 8, col = "blue")
+  #abline(v = sim$Refs["lanF","medianMSY"], lty = 1, col = "blue")
+  #legend(x = "bottomright", bty = "n", cex = 1.0, 
+  #       title = "F(msy)", title.col = "blue",
+  #       legend = c(paste0("lower = ", round(fmsy.lower,3)),
+  #                  paste0("median = ", round(sim$Refs["lanF","medianMSY"],3)), 
+  #                  paste0("upper = ", round(fmsy.upper,3))))
+  
+  fmsy.lower.median <- fmsy.lower
+  fmsy.upper.median <- fmsy.upper
+  landings.lower.median <- lm.pred.95[lm.pred.95$x == fmsy.lower.median,]$y
+  landings.upper.median <- lm.pred.95[lm.pred.95$x == fmsy.upper.median,]$y
+  
+  # Repeat for 95% of yield at F(05):
+  f05 <- sim$Refs["catF","F05"]
+  yield.f05 <- predict(x.lm, newdata = f05)
+  #points(f05, yield.f05, pch = 16, col = "green")
+  yield.f05.95 <- interval * yield.f05
+  #abline(h = yield.f05.95, col = "green")
+  lm.pred.f05.95 <- lm.pred[lm.pred$y >= yield.f05.95,]
+  f05.lower <- min(lm.pred.f05.95$x)
+  f05.upper <- max(lm.pred.f05.95$x)
+  #abline(v = c(f05.lower,f05.upper), lty = 8, col = "green")
+  #abline(v = f05, lty = 1, col = "green")
+  #legend(x = "right", bty = "n", cex = 1.0, 
+  #       title = "F(5%)", title.col = "green",
+  #       legend = c(paste0("lower = ", round(f05.lower,3)),
+  #                  paste0("estimate = ", round(f05,3)),
+  #                  paste0("upper = ", round(f05.upper,3))))
+  
+  # Estimate implied SSB for each F output
+  
+  x.95 <- data.95[data.95$variable == "Spawning stock biomass",]$Ftarget
+  b.95 <- data.95[data.95$variable == "Spawning stock biomass",]$p50
+  
+  # Plot curve with 95% line
+  #windows(width = 10, height = 7)
+  #par(mfrow = c(1,1), mar = c(5,4,2,1), mgp = c(3,1,0))
+  #plot(x.95, b.95, ylim = c(0, max(b.95, na.rm = TRUE)),
+  #     xlab = "Total catch F", ylab = "Median SSB")
+  
+  # Fit loess smoother to curve
+  b.lm <- loess(b.95 ~ x.95, span = 0.2)
+  b.lm.pred <- data.frame(x = seq(min(x.95), max(x.95), length = 1000),
+                          y = rep(NA, 1000))
+  b.lm.pred$y <- predict(b.lm, newdata = b.lm.pred$x) 
+  #lines(b.lm.pred$x, b.lm.pred$y, lty = 1, col = "red")
+  
+  # Estimate SSB for median F(msy) and range
+  b.msymed <- predict(b.lm, newdata = Fmsymed)
+  b.medlower <- predict(b.lm, newdata = fmsy.lower.median)
+  b.medupper <- predict(b.lm, newdata = fmsy.upper.median)
+  #abline(v = c(fmsy.lower.median, Fmsymed, fmsy.upper.median), col = "blue", lty = c(8,1,8))
+  #points(x = c(fmsy.lower.median, Fmsymed, fmsy.upper.median), 
+  #       y = c(b.medlower, b.msymed, b.medupper), col = "blue", pch = 16)
+  #legend(x = "topright", bty = "n", cex = 1.0, 
+  #       title = "F(msy)", title.col = "blue",
+  #       legend = c(paste0("lower = ", round(b.medlower,0)),
+  #                  paste0("median = ", round(b.msymed,0)),
+  #                  paste0("upper = ", round(b.medupper,0))))
+  
+  # Update summary table with John's format
+  
+  sim$Refs2 <- sim$Refs2[,!(colnames(sim$Refs) %in% c("FCrash05","FCrash50"))]
+  sim$Refs2 <- cbind(sim$Refs2, Medlower = rep(NA,6), Meanlower = rep(NA,6), 
+                       Medupper = rep(NA,6), Meanupper = rep(NA,6))
+  
+  sim$Refs2["lanF","Medlower"] <- fmsy.lower.median
+  sim$Refs2["lanF","Medupper"] <- fmsy.upper.median
+  sim$Refs2["lanF","Meanlower"] <- fmsy.lower.mean
+  sim$Refs2["lanF","Meanupper"] <- fmsy.upper.mean
+  
+  sim$Refs2["landings","Medlower"] <- landings.lower.median
+  sim$Refs2["landings","Medupper"] <- landings.upper.median
+  sim$Refs2["landings","Meanlower"] <- landings.lower.mean
+  sim$Refs2["landings","Meanupper"] <- landings.upper.mean
+  
+  sim$Refs2["lanB","medianMSY"] <- b.msymed
+  sim$Refs2["lanB","Medlower"] <- b.medlower
+  sim$Refs2["lanB","Medupper"] <- b.medupper
+  
+  # Reference point estimates
+  #cat("\nReference point estimates:\n")
+  return (sim)
+}
+
+
+#' @title Calculate Fmsy range
+#' 
+#' @description XXX
+#' 
+#' @export
+#' 
+#' @param sim XXX
+#' @param interval XXX
+#' @param type XXX
+
+eqsim_plot_range <- function (sim, interval=0.95, type="median")
+
+  {
+  
+  data.95 <- sim$rbp
+  
+  if(type == "mean") {
+    
+    x.95 <- data.95[data.95$variable == "Landings",]$Ftarget
+    y.95 <- data.95[data.95$variable == "Landings",]$Mean
+    
+    #x.95 <- x.95[2:length(x.95)]
+    #y.95 <- y.95[2:length(y.95)]
+    
+    # Plot curve with 95% line
+    # windows(width = 10, height = 7)
+    par(mfrow = c(1,1), mar = c(5,4,2,1), mgp = c(3,1,0))
+    plot(x.95, y.95, ylim = c(0, max(y.95, na.rm = TRUE)),
+         xlab = "Total catch F", ylab = "Mean landings")
+    yield.p95 <- interval * max(y.95, na.rm = TRUE)
+    abline(h = yield.p95, col = "blue", lty = 1)
+    
+    # Fit loess smoother to curve
+    x.lm <- loess(y.95 ~ x.95, span = 0.2)
+    lm.pred <- data.frame(x = seq(min(x.95), max(x.95), length = 1000),
+                          y = rep(NA, 1000))
+    lm.pred$y <- predict(x.lm, newdata = lm.pred$x) 
+    lines(lm.pred$x, lm.pred$y, lty = 1, col = "red")
+    points(x = sim$Refs["lanF","meanMSY"], 
+           y = predict(x.lm, newdata = sim$Refs["lanF","meanMSY"]),
+           pch = 16, col = "blue")
+    
+    # Limit fitted curve to values greater than the 95% cutoff
+    lm.pred.95 <- lm.pred[lm.pred$y >= yield.p95,]
+    fmsy.lower <- min(lm.pred.95$x)
+    fmsy.upper <- max(lm.pred.95$x)
+    abline(v = c(fmsy.lower, fmsy.upper), lty = 8, col = "blue")
+    abline(v = sim$Refs["lanF","meanMSY"], lty = 1, col = "blue")
+    legend(x = "bottomright", bty = "n", cex = 1.0, 
+           title = "F(msy)", title.col = "blue",
+           legend = c(paste0("lower = ", round(fmsy.lower,3)),
+                      paste0("mean = ", round(sim$Refs["lanF","meanMSY"],3)), 
+                      paste0("upper = ", round(fmsy.upper,3))))
+    
+    fmsy.lower.mean <- fmsy.lower
+    fmsy.upper.mean <- fmsy.upper
+    landings.lower.mean <- lm.pred.95[lm.pred.95$x == fmsy.lower.mean,]$y	
+    landings.upper.mean <- lm.pred.95[lm.pred.95$x == fmsy.upper.mean,]$y
+    
+    # Repeat for 95% of yield at F(05):
+    f05 <- sim$Refs["catF","F05"]
+    yield.f05 <- predict(x.lm, newdata = f05)
+    points(f05, yield.f05, pch = 16, col = "green")
+    yield.f05.95 <- interval * yield.f05
+    abline(h = yield.f05.95, col = "green")
+    lm.pred.f05.95 <- lm.pred[lm.pred$y >= yield.f05.95,]
+    f05.lower <- min(lm.pred.f05.95$x)
+    f05.upper <- max(lm.pred.f05.95$x)
+    abline(v = c(f05.lower,f05.upper), lty = 8, col = "green")
+    abline(v = f05, lty = 1, col = "green")
+    legend(x = "right", bty = "n", cex = 1.0, 
+           title = "F(5%)", title.col = "green",
+           legend = c(paste0("lower = ", round(f05.lower,3)),
+                      paste0("estimate = ", round(f05,3)),
+                      paste0("upper = ", round(f05.upper,3))))
+    
+    return(invisible(NULL))
+    
+  }
+  
+  
+  if(type == "median") {
+  ################################################
+  # Extract yield data (landings) - median version
+  
+  data.95 <- sim$rbp
+  x.95 <- data.95[data.95$variable == "Landings",]$Ftarget
+  y.95 <- data.95[data.95$variable == "Landings",]$p50
+  
+  
+  # Plot curve with 95% line
+  #windows(width = 10, height = 7)
+  par(mfrow = c(1,1), mar = c(5,4,2,1), mgp = c(3,1,0))
+  plot(x.95, y.95, ylim = c(0, max(y.95, na.rm = TRUE)),
+       xlab = "Total catch F", ylab = "Median landings")
+  yield.p95 <- interval * max(y.95, na.rm = TRUE)
+  abline(h = yield.p95, col = "blue", lty = 1)
+  
+  # Fit loess smoother to curve
+  x.lm <- loess(y.95 ~ x.95, span = 0.2)
+  lm.pred <- data.frame(x = seq(min(x.95), max(x.95), length = 1000),
+                        y = rep(NA, 1000))
+  lm.pred$y <- predict(x.lm, newdata = lm.pred$x) 
+  lines(lm.pred$x, lm.pred$y, lty = 1, col = "red")
+  
+  # Find maximum of fitted curve - this will be the new median (F(msy)
+  Fmsymed <- lm.pred[which.max(lm.pred$y),]$x
+  Fmsymed.landings <- lm.pred[which.max(lm.pred$y),]$y
+  
+  # Overwrite Refs table
+  sim$Refs[,"medianMSY"] <- NA
+  sim$Refs["lanF","medianMSY"] <- Fmsymed
+  sim$Refs["landings","medianMSY"] <- Fmsymed.landings
+  
+  # Add maximum of medians to plot
+  points(x = sim$Refs["lanF","medianMSY"], 
+         y = predict(x.lm, newdata = sim$Refs["lanF","medianMSY"]),
+         pch = 16, col = "blue")
+  
+  # Limit fitted curve to values greater than the 95% cutoff
+  lm.pred.95 <- lm.pred[lm.pred$y >= yield.p95,]
+  fmsy.lower <- min(lm.pred.95$x)
+  fmsy.upper <- max(lm.pred.95$x)
+  abline(v = c(fmsy.lower, fmsy.upper), lty = 8, col = "blue")
+  abline(v = sim$Refs["lanF","medianMSY"], lty = 1, col = "blue")
+  legend(x = "bottomright", bty = "n", cex = 1.0, 
+         title = "F(msy)", title.col = "blue",
+         legend = c(paste0("lower = ", round(fmsy.lower,3)),
+                    paste0("median = ", round(sim$Refs["lanF","medianMSY"],3)), 
+                    paste0("upper = ", round(fmsy.upper,3))))
+  
+  fmsy.lower.median <- fmsy.lower
+  fmsy.upper.median <- fmsy.upper
+  landings.lower.median <- lm.pred.95[lm.pred.95$x == fmsy.lower.median,]$y
+  landings.upper.median <- lm.pred.95[lm.pred.95$x == fmsy.upper.median,]$y
+  
+  # Repeat for 95% of yield at F(05):
+  f05 <- sim$Refs["catF","F05"]
+  yield.f05 <- predict(x.lm, newdata = f05)
+  points(f05, yield.f05, pch = 16, col = "green")
+  yield.f05.95 <- interval * yield.f05
+  abline(h = yield.f05.95, col = "green")
+  lm.pred.f05.95 <- lm.pred[lm.pred$y >= yield.f05.95,]
+  f05.lower <- min(lm.pred.f05.95$x)
+  f05.upper <- max(lm.pred.f05.95$x)
+  abline(v = c(f05.lower,f05.upper), lty = 8, col = "green")
+  abline(v = f05, lty = 1, col = "green")
+  legend(x = "right", bty = "n", cex = 1.0, 
+         title = "F(5%)", title.col = "green",
+         legend = c(paste0("lower = ", round(f05.lower,3)),
+                    paste0("estimate = ", round(f05,3)),
+                    paste0("upper = ", round(f05.upper,3))))
+  
+  return(invisible(NULL))
+  
+  }
+  
+  if(type == "ssb") {
+    # Estimate implied SSB for each F output
+    
+    x.95 <- data.95[data.95$variable == "Spawning stock biomass",]$Ftarget
+    b.95 <- data.95[data.95$variable == "Spawning stock biomass",]$p50
+    
+    # Plot curve with 95% line
+    #windows(width = 10, height = 7)
+    par(mfrow = c(1,1), mar = c(5,4,2,1), mgp = c(3,1,0))
+    plot(x.95, b.95, ylim = c(0, max(b.95, na.rm = TRUE)),
+         xlab = "Total catch F", ylab = "Median SSB")
+    
+    # Fit loess smoother to curve
+    b.lm <- loess(b.95 ~ x.95, span = 0.2)
+    b.lm.pred <- data.frame(x = seq(min(x.95), max(x.95), length = 1000),
+                            y = rep(NA, 1000))
+    b.lm.pred$y <- predict(b.lm, newdata = b.lm.pred$x) 
+    lines(b.lm.pred$x, b.lm.pred$y, lty = 1, col = "red")
+    
+    # Estimate SSB for median F(msy) and range
+    Fmsymed <- sim$Refs["landings","medianMSY"]
+    fmsy.lower.median <- sim$Refs2["lanF","Medlower"]
+    fmsy.upper.median <- sim$Refs2["lanF","Medupper"]
+    
+    b.msymed <- predict(b.lm, newdata = Fmsymed)
+    b.medlower <- predict(b.lm, newdata = fmsy.lower.median)
+    b.medupper <- predict(b.lm, newdata = fmsy.upper.median)
+    
+    abline(v = c(fmsy.lower.median, Fmsymed, fmsy.upper.median), col = "blue", lty = c(8,1,8))
+    points(x = c(fmsy.lower.median, Fmsymed, fmsy.upper.median), 
+           y = c(b.medlower, b.msymed, b.medupper), col = "blue", pch = 16)
+    legend(x = "topright", bty = "n", cex = 1.0, 
+           title = "F(msy)", title.col = "blue",
+           legend = c(paste0("lower = ", round(b.medlower,0)),
+                      paste0("median = ", round(b.msymed,0)),
+                      paste0("upper = ", round(b.medupper,0))))
+    
+    return(invisible(NULL))
+    
+  }
+  
+  # Update summary table with John's format
+  
+  #sim$Refs <- sim$Refs[,!(colnames(sim$Refs) %in% c("FCrash05","FCrash50"))]
+  #sim$Refs <- cbind(sim$Refs, Medlower = rep(NA,6), Meanlower = rep(NA,6), 
+  #                     Medupper = rep(NA,6), Meanupper = rep(NA,6))
+  
+  #sim$Refs["lanF","Medlower"] <- fmsy.lower.median
+  #sim$Refs["lanF","Medupper"] <- fmsy.upper.median
+  #sim$Refs["lanF","Meanlower"] <- fmsy.lower.mean
+  #sim$Refs["lanF","Meanupper"] <- fmsy.upper.mean
+  
+  #sim$Refs["landings","Medlower"] <- landings.lower.median
+  #sim$Refs["landings","Medupper"] <- landings.upper.median
+  #sim$Refs["landings","Meanlower"] <- landings.lower.mean
+  #sim$Refs["landings","Meanupper"] <- landings.upper.mean
+  
+  #sim$Refs["lanB","medianMSY"] <- b.msymed
+  #sim$Refs["lanB","Medlower"] <- b.medlower
+  #sim$Refs["lanB","Medupper"] <- b.medupper
+  
+  # Reference point estimates
+  #cat("\nReference point estimates:\n")
+  #return(invisible(NULL))
+  
+  if(type == "carmen") {
+    par(mfrow=c(2,2))
+    
+    # original from Carmen
+    #auxi <- sim$rbp$p50[sim$rbp$variable=="Catch"]
+    #plot(Fscan, auxi, type="l", main=paste("Median long-term catch, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+    #abline(v=FmsyMedianC, col=4,lwd=2)
+    #abline(v=FmsylowerMedianC, col=4,lwd=2,lty=2)
+    #abline(v=FmsyupperMedianC, col=4,lwd=2,lty=2)
+    #abline(h=max(auxi)*0.95, col=4, lty=2)
+    #abline(v=F5percRiskBlim, col=2,lwd=2)
+    
+    i <- sim$rbp$variable %in% "Catch"
+    plot(sim$rbp$Ftarget[i], sim$rbp$p50[i], type="l",
+         main=paste("Median long-term catch, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+    abline(v=sim$refs_interval$FmsyMedianC, col=4,lwd=2)
+    abline(v=sim$refs_interval$FmsylowerMedianC, col=4,lwd=2,lty=2)
+    abline(v=sim$refs_interval$FmsyupperMedianC, col=4,lwd=2,lty=2)
+    abline(h=max(sim$rbp$p50[i])*0.95, col=4, lty=2)
+    abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
+    
+    # original from Carmen
+    #auxi <- rbp$p50[rbp$variable=="Landings"]
+    #plot(Fscan, auxi, type="l", main=paste("Median long-term landings, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+    #abline(v=FmsyMedianL, col=3,lwd=2)
+    #abline(v=FmsylowerMedianL, col=3,lwd=2,lty=2)
+    #abline(v=FmsyupperMedianL, col=3,lwd=2,lty=2)
+    #abline(h=max(auxi)*0.95, col=3, lty=2)
+    #abline(v=F5percRiskBlim, col=2,lwd=2)
+    
+    i <- sim$rbp$variable %in% "Landings"
+    plot(sim$rbp$Ftarget[i], sim$rbp$p50[i], type="l",
+         main=paste("Median long-term landings, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="")
+    abline(v=sim$refs_interval$FmsyMedianL, col=4,lwd=2)
+    abline(v=sim$refs_interval$FmsylowerMedianL, col=4,lwd=2,lty=2)
+    abline(v=sim$refs_interval$FmsyupperMedianL, col=4,lwd=2,lty=2)
+    abline(h=max(sim$rbp$p50[i])*0.95, col=4, lty=2)
+    abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
+    
+    # Carmen original
+    #auxi <- approx(Fscan, rbp$p50[rbp$variable=="Spawning stock biomass"],xout=seq(min(Fscan),max(Fscan),length=200))
+    #plot(auxi$x, auxi$y, type="l", main=paste("SSB: Median and 5th percentile, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+    #abline(v=FmsyMedianL, col=3,lwd=2)
+    #abline(v=FmsylowerMedianL, col=3,lwd=2,lty=2)
+    #abline(v=FmsyupperMedianL, col=3,lwd=2,lty=2)
+    #abline(v=F5percRiskBlim, col=2,lwd=2)
+    #abline(v=0)
+    
+    #auxi <- approx(Fscan, rbp$p05[rbp$variable=="Spawning stock biomass"],xout=seq(min(Fscan),max(Fscan),length=200))
+    #lines(auxi$x, auxi$y, lwd=2, col=2)
+    #if(!missing(Blim)){abline(h=Blim, col=2, lty=2, lwd=2)}
+    #abline(h=Bpa, col=4, lty=2, lwd=2)
+    
+    i <- sim$rbp$variable %in% "Spawning stock biomass"
+    auxi <- approx(sim$rbp$Ftarget[i], sim$rbp$p50[i],xout=seq(min(sim$rbp$Ftarget[i]),max(sim$rbp$Ftarget[i]),length=200))
+    plot(auxi$x, auxi$y, type="l", main=paste("SSB: Median and 5th percentile, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+    abline(v=sim$refs_interval$FmsyMedianL, col=3,lwd=2)
+    abline(v=sim$refs_interval$FmsylowerMedianL, col=3,lwd=2,lty=2)
+    abline(v=sim$refs_interval$FmsyupperMedianL, col=3,lwd=2,lty=2)
+    abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
+    abline(v=0)
+    lines(auxi$x, auxi$y, lwd=2, col=2)
+    if(!is.null(sim$Blim)) {abline(h=sim$Blim, col=2, lty=2, lwd=2)}
+    
+    # Carmen original
+    #auxi <- approx(Fscan, rbp$p50[rbp$variable=="Recruitment"],xout=seq(min(Fscan),max(Fscan),length=200))
+    #plot(auxi$x, auxi$y, type="l", main=paste("Rec: Median and 5th percentile, Btrigger=",Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+    #abline(v=FmsyMedianL, col=3,lwd=2)
+    #abline(v=FmsylowerMedianL, col=3,lwd=2,lty=2)
+    #abline(v=FmsyupperMedianL, col=3,lwd=2,lty=2)
+    #abline(v=F5percRiskBlim, col=2,lwd=2)
+    #abline(v=0)
+    
+    #auxi <- approx(Fscan, rbp$p05[rbp$variable=="Recruitment"],xout=seq(min(Fscan),max(Fscan),length=200))
+    #lines(auxi$x, auxi$y, lwd=2, col=2)
+    
+    i <- sim$rbp$variable %in% "Recruitment"
+    auxi <- approx(sim$rbp$Ftarget[i], sim$rbp$p50[i],xout=seq(min(sim$rbp$Ftarget[i]),max(sim$rbp$Ftarget[i]),length=200))
+    plot(auxi$x, auxi$y, type="l", main=paste("Rec: Median and 5th percentile, Btrigger=",sim$refs_interval$Btrigger,sep=""),lwd=2,xlab="F",ylab="",ylim=c(0,max(auxi$y)))
+    abline(v=sim$refs_interval$FmsyMedianL, col=3,lwd=2)
+    abline(v=sim$refs_interval$FmsylowerMedianL, col=3,lwd=2,lty=2)
+    abline(v=sim$refs_interval$FmsyupperMedianL, col=3,lwd=2,lty=2)
+    abline(v=sim$refs_interval$F5percRiskBlim, col=2,lwd=2)
+    abline(v=0)
+    lines(auxi$x, auxi$y, lwd=2, col=2)
+    return(invisible(NULL))
+  }
+  
+  
+}
+  

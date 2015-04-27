@@ -10,6 +10,8 @@ smooth_hockey(ab, ssb, gamma = 0.1)
 \item{ab}{the model parameters}
 
 \item{ssb}{a vector of ssb}
+
+\item{gamma}{a smoother parameter}
 }
 \value{
 log recruitment according to model

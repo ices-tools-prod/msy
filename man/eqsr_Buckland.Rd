@@ -4,7 +4,7 @@
 \alias{eqsr_Buckland}
 \title{stock recruitment function}
 \usage{
-eqsr_Buckland(data, nsamp = 5000, models = c("ricker", "segreg", "bevholt"),
+eqsr_Buckland(data, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"),
   ...)
 }
 \arguments{

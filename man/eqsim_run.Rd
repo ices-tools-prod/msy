@@ -6,9 +6,9 @@
 \usage{
 eqsim_run(fit, bio.years = c(2008, 2012), bio.const = FALSE,
   sel.years = c(2008, 2012), sel.const = FALSE, Fscan = seq(0, 1, len =
-  20), Fcv = 0, Fphi = 0, Blim, Bpa, recruitment.trim = c(3, -3),
-  Btrigger = 0, Nrun = 200, process.error = TRUE, verbose = TRUE,
-  extreme.trim)
+  20), Fcv = 0, Fphi = 0, SSBcv = 0, rhologRec = FALSE, Blim, Bpa,
+  recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
+  process.error = TRUE, verbose = TRUE, extreme.trim)
 }
 \arguments{
 \item{fit}{A list returned from the function fitModels}
@@ -26,6 +26,11 @@ eqsim_run(fit, bio.years = c(2008, 2012), bio.const = FALSE,
 \item{Fcv}{Assessment error in the advisory year}
 
 \item{Fphi}{Autocorrelation in assessment error in the advisory year}
+
+\item{SSBcv}{Spawning stock biomass error in the advisory year}
+
+\item{rhologRec}{A flag for recruitment autocorrelation. If FALSE (default)
+then not applied.}
 
 \item{Blim}{This we know}
 

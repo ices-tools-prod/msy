@@ -4,12 +4,14 @@
 \alias{mygcv}
 \title{mygcv}
 \usage{
-mygcv(dat, rho)
+mygcv(dat, rho, n)
 }
 \arguments{
 \item{dat}{XXX}
 
 \item{rho}{a parameter}
+
+\item{n}{XXX}
 }
 \value{
 something

@@ -1,30 +1,32 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.14
-Date: 2015-03-13
+Version: 0.1.16
+Date: 2015-03-19
 Authors@R: as.person(c(
     "Colin Millar <colinpmillar@gmail.com> [aut,cre]",
     "Timothy Earl [aut]",
-    "Einar Hjorleifsson  [aut]",
-    "John Simmonds [ctb]",
+    "Einar Hjörleifsson <einar.hjorleifsson@gmail.com> [aut]",
+    "John Simmonds <e.j.simmonds1@gmail.com> [ctb]",
+    "Jose De Oliveira <jose.deoliveira@cefas.co.uk>, [ctb]",
+    "Carmen Fernandez <cferllxx@gmail.com> [ctb]",
     "Noel Cadigan [ctb]"))
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
 LazyData: true
+URL: http://github.com/wgmg/msy
+BugReports: http://github.com/wgmg/msy/issues
 Depends:
     R (>= 3.0.0)
 Imports:
     FLCore,
+    ggplot2,
+    grid,
     MASS,
     mgcv,
-    scam,
-    reshape2,
     plyr,
-    ggplot2,
-    gridExtra,
-    R2admb,
-    stringr
+    scam,
+    reshape2
 Suggests:
     knitr
 VignetteBuilder: knitr

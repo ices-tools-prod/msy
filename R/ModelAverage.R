@@ -25,23 +25,23 @@
 #' \item stk FLStock object, same as provided as input by the user.
 #' }
 #' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-#' @export
+
 fitModels <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"), 
                method = "Buckland",
                runid = NULL, remove.years = NULL, delta = 1.3, nburn = 10000) 
 {
   message("NOTE: THIS FUNCTION IS NO LONGER MAINTAINED, USE FUNCTION eqsr_fit")
-  dms <- dims(stk)
+  dms <- FLCore::dims(stk)
   rage <- dms $ min
   if (rage == 0)
   {
-    data <- data.frame(rec = stock.n(stk)[1,drop=TRUE],
-                       ssb = ssb(stk)[drop=TRUE],
+    data <- data.frame(rec = FLCore::stock.n(stk)[1,drop=TRUE],
+                       ssb = FLCore::ssb(stk)[drop=TRUE],
                        year = with(dms, 1:year + minyear - 1)) 
   } else
   {
-    data <- data.frame(rec = stock.n(stk)[1,-seq(rage),drop=TRUE],
-                       ssb = ssb(stk)[1,seq(dms$year - rage),drop=TRUE],
+    data <- data.frame(rec = FLCore::stock.n(stk)[1,-seq(rage),drop=TRUE],
+                       ssb = FLCore::ssb(stk)[1,seq(dms$year - rage),drop=TRUE],
                        year = with(dms, (rage+1):year + minyear - 1)) 
   }
 
@@ -53,7 +53,7 @@ fitModels <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt")
   #--------------------------------------------------------
   data <- data[complete.cases(data),]
 
-  if (is.null(runid)) runid <- name(stk)
+  if (is.null(runid)) runid <- FLCore::name(stk)
 
   method <- match.arg(method, c("Buckland","Simmonds","King","Cadigan"))
   if (!is.character(models)) stop("models arg should be character vector giving names of stock recruit models")
@@ -208,7 +208,7 @@ SRplot <- function (fit, n = 5000)
   maxSSB <- max(ssb)*1.1
   maxrec <- max(rec*1.5)
   
-  x2 <- melt(tapply(fit$fit$model,fit$fit$model,length))
+  x2 <- reshape2::melt(tapply(fit$fit$model,fit$fit$model,length))
   x2$lab <- paste(x2$Var1,round(x2$value/sum(x2$value),2))
 
   plot(ssb, rec, xlim = c(0, maxSSB), ylim = c(0, maxrec), type = "n", 
