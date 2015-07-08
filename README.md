@@ -5,41 +5,6 @@ msy
 
 The `msy` R package is a collection of methods to estimate equilibrium reference points for fish stocks
 
-Install
--------
-
-To install the latest version of msy:
-
-    # install.packages("devtools")
-    library(devtools)
-    install_github("flr/FLCore")
-    install_github("wgmg/msy")
-    library(msy)
-
-Sometimes a more recent developmental version of msy can be obtained from:
-
-    # install.packages("devtools")
-    library(devtools)
-    install_github("einarhjorleifsson/msy")
-    library(msy)
-
-Useage
-------
-
-```
-FIT <- eqsr_fit(icesStocks$codNS,
-                nsamp = 1000, 
-                models = c("Ricker", "Smooth_hockey", "Bevholt"))
-eqsr_plot(FIT,n=2e4)
-SIM <- eqsim_run(FIT, Fcv=0.25, Fphi=0.30,
-                 Blim=70000,Bpa=150000,
-                 Fscan = seq(0,1.2,len=40),
-                 verbose=FALSE)
-SIM$Refs
-eqsim_plot(SIM,catch=TRUE)
-eqsim_plot_range(SIM)
-```
-
 Contact
 -------
 
@@ -49,12 +14,10 @@ You are welcome to:
 * send a pull request on: https://github.com/wgmg/msy
 
 
-msy vignette
-===
 
 # Preamble
 
-This document is as much as the `msy`-package itself still in developement.
+This document is, as is much as the `msy`-package itself, still in developement.
 
 The origin of this package is from an intial coding by John Simmonds which was restructured by Colin Millar into an R-package with additional development, including coding the Buckland method. Einar Hjörleifsson compartmentalized the structure of the code as well as providing the output of the analysis in a more structured format.
 
