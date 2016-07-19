@@ -31,3 +31,4 @@ Imports:
 Suggests:
     knitr
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1
