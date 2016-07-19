@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wgmg/msy.svg?branch=master)](https://travis-ci.org/wgmg/msy)
+[![Build Status](https://travis-ci.org/ices-tools-prod/msy.svg?branch=master)](https://travis-ci.org/ices-tools-prod/msy)
 
 msy
 ===
@@ -10,8 +10,8 @@ Contact
 
 You are welcome to:
 
-* submit suggestions and bug-reports at: https://github.com/wgmg/msy/issues
-* send a pull request on: https://github.com/wgmg/msy
+* submit suggestions and bug-reports at: https://github.com/ices-tools-prod/msy/issues
+* send a pull request on: https://github.com/ices-tools-prod/msy
 
 
 
@@ -25,7 +25,7 @@ At this moment there is no person responsible for the maintenance of the package
 
 # Installation
 
-The developmental repository for the `msy` package is located on [github](https://github.com), more specifically on [github.com/wgmg/msy](https://github.com/wgmg/msy)
+The developmental repository for the `msy` package is located on [github](https://github.com), more specifically on [github.com/ices-tools-prod/msy](https://github.com/ices-tools-prod/msy)
 
 
 The easiest way to install the `msy` package is to use the function `install_github` in the `devtools` package. Since the input into the msy is in the form of a `FLStock` object it is advised to obtain the latest release of `FLCore` from the same site.
@@ -37,7 +37,7 @@ Run the following lines to install the latest versions of `msy` and `FLCore`.
 ```{r install, eval=FALSE}
 # install.packages("devtools")
 library(devtools)
-install_github("wgmg/msy")
+install_github("ices-tools-prod/msy")
 install_github("flr/FLCore")
 ```
 
