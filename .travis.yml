@@ -1,25 +1,32 @@
-# Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
+# .travis.yml for ices-tools packages
+#
 
-language: c
+warnings_are_errors: false
 
-sudo: required
+os:
+  - linux
+  - osx
+  - windows
 
-before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
+language: r
 
-install:
-  - ./travis-tool.sh aptget_install libgsl0-dev
-  - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github flr/FLCore
+r:
+  - release
+  - devel
 
-script: ./travis-tool.sh run_tests
+sudo: false
 
-on_failure:
-  - ./travis-tool.sh dump_logs
+repos:
+  CRAN: https://cloud.r-project.org
+  flr: http://flr-project.org/R
+
+cache: packages
 
 notifications:
   email:
     on_success: change
     on_failure: change
+
+branches:
+  only:
+    - master
