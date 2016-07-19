@@ -20,6 +20,9 @@ repos:
   CRAN: https://cloud.r-project.org
   flr: http://flr-project.org/R
 
+r_packages:
+  - rmarkdown
+
 cache: packages
 
 notifications:
