@@ -36,9 +36,9 @@ Run the following lines to install the latest versions of `msy` and `FLCore`.
 
 ```{r install, eval=FALSE}
 # install.packages("devtools")
+install.packages("FLCore", repo = "http://flr-project.org/R")
 library(devtools)
 install_github("ices-tools-prod/msy")
-install_github("flr/FLCore")
 ```
 
 The above is equivalent to `install.packages` and hence need only to be performed once. However, since the `msy` package is currently under development (including bug-fixing) one may expect more frequent code updating in the package than what one may be familiar with for packages on `CRAN`. Once installed the `msy` packages is simply loaded via the familiar:
