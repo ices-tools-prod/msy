@@ -3,7 +3,7 @@ Type: Package
 Title: Estimation of equilibrium reference points for fisheries
 Version: 0.1.16
 Date: 2015-03-19
-Authors@R: as.person(c(
+Authors@R: c(
     person("Colin", "Millar", email = "colin.millar@ices.dk", role = c("aut", "cre")),
     person("Timothy", "Earl", role = "aut"),
     person("Noel", "Cadigan", role = "aut"),
