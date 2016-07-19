@@ -12,16 +12,6 @@
 
 
 
-#' A function only available for R 2.15.1
-#'
-#' for back compatibility
-#'
-#' @param ... whatever
-#' @return result of paste with sep = ""
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
-paste0 <- function(...) paste(..., sep = "")
-
-
 #' @title Progress function
 #'
 #'
