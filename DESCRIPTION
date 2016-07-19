@@ -10,7 +10,7 @@ Authors@R: as.person(c(
     person("Einar", "Hjörleifsson", role = "aut"),
     person("John", "Simmonds", role = "aut"),
     person("Jose", "De Oliveira", role = "ctb"),
-    person("Carmen", "Fernandez", role = "ctb"),
+    person("Carmen", "Fernandez", role = "ctb")
     )
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
