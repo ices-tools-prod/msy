@@ -1,5 +1,7 @@
 # .travis.yml for ices-tools packages
 
+warnings_are_errors: false
+
 os:
   - linux
 
