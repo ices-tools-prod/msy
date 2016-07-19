@@ -1,8 +1,8 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.16
-Date: 2015-03-19
+Version: 0.1.17
+Date: 2016-07-19
 Authors@R: c(
     person("Colin", "Millar", email = "colin.millar@ices.dk", role = c("aut", "cre")),
     person("Timothy", "Earl", role = "aut"),
@@ -15,8 +15,8 @@ Authors@R: c(
 Description: Estimation of equilibrium reference points for fisheries
 License: GPL (>= 2)
 LazyData: true
-URL: http://github.com/wgmg/msy
-BugReports: http://github.com/wgmg/msy/issues
+URL: http://github.com/ices-tools-prod/msy
+BugReports: http://github.com/ices-tools-prod/msy/issues
 Depends:
     R (>= 3.0.0)
 Imports:
