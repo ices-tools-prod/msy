@@ -1,20 +1,20 @@
 # .travis.yml for ices-tools packages
-#
-
-warnings_are_errors: false
 
 os:
   - linux
-  - osx
-  - windows
 
 language: r
-
 r:
+  - oldrel
   - release
   - devel
 
 sudo: false
+
+addons:
+  apt:
+    packages:
+    - libgsl0-dev
 
 repos:
   CRAN: https://cloud.r-project.org
