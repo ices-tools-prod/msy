@@ -12,6 +12,10 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r setup, eval=TRUE, echo=FALSE}
+knitr::opts_chunk$set(eval = TRUE) # set to FALSE locally if you don't want to build when developing
+```
+
 # Preamble
 
 This document is as much as the `msy`-package itself still in developement.
