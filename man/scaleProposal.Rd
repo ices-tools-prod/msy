@@ -17,5 +17,5 @@ Taken from the proposal used for precisions in the C library GMRFLib by Havard R
 and described in several papers and his book on GMRFs with Leonard Held.
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@ices.dk}
 }

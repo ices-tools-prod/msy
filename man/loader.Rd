@@ -13,5 +13,5 @@ loader(p)
 plots the prgress of an iterative procedure using "[=>   ]", "[==> ]", etc.
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@ices.dk}
 }

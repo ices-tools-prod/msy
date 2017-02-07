@@ -9,7 +9,7 @@
 #' do a ggplot
 #' @param Scale Numeric value for scaling varibles in plot.
 #' @return NULL produces a plot
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 eqsr_plot <- function (fit, n = 5000, x.mult=1.1, y.mult=1.4, ggPlot=FALSE, Scale=1)
 {

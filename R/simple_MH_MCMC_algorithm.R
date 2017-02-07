@@ -9,7 +9,7 @@
 #'
 #' @param A the scale of the proposal, 2 is a big jump, 1.1 is a small jump.
 #' @return a draw from a symmetrical (on the multiplicative scale) random variable
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 scaleProposal <- function(A)
 {

@@ -3,7 +3,7 @@
 #'
 #' @param fit an fitted MCMC returned from \code{fitModels}
 #' @return NULL produces a plot
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 LLplot <- function(fit)
 {
@@ -28,7 +28,7 @@ LLplot <- function(fit)
 #'
 #' @param fit an fitted MCMC returned from \code{fitModels}
 #' @return NULL produces one or several plots
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 LLmodplot <- function(fit)
 {

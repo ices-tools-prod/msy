@@ -45,5 +45,5 @@ biomass (ssb) and year used in the fitting of the data.
 Unmaintained version of eqsr_fit.
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@ices.dk}
 }

@@ -9,7 +9,7 @@
 #' @param models A character vector specifying stock-recruitment models
 #' @param ... Additional arguments
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 fitModelsSimmonds <- function(data, runid, delta = 1.3, nburn = 10000, nsamp = 5000, models = c("ricker","segreg","bevholt"), ...)
 {

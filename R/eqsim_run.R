@@ -4,7 +4,7 @@
 #'
 #' @export
 #'
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #'
 #' @param fit A list returned from the function fitModels
 #' @param bio.years The years to sample maturity, weights and M from

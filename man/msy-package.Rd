@@ -22,7 +22,7 @@ LazyLoad: \tab yes \cr
 Simmonds, Cadigan, Steve Smith
 }
 \author{
-Colin Millar \email{colinpmillar@gmail.com}
+Colin Millar \email{colin.millar@ices.dk}
 
 Noel Cadigan \email{Noel.Cadigan@mi.mun.ca}
 

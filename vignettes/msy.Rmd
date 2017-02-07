@@ -1,6 +1,6 @@
 ---
 title: "Using the eqsim routines in the msy package"
-author: "John Simmond, Colin Millar and Einar Hjörleifsson"
+author: "John Simmonds, Colin Millar and Einar Hjörleifsson"
 date: '`r Sys.Date()`'
 output:
   html_document:

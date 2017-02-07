@@ -8,7 +8,7 @@
 #'
 #' @param p Value
 #' @return NULL
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 loader <- function(p)
 {
   if (p==0) cat("0%                       50%                     100%\n")

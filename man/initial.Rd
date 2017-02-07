@@ -18,5 +18,5 @@ vector of starting values
 a quick fix!!
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@ices.dk}
 }

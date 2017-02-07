@@ -13,7 +13,7 @@
 #' @aliases msy
 #' @docType package
 #' @title Estimation of equilibrium reference points for fish stocks
-#' @author Colin Millar \email{colinpmillar@@gmail.com}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @author Noel Cadigan \email{Noel.Cadigan@@mi.mun.ca}
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @author Jose D'Oliveira \email{jose.deoliveira@@cefas.co.uk}

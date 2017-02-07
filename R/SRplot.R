@@ -4,7 +4,7 @@
 #' @param fit an fitted MCMC returned from \code{fitModels}
 #' @param n Number of random recruitment draws to plot
 #' @return NULL produces a plot
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 SRplot <- function (fit, n = 5000)
 {

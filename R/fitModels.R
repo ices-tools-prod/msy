@@ -24,7 +24,7 @@
 #' \item stknam A character vector containing stock name
 #' \item stk FLStock object, same as provided as input by the user.
 #' }
-#' @author Colin Millar \email{colin.millar@@jrc.ec.europa.eu}
+#' @author Colin Millar \email{colin.millar@@ices.dk}
 
 fitModels <- function(stk, nsamp = 5000, models = c("ricker","segreg","bevholt"),
                method = "Buckland",

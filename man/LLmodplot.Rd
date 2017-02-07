@@ -16,5 +16,5 @@ NULL produces one or several plots
 plots the fits for each model considered in \code{fitModels}
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@ices.dk}
 }

@@ -48,5 +48,5 @@ If more than one stock recruit relationship is provided, the models are weighted
 based on smooth AIC weighting (See Buckland et al.).
 }
 \author{
-Colin Millar \email{colin.millar@jrc.ec.europa.eu}
+Colin Millar \email{colin.millar@ices.dk}
 }
