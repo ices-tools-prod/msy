@@ -1,4 +1,3 @@
-
 #' plotMSY
 #'
 #'
@@ -24,9 +23,6 @@
 #' @author Tim Earl \email{timothy.earl@@cefas.co.uk}
 #' @export
 
-
-
-
 plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(NA,NA,NA), trimming = NA, nits = 100, nhair = 100, varybiodata = TRUE, stockname = "",
                    fpa=NA, flim=NA, bpa=NA, blim=NA, outputfolder="", datfilename=NA, silent=TRUE, onlyYPR=FALSE, optLanding=TRUE)
 {
@@ -42,7 +38,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
       return()
     }
     bp = boxplot(x,plot=FALSE,...,na.rm=TRUE)
-    bp$stats = as.matrix(quantile(x,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE))
+    bp$stats = as.matrix(stats::quantile(x,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE))
     bp$out = c(x[x<bp$stats[1]],x[x>bp$stats[5]])
     bp$out <- bp$out[!is.na(bp$out)]
     bp$group = rep(1,length(bp$out))
@@ -88,14 +84,14 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
     #take input from sen and sum files
     senfilename = tolower(senfilename)
     indexfilename = tolower(indexfilename)
-    if (is.na(senfilename)) senfilename = tolower(choose.files("*.sen", "Choose SEN file",multi=FALSE))
+    if (is.na(senfilename)) senfilename = tolower(utils::choose.files("*.sen", "Choose SEN file",multi=FALSE))
     if (!file.exists(senfilename)) stop("SEN file not found")
     sumfilename = sub(".sen",".sum",senfilename,fixed=TRUE)
     if (!file.exists(sumfilename)) stop("SUM file not found")
 
     if (any(is.na(pfpm)))
     {
-      if (is.na(indexfilename)) indexfilename = tolower(choose.files("*.*", "Choose index file",multi=FALSE))
+      if (is.na(indexfilename)) indexfilename = tolower(utils::choose.files("*.*", "Choose index file",multi=FALSE))
       if (!file.exists(indexfilename)) stop("Index file not found")
     } else {
       if (length(pfpm)!=2) stop("pfpm must be a vector of length 2")
@@ -141,7 +137,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
 
   #Start of plotMSY function proper
   cat("Stock:", stockname, "\n")
-  graphics.off()   #So that graphics output can be sent to files
+  grDevices::graphics.off()   #So that graphics output can be sent to files
   dir.create(outputfolder, showWarnings=FALSE, recursive=TRUE)
   outputfilename = paste(outputfolder, stockname, ".txt", sep="")
   output = list()
@@ -167,9 +163,9 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
     system("srmsymc.exe -mceval",show.output.on.console=!silent)
 
     #Read in simpar.dat, simpary.dat, simparSSB.dat  and remove unfeasible simulations
-    simdata[[srtype]] = read.table(".\\simpar.dat")
-    simy[[srtype]] = as.matrix(read.table(".\\simpary.dat"))
-    simSSB[[srtype]] = as.matrix(read.table(".\\simparssb.dat"))
+    simdata[[srtype]] = utils::read.table(".\\simpar.dat")
+    simy[[srtype]] = as.matrix(utils::read.table(".\\simpary.dat"))
+    simSSB[[srtype]] = as.matrix(utils::read.table(".\\simparssb.dat"))
     colnames(simdata[[srtype]]) = c("N","ap","bp","alpha","beta","sigr","scor","fcrash","fmax","f01","f20","f25","f30","f35","f40","fmsy","msy","bmsy","msypr","bmsypr","msyr",
                                     "fnfcrash","fnfmax","fnf01","fnf20","fnf15","fnf30","fnf35","fnf40","dydf","penalty","nll","AIC")
     simdatadet[[srtype]] = subset(simdata[[srtype]], subset=(simdata[[srtype]]$N==0))
@@ -210,8 +206,8 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
       if (length(simdata[[srtype]][,1])>0)
       {
         output[[srtype]]["Mean",i] = mean(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)
-        output[[srtype]][3:7,i] = quantile(simdata[[srtype]][,indexmap[i]],c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE)
-        output[[srtype]]["CV",i] = sd(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)/mean(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)
+        output[[srtype]][3:7,i] = stats::quantile(simdata[[srtype]][,indexmap[i]],c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE)
+        output[[srtype]]["CV",i] = stats::sd(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)/mean(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)
         output[[srtype]]["N",i] = sum(!is.na(simdata[[srtype]][,indexmap[i]]))
 
 
@@ -223,8 +219,8 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
   }
 
 
-  simSSBpr = as.matrix(read.table(".\\simparssbpr.dat"))
-  simypr = as.matrix(read.table(".\\simparypr.dat"))
+  simSSBpr = as.matrix(utils::read.table(".\\simparssbpr.dat"))
+  simypr = as.matrix(utils::read.table(".\\simparypr.dat"))
 
   outputpr = matrix(NA,nrow =9, ncol=11,dimnames=list(c("Deterministic","Mean","5%ile","25%ile","50%ile","75%ile","95%ile","CV","N"),
                                                      c("F20","F25","F30","F35","F40","F01","Fmax","Bmsypr","MSYpr","Fpa","Flim")))
@@ -236,8 +232,8 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
     if (!noredlines[[srtype]])
     {
       outputpr["Mean",i] = mean(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)
-      outputpr[3:7,i] = quantile(simdata[[srtype]][,indexmap[i]],c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE)
-      outputpr["CV",i] = sd(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)/mean(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)
+      outputpr[3:7,i] = stats::quantile(simdata[[srtype]][,indexmap[i]],c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE)
+      outputpr["CV",i] = stats::sd(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)/mean(simdata[[srtype]][,indexmap[i]],na.rm=TRUE)
       outputpr["N",i] =  sum(!is.na(simdata[[srtype]][,indexmap[i]]))
     }
   }
@@ -291,7 +287,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
     {
 
 ##Plot SRRs
-    png(paste(outputfolder, stockname, "_SRR.png",sep=""),height=11.5,width=9,units="in",res=144)
+    grDevices::png(paste(outputfolder, stockname, "_SRR.png",sep=""),height=11.5,width=9,units="in",res=144)
       layout(t(matrix(1:6,2)))
       SSB = max(sumsen$SSB)*(0:105)/100  #x values for plotting
 
@@ -311,11 +307,11 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
           {
             m[i,] = recruitment(SSB, simdata[[srtype]]$alpha[i], simdata[[srtype]]$beta[i], srtype)
           }
-          lines(SSB,apply(m,2,quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)      #Confidence intervals
-          lines(SSB,apply(m,2,quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
-          lines(SSB,apply(m,2,quantile,probs=0.5,na.rm=TRUE),col='red')
-          lines(SSB,apply(m,2,quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
-          lines(SSB,apply(m,2,quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
+          lines(SSB,apply(m,2,stats::quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)      #Confidence intervals
+          lines(SSB,apply(m,2,stats::quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
+          lines(SSB,apply(m,2,stats::quantile,probs=0.5,na.rm=TRUE),col='red')
+          lines(SSB,apply(m,2,stats::quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
+          lines(SSB,apply(m,2,stats::quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
         }
         lines(SSB,recruits, col="blue")   #Deterministic line
         legend(0,0.7*max(sumsen$Recruits), yjust=0,
@@ -329,11 +325,11 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
           if (srnhair > 1)  for (i in 2+(1:srnhair))  points(SSB,recruitment(SSB, simdata[[srtype]]$alpha[i], simdata[[srtype]]$beta[i], srtype),type='l', col='red')  #Simulations
           lines(SSB,recruits, col="blue")
       }
-    dev.off() #SRR plot
+    grDevices::dev.off() #SRR plot
 
 
     #plots of parameter correlation
-    png(paste(outputfolder, stockname, "_diagnostics.png",sep=""),height=11.5,width=9,units="in",res=144)
+    grDevices::png(paste(outputfolder, stockname, "_diagnostics.png",sep=""),height=11.5,width=9,units="in",res=144)
       layout(t(matrix(c(1:6),2)))
       for (srtype in sr)
       {
@@ -350,7 +346,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         points(simdatadet[[srtype]]$alpha,simdatadet[[srtype]]$beta,col='blue',pch=19)
         title(paste(stockname,"Unscaled parameters",srname[srtype]))
        }
-     dev.off() #Diagnostics plot
+     grDevices::dev.off() #Diagnostics plot
 
 
 
@@ -358,7 +354,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
 
     for (srtype in sr)
     {
-      png(paste(outputfolder, stockname, "_Yield_",srsn[srtype],".png",sep=""),height=11.5,width=9,units="in",res=144)
+      grDevices::png(paste(outputfolder, stockname, "_Yield_",srsn[srtype],".png",sep=""),height=11.5,width=9,units="in",res=144)
         layout(t(matrix(c(1,1:7),2)), widths=c(5,5), heights=c(1,3,3.5,4))
         par(mai=c(0,0,0.8,0))
         plot.new()
@@ -392,11 +388,11 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         if (!noredlines[[srtype]])
         {
           #quantiles
-          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)
-          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
-          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,quantile,probs=0.5,na.rm=TRUE),col='red')
-          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
-          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
+          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,stats::quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)
+          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,stats::quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
+          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,stats::quantile,probs=0.5,na.rm=TRUE),col='red')
+          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,stats::quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
+          lines(simy[[srtype]][1,],apply(simy[[srtype]][-1,],2,stats::quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
         }
         points(t(simy[[srtype]][1,]),t(simy[[srtype]][2,]),type='l', col='blue')
         if (!is.na(sumfilename)) points(sumData[,10],sumData[,6],cex=.7,type='b')
@@ -414,11 +410,11 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         if (!noredlines[[srtype]])
         {
           #quantiles
-          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,quantile,probs=0.05),col='red',lty=3)
-          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,quantile,probs=0.1),col='red',lty=2)
-          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,quantile,probs=0.5),col='red')
-          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,quantile,probs=0.9),col='red',lty=2)
-          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,quantile,probs=0.95),col='red',lty=3)
+          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,stats::quantile,probs=0.05),col='red',lty=3)
+          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,stats::quantile,probs=0.1),col='red',lty=2)
+          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,stats::quantile,probs=0.5),col='red')
+          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,stats::quantile,probs=0.9),col='red',lty=2)
+          lines(simSSB[[srtype]][1,],apply(simSSB[[srtype]][-1,],2,stats::quantile,probs=0.95),col='red',lty=3)
         }
         points(t(simSSB[[srtype]][1,]),t(simSSB[[srtype]][2,]),type='l',col='blue')
         if (!is.na(sumfilename)) points(sumData[,10],sumData[,3],cex=.7,type='b')
@@ -429,11 +425,11 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
                                  plot(t(simSSB[[srtype]][1,]),1.5*t(simSSB[[srtype]][2,]),type='n',axes=TRUE, ylab = SSBtext,xlab="F", xlim=xlim)
         if (srnhair > 1)  for (i in 2+(1:srnhair))  points(t(simSSB[[srtype]][1,]),t(simSSB[[srtype]][i,]),type='l', col='red')
         lines(t(simSSB[[srtype]][1,]),t(simSSB[[srtype]][2,]),col='blue')
-      dev.off()
+      grDevices::dev.off()
      }
      }
 
-      png(paste(outputfolder, stockname, "_YPR.png",sep=""),height=11.5,width=9,units="in",res=144)
+      grDevices::png(paste(outputfolder, stockname, "_YPR.png",sep=""),height=11.5,width=9,units="in",res=144)
         ##yield per recruit
         srtype = 1 ##Any of them should be the same for fmax, f01, f35, f40
         layout(t(matrix(c(1,1:7),2)), widths=c(5,5), heights=c(1,3,3.5,4))
@@ -467,11 +463,11 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         if (prod(dim(simypr)) >0)
         {
           #quantiles
-          lines(simypr[1,],apply(simypr[-1,],2,quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)
-          lines(simypr[1,],apply(simypr[-1,],2,quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
-          lines(simypr[1,],apply(simypr[-1,],2,quantile,probs=0.5,na.rm=TRUE),col='red')
-          lines(simypr[1,],apply(simypr[-1,],2,quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
-          lines(simypr[1,],apply(simypr[-1,],2,quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
+          lines(simypr[1,],apply(simypr[-1,],2,stats::quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)
+          lines(simypr[1,],apply(simypr[-1,],2,stats::quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
+          lines(simypr[1,],apply(simypr[-1,],2,stats::quantile,probs=0.5,na.rm=TRUE),col='red')
+          lines(simypr[1,],apply(simypr[-1,],2,stats::quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
+          lines(simypr[1,],apply(simypr[-1,],2,stats::quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
         }
         points(t(simypr[1,]),t(simypr[2,]),type='l', col='blue')
 
@@ -485,25 +481,25 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         if (prod(dim(simSSBpr))>0)
         {
           #quantiles
-          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)
-          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
-          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,quantile,probs=0.5,na.rm=TRUE),col='red')
-          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
-          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
+          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,stats::quantile,probs=0.05,na.rm=TRUE),col='red',lty=3)
+          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,stats::quantile,probs=0.1,na.rm=TRUE),col='red',lty=2)
+          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,stats::quantile,probs=0.5,na.rm=TRUE),col='red')
+          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,stats::quantile,probs=0.9,na.rm=TRUE),col='red',lty=2)
+          lines(simSSBpr[1,],apply(simSSBpr[-1,],2,stats::quantile,probs=0.95,na.rm=TRUE),col='red',lty=3)
         }
         points(t(simSSBpr[1,]),t(simSSBpr[2,]),type='l', col='blue')
 
         plot(t(simSSBpr[1,]),1.5*t(simSSBpr[2,]),type='n', xlab="F",ylab = "SSB per recruit",axes=TRUE, xlim=xlim)
         if (srnhair > 1)  for (i in 2+(1:srnhair))  points(t(simSSBpr[1,]),t(simSSBpr[i,]),type='l', col='red')
         points(t(simSSBpr[1,]),t(simSSBpr[2,]),type='l', col='blue')
-      graphics.off()
+      grDevices::graphics.off()
 
 
            ## Combined distribution
       if(!onlyYPR)
       {
     #    browser()
-        png(paste(outputfolder, stockname, "_Fmsy.png",sep=""),height=11.5,width=9,units="in",res=144)
+        grDevices::png(paste(outputfolder, stockname, "_Fmsy.png",sep=""),height=11.5,width=9,units="in",res=144)
         allSimData = rbind(simdata[[1]],simdata[[2]],simdata[[3]])
         f.breaks <- hist(c(allSimData$fmsy,allSimData$fcrash),50, plot=FALSE)$breaks
         allSimDataHist = hist(allSimData$fmsy,f.breaks,plot=FALSE)
@@ -518,14 +514,14 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         mx = max(f.breaks)
 
 
-        hist(rbind(simdata[[1]],simdata[[2]],simdata[[3]])$fmsy, f.breaks, col=grey(0.75), ylim = c(0,1.10*max(tempHist$counts)), xlab="Fmsy",
+        hist(rbind(simdata[[1]],simdata[[2]],simdata[[3]])$fmsy, f.breaks, col=grDevices::grey(0.75), ylim = c(0,1.10*max(tempHist$counts)), xlab="Fmsy",
         main = paste(stockname,"- combined Fmsy distribution: equally weighted"))
-        hist(rbind(simdata[[1]],simdata[[2]])$fmsy, tempHist$breaks, add =TRUE, col=grey(0.5))
-        hist(simdata[[1]]$fmsy, tempHist$breaks, add =TRUE, col=grey(0.25))
-        qs = cbind(quantile(allSimData$fmsy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
-                   quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
-                   quantile(allSimData$msy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
-                   quantile(allSimData$bmsy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE) )
+        hist(rbind(simdata[[1]],simdata[[2]])$fmsy, tempHist$breaks, add =TRUE, col=grDevices::grey(0.5))
+        hist(simdata[[1]]$fmsy, tempHist$breaks, add =TRUE, col=grDevices::grey(0.25))
+        qs = cbind(stats::quantile(allSimData$fmsy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
+                   stats::quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
+                   stats::quantile(allSimData$msy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
+                   stats::quantile(allSimData$bmsy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE) )
         lines(c(qs[1,1],qs[1,1]),c(0,my),col='red',lty=3)      #Confidence intervals
         lines(c(qs[2,1],qs[2,1]),c(0,my*1.05),col='red',lty=2)
         lines(c(qs[3,1],qs[3,1]),c(0,my),col='red')
@@ -537,12 +533,12 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         text(qs[4,1],my*1.05,"75%",pos=3,col="red")
         text(qs[5,1],my,"95%",pos=3,col="red")
 
-        legend(0.75*mx,my,c("Ricker","Beverton-Holt","Hockeystick"), fill=grey(0.25*1:3))
+        legend(0.75*mx,my,c("Ricker","Beverton-Holt","Hockeystick"), fill=grDevices::grey(0.25*1:3))
 
-        hist(rbind(simdata[[1]],simdata[[2]],simdata[[3]])$fcrash, f.breaks, col=grey(0.75), ylim = c(0,1.10*max(tempHist$counts)), xlab="Fcrash",
+        hist(rbind(simdata[[1]],simdata[[2]],simdata[[3]])$fcrash, f.breaks, col=grDevices::grey(0.75), ylim = c(0,1.10*max(tempHist$counts)), xlab="Fcrash",
         main = paste(stockname,"- combined Fcrash distribution: equally weighted"))
-        hist(rbind(simdata[[1]],simdata[[2]])$fcrash, f.breaks, add =TRUE, col=grey(0.5))
-        hist(simdata[[1]]$fcrash, f.breaks, add =TRUE, col=grey(0.25))
+        hist(rbind(simdata[[1]],simdata[[2]])$fcrash, f.breaks, add =TRUE, col=grDevices::grey(0.5))
+        hist(simdata[[1]]$fcrash, f.breaks, add =TRUE, col=grDevices::grey(0.25))
 
 #        qs = quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95))
         lines(c(qs[1,2],qs[1,2]),c(0,my),col='red',lty=3)      #Confidence intervals
@@ -555,7 +551,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         text(qs[3,2],my,"50%",pos=3,col="red")
         text(qs[4,2],my*1.05,"75%",pos=3,col="red")
         text(qs[5,2],my,"95%",pos=3,col="red")
-     graphics.off()
+     grDevices::graphics.off()
 
       if (srautoweights)
       {
@@ -566,14 +562,14 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
           srwall <- sapply(trim, function(p){1/colMeans(1/lik[(p+1):nits,],na.rm=TRUE)} )*ifelse(is.na(srweights),1,0)
           srwall[is.na(srwall)] <- 0
           srwall <- t(t(srwall)/colSums(srwall)    )
-          png(paste0(outputfolder, stockname, "_trim_diag.png"),800,600)
+          grDevices::png(paste0(outputfolder, stockname, "_trim_diag.png"),800,600)
             plot(100*trim/nits,srwall["Ricker",],ylim=range(0,srwall), lty=1, type='l',
                   ylab="Relative weight", xlab="Trimmed percentage", main = paste(stockname,"Trimming the harmonic mean",sep=" - "))
             lines(100*trim/nits,srwall["Beverton-Holt",],lty=2)
             lines(100*trim/nits,srwall["Smooth hockeystick",],lty=3)
             legend("topright",pch=NA,lty=1:3,legend=srname)
-          dev.off()
-          write.csv(t(rbind(Percentage=100*trim/nits,srwall)),paste0(outputfolder,stockname,"_trim_diag.csv"),row.names=FALSE)
+          grDevices::dev.off()
+          utils::write.csv(t(rbind(Percentage=100*trim/nits,srwall)),paste0(outputfolder,stockname,"_trim_diag.csv"),row.names=FALSE)
           trimming <- 0
 
         }
@@ -594,7 +590,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
       }
 
       # browser()
-      png(paste0(outputfolder, stockname, "_Fmsy2.png"),height=11.5,width=9,units="in",res=144)
+      grDevices::png(paste0(outputfolder, stockname, "_Fmsy2.png"),height=11.5,width=9,units="in",res=144)
         #par(mfrow=c(2,1))
         allSimData = rbind(simdata[[1]][seq(length=srweights[1]),],
                            simdata[[2]][seq(length=srweights[2]),],
@@ -606,20 +602,20 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
                           simSSB[[3]][seq(length=srweights[3]),])
         allSimSSB <- allSimSSB[!is.na(rowSums(allSimSSB)),]
         allSimDataHist = hist(allSimData$fmsy,f.breaks,plot=FALSE)
-        qs = cbind(qs,quantile(allSimData$fmsy,c(0.05, 0.25, 0.50, 0.75, 0.95)),
-                   quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
-                   quantile(allSimData$msy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
-                   quantile(allSimData$bmsy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE) )
+        qs = cbind(qs,stats::quantile(allSimData$fmsy,c(0.05, 0.25, 0.50, 0.75, 0.95)),
+                   stats::quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
+                   stats::quantile(allSimData$msy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE),
+                   stats::quantile(allSimData$bmsy,c(0.05, 0.25, 0.50, 0.75, 0.95),na.rm=TRUE) )
 
         tempHist = hist(c(allSimData$fmsy,allSimData$fcrash),f.breaks, plot=FALSE)
         my = max(tempHist$counts)
         mx = max(tempHist$breaks)
         par(mfrow=c(2,1))
-        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),],simdata[[3]][seq(length=srweights[3]),])$fmsy, f.breaks, col=grey(0.75),
+        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),],simdata[[3]][seq(length=srweights[3]),])$fmsy, f.breaks, col=grDevices::grey(0.75),
              ylim = c(0,1.10*max(tempHist$counts)), xlab="Fmsy",
              main = paste(stockname,"- combined Fmsy distribution:",ifelse(srautoweights,"automatically weighted","manually weighted")))
-        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),])$fmsy, f.breaks, add =TRUE, col=grey(0.5))
-        hist(simdata[[1]][seq(length=srweights[1]),]$fmsy, f.breaks, add =TRUE, col=grey(0.25))
+        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),])$fmsy, f.breaks, add =TRUE, col=grDevices::grey(0.5))
+        hist(simdata[[1]][seq(length=srweights[1]),]$fmsy, f.breaks, add =TRUE, col=grDevices::grey(0.25))
 
 
         lines(c(qs[1,5],qs[1,5]),c(0,my),col='red',lty=3)      #Confidence intervals
@@ -635,12 +631,12 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
 
 
         legtext <- paste(c("Ricker","Beverton-Holt","Hockeystick")," (",round(100*srweightsexact),"%)",sep="")
-        legend(0.75*mx,my,legtext, fill=grey(0.25*1:3))
+        legend(0.75*mx,my,legtext, fill=grDevices::grey(0.25*1:3))
 
-        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),],simdata[[3]][seq(length=srweights[3]),])$fcrash, f.breaks, col=grey(0.75), ylim = c(0,1.10*max(tempHist$counts)), xlab="Fcrash",
+        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),],simdata[[3]][seq(length=srweights[3]),])$fcrash, f.breaks, col=grDevices::grey(0.75), ylim = c(0,1.10*max(tempHist$counts)), xlab="Fcrash",
                      main = paste(stockname,"- combined Fcrash distribution:",ifelse(srautoweights,"automatically weighted","manually weighted")))
-        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),])$fcrash, f.breaks, add =TRUE, col=grey(0.5))
-        hist(simdata[[1]][seq(length=srweights[1]),]$fcrash, f.breaks, add =TRUE, col=grey(0.25))
+        hist(rbind(simdata[[1]][seq(length=srweights[1]),],simdata[[2]][seq(length=srweights[2]),])$fcrash, f.breaks, add =TRUE, col=grDevices::grey(0.5))
+        hist(simdata[[1]][seq(length=srweights[1]),]$fcrash, f.breaks, add =TRUE, col=grDevices::grey(0.25))
 
 
 #        qs = quantile(allSimData$fcrash,c(0.05, 0.25, 0.50, 0.75, 0.95))
@@ -654,22 +650,22 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
         text(qs[3,6],my,"50%",pos=3,col="red")
         text(qs[4,6],my*1.05,"75%",pos=3,col="red")
         text(qs[5,6],my,"95%",pos=3,col="red")
-     graphics.off()
+     grDevices::graphics.off()
 
     #  browser()
       if(!is.na(blim))
       {
-        png(paste(outputfolder, stockname, "_Fmsy3.png",sep=""),height=11.5,width=9,units="in",res=144)
+        grDevices::png(paste(outputfolder, stockname, "_Fmsy3.png",sep=""),height=11.5,width=9,units="in",res=144)
           plot(NA,xlim=range(allSimSSB[1,]),ylim=c(0,1),xlab="F",ylab="Probability SSB < Blim",
                main = paste(stockname,"- Probability SSB < Blim"))
           probs <- apply(allSimSSB[-1,],2,function(x){sum(x<blim)/length(x)})
           lines(allSimSSB[1,], probs,lty=1)
           abline(h=0.05,lty=2)
-          est.fpa <- approx(probs, allSimSSB[1,], 0.05,ties="ordered")$y
+          est.fpa <- stats::approx(probs, allSimSSB[1,], 0.05,ties="ordered")$y
           abline(v=est.fpa,lty=2)
           text(est.fpa,1,round(est.fpa,2))
           text(max(allSimSSB[1,]),0.05,"0.05")
-        graphics.off()
+        grDevices::graphics.off()
       }
 
       }
@@ -688,12 +684,12 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
               cat('\n',srname[srtype], '\n', file=outputfilename,append=TRUE)
               cat(sum(!is.na(simdata[[srtype]]$alpha)),"/",nits,' Iterations resulted in feasible parameter estimates\n',sep="", file=outputfilename,append=TRUE)
               cat('',colnames(output[[srtype]]), '\n', file=outputfilename,append=TRUE,sep='\t')
-              write.table(output[[srtype]],file=outputfilename,append=TRUE,quote=FALSE,col.names=FALSE,sep='\t',na="")
+              utils::write.table(output[[srtype]],file=outputfilename,append=TRUE,quote=FALSE,col.names=FALSE,sep='\t',na="")
        }
 
      cat('\n',"Per recruit", '\n', file=outputfilename,append=TRUE)
      cat('',colnames(outputpr), '\n', file=outputfilename,append=TRUE,sep='\t')
-     write.table(outputpr,file=outputfilename,append=TRUE,quote=FALSE,col.names=FALSE,sep='\t',na="")
+     utils::write.table(outputpr,file=outputfilename,append=TRUE,quote=FALSE,col.names=FALSE,sep='\t',na="")
      if(!onlyYPR)
      {
        cat('\n',"Combining all SRRs\n", file=outputfilename,append=TRUE)
@@ -703,7 +699,7 @@ plotMSY = function(senfilename = NA, indexfilename = NA, pfpm = NA, srweights=c(
          cat('Manually specified weights\n',names(srweights),'\n',srweightsexact,'\n', sep='\t', file=outputfilename,append=TRUE)
        }
        cat('\n','Percentage\tFmsy\tFcrash\tMSY\tBmsy\tFmsy_w\tFcrash_w\tMSY_w\tBmsy_w\n', file=outputfilename,append=TRUE)
-       write.table(qs,file=outputfilename,append=TRUE,quote=FALSE,col.names=FALSE,sep='\t',na="")
+       utils::write.table(qs,file=outputfilename,append=TRUE,quote=FALSE,col.names=FALSE,sep='\t',na="")
      }
 
      #Tidy up files

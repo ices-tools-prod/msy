@@ -2,8 +2,8 @@
 % Please edit documentation in R/msy-package.R
 \docType{package}
 \name{msy-package}
-\alias{msy}
 \alias{msy-package}
+\alias{msy}
 \title{Estimation of equilibrium reference points for fish stocks}
 \description{
 Estimation of equilibrium reference points for fish stocks
@@ -18,10 +18,8 @@ License: \tab GPL (>= 2) \cr
 LazyLoad: \tab yes \cr
 }
 }
-\examples{
-x <- 1
-cat(x)
-
+\references{
+Simmonds, Cadigan, Steve Smith
 }
 \author{
 Colin Millar \email{colinpmillar@gmail.com}
@@ -32,11 +30,4 @@ Tim Earl \email{timothy.earl@cefas.co.uk}
 
 Jose D'Oliveira \email{jose.deoliveira@cefas.co.uk}
 }
-\references{
-Simmonds, Cadigan, Steve Smith
-}
-\seealso{
-\code{\link{paste}}
-}
 \keyword{package}
-
