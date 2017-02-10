@@ -20,8 +20,6 @@ License: GPL (>= 2)
 LazyData: true
 URL: http://github.com/ices-tools-prod/msy
 BugReports: http://github.com/ices-tools-prod/msy/issues
-Depends:
-    R (>= 3.2.5)
 Imports:
     FLCore,
     ggplot2,
