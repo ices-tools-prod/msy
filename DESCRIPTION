@@ -12,7 +12,7 @@ Authors@R: c(
     person("Jose", "De Oliveira", role = "ctb"),
     person("Carmen", "Fernandez", role = "ctb")
     )
-Description: This package implments methods to estimate of equilibrium reference 
+Description: Methods to estimate equilibrium reference
              points for fisheries data.  Currently data must be converted into
              FLStock objects of the FLR (Fisheries Library in R) style, defined
              in the R package FLCore.
