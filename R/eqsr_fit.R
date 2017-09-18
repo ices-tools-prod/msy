@@ -47,7 +47,7 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"),
   dms <- FLCore::dims(stk)
   rage <- dms $ min
   if (rage == 0)
-  { x = FLCore::stock.n(stk)[1,drop=TRUE]
+  { as.vector(x = FLCore::stock.n(stk)[1,])
   } else {
     x = c(FLCore::stock.n(stk)[1,-seq(rage),drop=TRUE],rep(NA,rage))
   }
