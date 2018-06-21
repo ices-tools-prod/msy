@@ -9,6 +9,7 @@
 #' @param p Value
 #' @return NULL
 #' @author Colin Millar \email{colin.millar@@ices.dk}
+#' @export
 loader <- function(p)
 {
   if (p==0) cat("0%                       50%                     100%\n")
