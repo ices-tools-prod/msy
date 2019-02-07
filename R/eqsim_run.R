@@ -6,12 +6,12 @@
 #' @param bio.years The years to sample maturity, weights and M from, given as
 #'                  a vector of length 2, i.e. c(2010, 2015) select from the
 #'                  years 2010 to 2015 inclusive.
-#' @param bio.const A flag, if FALSE mean of the biological values from the
+#' @param bio.const A flag (default FALSE), if TRUE mean of the biological values from the
 #'                  years selected are used
 #' @param sel.years The years to sample the selection patterns from, given as
 #'                  a vector of length 2, i.e. c(2010, 2015) select from the
 #'                  years 2010 to 2015 inclusive.
-#' @param sel.const A flag, if FALSE mean of the selection patterns from the
+#' @param sel.const A flag (default FALSE), if TRUE mean of the selection patterns from the
 #'                  years selected are used
 #' @param Fscan F values to scan over, i.e. seq(0, 2, by = 0.05)
 #' @param Fcv Assessment error in the advisory year
@@ -34,7 +34,15 @@
 #' @param verbose Flag, if TRUE (default) indication of the progress of the
 #'        simulation is provided in the console. Useful to turn to FALSE when
 #'        knitting documents.
-#' @param extreme.trim Call John Simmonds :-)
+#' @param extreme.trim a pair of quantiles (low, high) which are used to trim
+#'                     the equilibrium catch values, across simulations within
+#'                     an F scenario, when calculating the mean catch and
+#'                     landings for that F scenario.  These mean values
+#'                     calculated accross simulations within an F scenario
+#'                     are used to find which F scenario gave the maximum catch.
+#'                     \code{extreme.trim} can therefore be used to stablise the
+#'                     estimate of mean equilibrium catch and landings by F
+#'                     scenario.
 #' @export
 eqsim_run <- function(fit,
                       bio.years = c(2008, 2012), # years sample weights, M and mat

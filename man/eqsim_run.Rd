@@ -2,26 +2,32 @@
 % Please edit documentation in R/eqsim_run.R
 \name{eqsim_run}
 \alias{eqsim_run}
-\title{simulates the equilibrium results for a population}
+\title{Simulates the Equilibrium Results for a Population.}
 \usage{
 eqsim_run(fit, bio.years = c(2008, 2012), bio.const = FALSE,
   sel.years = c(2008, 2012), sel.const = FALSE, Fscan = seq(0, 1, len
-  = 20), Fcv = 0, Fphi = 0, SSBcv = 0, rhologRec = FALSE, Blim,
-  Bpa, recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
+  = 20), Fcv = 0, Fphi = 0, SSBcv = 0, rhologRec = TRUE, Blim, Bpa,
+  recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
   process.error = TRUE, verbose = TRUE, extreme.trim)
 }
 \arguments{
 \item{fit}{A list returned from the function fitModels}
 
-\item{bio.years}{The years to sample maturity, weights and M from}
+\item{bio.years}{The years to sample maturity, weights and M from, given as
+a vector of length 2, i.e. c(2010, 2015) select from the
+years 2010 to 2015 inclusive.}
 
-\item{bio.const}{A flag, if FALSE mean of the biological values from the years selected are used}
+\item{bio.const}{A flag (default FALSE), if TRUE mean of the biological values from the
+years selected are used}
 
-\item{sel.years}{The years to sample the selection patterns from}
+\item{sel.years}{The years to sample the selection patterns from, given as
+a vector of length 2, i.e. c(2010, 2015) select from the
+years 2010 to 2015 inclusive.}
 
-\item{sel.const}{A flag, if FALSE mean of the selection patterns from the years selected are used}
+\item{sel.const}{A flag (default FALSE), if TRUE mean of the selection patterns from the
+years selected are used}
 
-\item{Fscan}{F values to scan over}
+\item{Fscan}{F values to scan over, i.e. seq(0, 2, by = 0.05)}
 
 \item{Fcv}{Assessment error in the advisory year}
 
@@ -29,33 +35,41 @@ eqsim_run(fit, bio.years = c(2008, 2012), bio.const = FALSE,
 
 \item{SSBcv}{Spawning stock biomass error in the advisory year}
 
-\item{rhologRec}{A flag for recruitment autocorrelation. If FALSE (default)
-then not applied.}
+\item{rhologRec}{A flag for recruitment autocorrelation, default (TRUE).}
 
-\item{Blim}{This we know}
+\item{Blim}{SSB limit reference point}
 
-\item{Bpa}{This we know}
+\item{Bpa}{SSB precuationary reference point}
 
-\item{recruitment.trim}{A numeric vector with two log-value clipping the extreme
-recruitment values from a continuous lognormal distribution. The values must
-be set as c("high","low").}
+\item{recruitment.trim}{A numeric vector with two log-value clipping the
+extreme recruitment values from a continuous lognormal distribution.
+The values must be set as c("high","low").}
 
 \item{Btrigger}{If other than 0 (default) the target F applied is reduced by
-SSB/Btrigger}
+SSB/Btrigger. This is the "ICES Advice Rule".}
 
-\item{Nrun}{The number of years to run in total (last 50 years from that will be retained)}
+\item{Nrun}{The number of years to run in total (the last 50 years from that
+will be retained to compute equilibrium values from)}
 
-\item{process.error}{Use stochastic recruitment or mean recruitment?  (TRUE = predictive)}
+\item{process.error}{Use stochastic recruitment or mean recruitment?
+(TRUE uses the predictive distribution of recruitment,
+model estimate of recruitment + simulated observation
+error)}
 
 \item{verbose}{Flag, if TRUE (default) indication of the progress of the
 simulation is provided in the console. Useful to turn to FALSE when
 knitting documents.}
 
-\item{extreme.trim}{Call John Simmonds :-)}
+\item{extreme.trim}{a pair of quantiles (low, high) which are used to trim
+the equilibrium catch values, across simulations within
+an F scenario, when calculating the mean catch and
+landings for that F scenario.  These mean values
+calculated accross simulations within an F scenario
+are used to find which F scenario gave the maximum catch.
+\code{extreme.trim} can therefore be used to stablise the
+estimate of mean equilibrium catch and landings by F
+scenario.}
 }
 \description{
 XXX
-}
-\author{
-Colin Millar \email{colin.millar@ices.dk}
 }
