@@ -151,9 +151,9 @@ eqsr_plot <- function (fit, n = 20000, x.mult = 1.1, y.mult = 1.4,
     out$rec <- out$rec/Scale
     out$mid.grp <- out$mid.grp/Scale
     Percentiles$ssb <- Percentiles$ssb/Scale
-    Percentiles$p50 <- Percentiles$p50
-    Percentiles$p05 <- Percentiles$p05
-    Percentiles$p95 <- Percentiles$p95
+    Percentiles$p50 <- Percentiles$p50/Scale
+    Percentiles$p05 <- Percentiles$p05/Scale
+    Percentiles$p95 <- Percentiles$p95/Scale
 
     modelLines$ssb <- modelLines$ssb/Scale
     modelLines$rec <- modelLines$rec/Scale
