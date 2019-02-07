@@ -46,10 +46,10 @@ A list containing the following objects:
 \description{
 Fits one or more stock recruitment relationship to data containted in an
 FLStock object. If more than one stock recruit relationship is provided, the
-models are weighted based on smooth AIC weighting (See Buckland et al.).
+models are weighted based on smooth AIC weighting (See Buckland et al., 1997).
 }
 \examples{
-/dontrun{
+\dontrun{
 data(icesStocks)
 FIT <- eqsr_fit(icesStocks$saiNS,
                 nsamp = 1000,
@@ -65,6 +65,8 @@ Buckland, S.T., K.P. Burnham & N.H. Augustin (1997). Model selection: An integra
 Biometrics 53, 603-618.
 DOI: \href{https://doi.org/10.2307/2533961}{10.2307/2533961}
 }
-\author{
-Colin Millar \email{colin.millar@ices.dk}
+\seealso{
+\code{\link{eqsr_plot}} plots a simulation of predictive recruitment
+from the fit, and shows a summary of the contributions of each stock
+recruitment model to the model average fit.
 }

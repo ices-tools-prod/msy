@@ -32,7 +32,6 @@
 #'   \item `id.sr` A string containing run name (taken from the `id.sr` argument)
 #'
 #' }
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #'
 #' @references
 #'
@@ -40,8 +39,13 @@
 #' Biometrics 53, 603-618.
 #' DOI: \href{https://doi.org/10.2307/2533961}{10.2307/2533961}
 #'
+#' @seealso
+#' \code{\link{eqsr_plot}} plots a simulation of predictive recruitment
+#' from the fit, and shows a summary of the contributions of each stock
+#' recruitment model to the model average fit.
+#'
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' data(icesStocks)
 #' FIT <- eqsr_fit(icesStocks$saiNS,
 #'                 nsamp = 1000,
