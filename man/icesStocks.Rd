@@ -17,4 +17,3 @@ A list FLStock object for various stocks
 \author{
 NA
 }
-

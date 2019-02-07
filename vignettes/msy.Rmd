@@ -1,6 +1,6 @@
 ---
 title: "Using the eqsim routines in the msy package"
-author: "John Simmond, Colin Millar and Einar Hjörleifsson"
+author: "John Simmonds, Colin Millar and Einar Hjörleifsson"
 date: '`r Sys.Date()`'
 output:
   html_document:
@@ -11,6 +11,10 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown} 
   \usepackage[utf8]{inputenc}
 ---
+
+```{r setup, eval=TRUE, echo=FALSE}
+knitr::opts_chunk$set(eval = TRUE) # set to FALSE locally if you don't want to build when developing
+```
 
 # Preamble
 

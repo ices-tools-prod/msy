@@ -1,7 +1,7 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.2-0
+Version: 0.1.17
 Date: 2016-07-19
 Authors@R: c(
     person("Colin", "Millar", email = "colin.millar@ices.dk", role = c("aut", "cre")),
@@ -12,23 +12,21 @@ Authors@R: c(
     person("Jose", "De Oliveira", role = "ctb"),
     person("Carmen", "Fernandez", role = "ctb")
     )
-Description: Estimation of equilibrium reference points for fisheries
+Description: Methods to estimate equilibrium reference
+             points for fisheries data.  Currently data must be converted into
+             FLStock objects of the FLR (Fisheries Library in R) style, defined
+             in the R package FLCore.
 License: GPL (>= 2)
 LazyData: true
 URL: http://github.com/ices-tools-prod/msy
 BugReports: http://github.com/ices-tools-prod/msy/issues
-Depends:
-    R (>= 3.2.5)
 Imports:
     FLCore,
     ggplot2,
-    grid,
-    MASS,
-    mgcv,
-    plyr,
-    scam,
-    reshape2
+    reshape2,
+    plyr
+Additional_repositories: http://flr-project.org/R
 Suggests:
     knitr
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
