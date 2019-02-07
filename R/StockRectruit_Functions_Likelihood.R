@@ -99,6 +99,10 @@ smooth_hockey <- function(ab, ssb, gamma = 0.1) {
 
 
 
+#segreg3  <- function(ab, ssb, Blim) {
+#  log(ifelse(ssb >= Blim, ab$a * Blim, ab$a * ssb))
+#}
+
 
 ######
 # This function calculates the log likelihood of the stock recruit relationship
