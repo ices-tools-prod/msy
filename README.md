@@ -1,6 +1,5 @@
 [![Build
 Status](https://travis-ci.org/ices-tools-prod/msy.svg?branch=master)](https://travis-ci.org/ices-tools-prod/msy)
-[![codecov](https://codecov.io/gh/ices-tools-prod/msy/branch/master/graph/badge.svg)](https://codecov.io/gh/ices-tools-prod/msy)
 [![local
 release](https://img.shields.io/github/release/ices-tools-prod/msy.svg?maxAge=3600)](https://github.com/ices-tools-prod/msy/tree/0.2-0)
 [![CRAN
@@ -59,6 +58,89 @@ install.packages("FLCore", repo = "http://flr-project.org/R")
 library(devtools)
 install_github("ices-tools-prod/msy")
 ```
+
+    ## 
+    ##   
+      
+      
+       checking for file 'D:\projects\git\ices-tools-prod\msy/DESCRIPTION' ...
+      
+       checking for file 'D:\projects\git\ices-tools-prod\msy/DESCRIPTION' ... 
+      
+    v  checking for file 'D:\projects\git\ices-tools-prod\msy/DESCRIPTION' (528ms)
+    ## 
+      
+      
+      
+    -  preparing 'msy': (1.1s)
+    ##   
+      
+       checking DESCRIPTION meta-information ...
+      
+       checking DESCRIPTION meta-information ... 
+      
+    v  checking DESCRIPTION meta-information
+    ## 
+      
+      
+      
+    -  checking for LF line-endings in source and make files and shell scripts (1.1s)
+    ## 
+      
+      
+      
+    -  checking for empty or unneeded directories
+    ## 
+      
+      
+      
+    -  looking to see if a 'data/datalist' file should be added
+    ## 
+      
+      
+      
+    -  building 'msy_0.1.18.tar.gz'
+    ## 
+      
+       
+    ## 
+    Running "D:/programs/R/R-3.5/bin/x64/Rcmd.exe" INSTALL \
+    ##   "C:\Users\colin\AppData\Local\Temp\RtmpK4nngL/msy_0.1.18.tar.gz" \
+    ##   --install-tests 
+    ## * installing to library 'D:/R/win-library/3.5'
+    ## * installing *source* package 'msy' ...
+    ## ** R
+    ## ** data
+    ## *** moving datasets to lazyload DB
+    ## ** byte-compile and prepare package for lazy loading
+    ## ** help
+    ## *** installing help indices
+    ##   converting help for package     finding HTML links ...'msy'
+    ##  done
+    ##     Bevholt                                 html  
+    ##     Ricker                                  html  
+    ##     Segreg                                  html  
+    ##     bevholt2                                html  
+    ##     eqsim_ggplot                            html  
+    ##     eqsim_plot                              html  
+    ##     eqsim_plot_range                        html  
+    ##     eqsim_range                             html  
+    ##     eqsim_run                               html  
+    ##     eqsr_Buckland                           html  
+    ##     eqsr_fit                                html  
+    ##     eqsr_plot                               html  
+    ##     icesStocks                              html  
+    ##     initial                                 html  
+    ##     llik                                    html  
+    ##     msy-package                             html  
+    ##     segreg2                                 html  
+    ##     smooth_hockey                           html  
+    ## ** building package indices
+    ## ** testing if installed package can be loaded
+    ## *** arch - i386
+    ## *** arch - x64
+    ## * DONE (msy)
+    ## In R CMD INSTALL
 
 The above is equivalent to `install.packages` and hence need only to be
 performed once. However, since the `msy` package is currently under
@@ -156,18 +238,18 @@ SIM$Refs
 
 ``` 
                   F05          F10          F50    medianMSY      meanMSY
-catF     3.724201e-01 3.952663e-01 4.938595e-01 1.846154e-01 2.153846e-01
+catF     3.710933e-01 3.941449e-01 4.946953e-01 1.846154e-01 2.153846e-01
 lanF               NA           NA           NA 1.846154e-01 2.153846e-01
-catch    1.242538e+05 1.209436e+05 9.438258e+04 1.302175e+05 1.306105e+05
-landings           NA           NA           NA 1.302175e+05 1.306105e+05
-catB     1.939817e+05 1.771414e+05 1.058189e+05 4.088200e+05 3.540999e+05
-lanB               NA           NA           NA 4.088200e+05 3.540999e+05
+catch    1.238782e+05 1.208750e+05 9.460774e+04 1.300622e+05 1.304077e+05
+landings           NA           NA           NA 1.300622e+05 1.304077e+05
+catB     1.949532e+05 1.782281e+05 1.057544e+05 4.090448e+05 3.543909e+05
+lanB               NA           NA           NA 4.090448e+05 3.543909e+05
              FCrash05     FCrash50
 catF     4.615385e-01    0.6153846
 lanF               NA           NA
-catch    1.056576e+05 1722.3839424
+catch    1.058257e+05 2924.6731442
 landings           NA           NA
-catB     1.292579e+05 1515.1759130
+catB     1.296521e+05 2511.8059881
 lanB               NA           NA
 ```
 
@@ -177,7 +259,7 @@ Summary plots conditioned on maximizing **catch** are obtained by:
 eqsim_plot(SIM,catch=TRUE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](README_files/figure-gfm/plot_catch-1.png)<!-- -->
 
 Summary plots of **Fmsy range** (WKMSYREF3) are obtained by:
 
@@ -185,19 +267,19 @@ Summary plots of **Fmsy range** (WKMSYREF3) are obtained by:
 eqsim_plot_range(SIM, type="mean")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/plot_msy-1.png)<!-- -->
 
 ``` r
 eqsim_plot_range(SIM, type="median")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+![](README_files/figure-gfm/plot_msy-2.png)<!-- -->
 
 ``` r
 eqsim_plot_range(SIM, type="ssb")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
+![](README_files/figure-gfm/plot_msy-3.png)<!-- -->
 
 ## The recruitment model
 
@@ -231,8 +313,7 @@ args(eqsr_fit)
 ```
 
     function (stk, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"), 
-        method = "Buckland", id.sr = NULL, remove.years = NULL, delta = 1.3, 
-        nburn = 10000) 
+        id.sr = FLCore::name(stk), remove.years = NULL) 
     NULL
 
 Here:
@@ -256,26 +337,27 @@ str(FIT, 2, give.attr=FALSE)
 
     List of 6
      $ sr.sto:'data.frame': 1000 obs. of  4 variables:
-      ..$ a    : num [1:1000] 1.22 2.28 1.33 2.04 1.24 ...
-      ..$ b.b  : num [1:1000] 9.99e+04 6.12e-06 1.04e+05 5.39e-06 9.78e+04 ...
-      ..$ cv   : num [1:1000] 0.489 0.492 0.574 0.44 0.492 ...
-      ..$ model: chr [1:1000] "Segreg" "Ricker" "Segreg" "Ricker" ...
+      ..$ a    : num [1:1000] 1.19 1.29 1.21 1.24 1.92 ...
+      ..$ b.b  : num [1:1000] 9.29e+04 1.06e+05 1.06e+05 1.04e+05 5.38e-06 ...
+      ..$ cv   : num [1:1000] 0.45 0.541 0.471 0.42 0.498 ...
+      ..$ model: chr [1:1000] "Segreg" "Segreg" "Segreg" "Segreg" ...
      $ sr.det:'data.frame': 2 obs. of  6 variables:
       ..$ a    : num [1:2] 1.44 1.21
       ..$ b    : num [1:2] 3.74e-06 1.06e+05
       ..$ cv   : num [1:2] 0.521 0.492
       ..$ model: chr [1:2] "Ricker" "Segreg"
-      ..$ n    : int [1:2] 119 881
-      ..$ prop : num [1:2] 0.119 0.881
-     $ pRec  : num [1:1000, 1:44] 121799 126938 137826 122702 121787 ...
+      ..$ n    : int [1:2] 120 880
+      ..$ prop : num [1:2] 0.12 0.88
+     $ pRec  : num [1:1000, 1:44] 110142 136639 128081 128952 115870 ...
      $ stk   :Formal class 'FLStock' [package "FLCore"] with 20 slots
-     $ rby   :'data.frame': 44 obs. of  6 variables:
-      ..$ year    : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
-      ..$ rec     : num [1:44] 291836 327932 171373 152852 148741 ...
-      ..$ ssb     : num [1:44] 194228 164413 263979 311949 429606 ...
-      ..$ fbar    : num [1:44] 0.322 0.291 0.262 0.408 0.329 ...
-      ..$ landings: num [1:44] 113751 88326 130588 234962 265381 ...
-      ..$ catch   : num [1:44] 113751 88326 130588 234962 265381 ...
+     $ rby   :'data.frame': 44 obs. of  7 variables:
+      ..$ year        : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
+      ..$ rec         : num [1:44] 291836 327932 171373 152852 148741 ...
+      ..$ ssb         : num [1:44] 194228 164413 263979 311949 429606 ...
+      ..$ fbar        : num [1:44] 0.322 0.291 0.262 0.408 0.329 ...
+      ..$ landings    : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ catch       : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ remove.years: logi [1:44] FALSE FALSE FALSE FALSE FALSE FALSE ...
      $ id.sr : chr "SAITHE IN IV, VI and IIIa : 1967 - 2013"
 
 where:
@@ -302,9 +384,9 @@ FIT$sr.det
 ```
 
 ``` 
-         a            b        cv  model   n  prop
-1 1.443935 3.743708e-06 0.5207246 Ricker 119 0.119
-2 1.212853 1.062150e+05 0.4917162 Segreg 881 0.881
+         a            b        cv  model   n prop
+1 1.443935 3.743708e-06 0.5207246 Ricker 120 0.12
+2 1.212853 1.062150e+05 0.4917162 Segreg 880 0.88
 ```
 
 Here the a, b and cv are the estimated parameters from the deterministic
@@ -317,7 +399,7 @@ Again to obtain a plot one simply calls:
 eqsr_plot(FIT,n=2e4)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/plot_fit_2-1.png)<!-- -->
 
 The `n` supplied to the `eqsr_plot` stands here for the number of
 stochastic recruitment points desired to include in the plot. The
@@ -333,7 +415,7 @@ fancy colours :-):
 eqsr_plot(FIT,n=2e4,ggPlot=TRUE,Scale=1e3)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](README_files/figure-gfm/plot_fit_ggplot-1.png)<!-- -->
 
 Here the model fits are represented in different colours with the yellow
 lines indicating the 5%, 50% and 95% percentiles of the stochastic
@@ -429,31 +511,32 @@ str(SIM, 2, give.attr = FALSE)
       ..$ weca : num [1:8, 1:2] 0.964 1.116 1.382 1.74 2.722 ...
       ..$ sel  : num [1:8, 1:2] 0.315 1.006 1.186 1.493 1.529 ...
      $ rbya         :List of 1
-      ..$ ferr: num [1:40, 1:50, 1:1000] -0.396 -0.396 -0.396 -0.396 -0.396 ...
-     $ rby          :'data.frame':  44 obs. of  6 variables:
-      ..$ year    : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
-      ..$ rec     : num [1:44] 291836 327932 171373 152852 148741 ...
-      ..$ ssb     : num [1:44] 194228 164413 263979 311949 429606 ...
-      ..$ fbar    : num [1:44] 0.322 0.291 0.262 0.408 0.329 ...
-      ..$ landings: num [1:44] 113751 88326 130588 234962 265381 ...
-      ..$ catch   : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ ferr: num [1:40, 1:50, 1:1000] 0.203 0.203 0.203 0.203 0.203 ...
+     $ rby          :'data.frame':  44 obs. of  7 variables:
+      ..$ year        : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
+      ..$ rec         : num [1:44] 291836 327932 171373 152852 148741 ...
+      ..$ ssb         : num [1:44] 194228 164413 263979 311949 429606 ...
+      ..$ fbar        : num [1:44] 0.322 0.291 0.262 0.408 0.329 ...
+      ..$ landings    : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ catch       : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ remove.years: logi [1:44] FALSE FALSE FALSE FALSE FALSE FALSE ...
      $ rbp          :'data.frame':  160 obs. of  10 variables:
       ..$ Ftarget : num [1:160] 0 0.0308 0.0615 0.0923 0.1231 ...
       ..$ variable: chr [1:160] "Recruitment" "Recruitment" "Recruitment" "Recruitment" ...
-      ..$ p025    : num [1:160] 26441 32836 38160 41745 44240 ...
-      ..$ p05     : num [1:160] 36473 43370 47622 50819 53028 ...
-      ..$ p25     : num [1:160] 82121 84571 86601 88207 89730 ...
-      ..$ p50     : num [1:160] 121251 122385 123742 125223 126460 ...
-      ..$ p75     : num [1:160] 173802 174322 175199 176386 177503 ...
-      ..$ p95     : num [1:160] 287314 288162 289108 290173 291413 ...
-      ..$ p975    : num [1:160] 337189 337604 338081 339429 340985 ...
+      ..$ p025    : num [1:160] 27483 34415 39018 42237 44708 ...
+      ..$ p05     : num [1:160] 37452 44270 48406 51410 53625 ...
+      ..$ p25     : num [1:160] 81722 84240 86579 88387 89746 ...
+      ..$ p50     : num [1:160] 120450 121736 123263 124674 126146 ...
+      ..$ p75     : num [1:160] 172830 173347 174275 175464 176639 ...
+      ..$ p95     : num [1:160] 287730 288186 288821 289334 290374 ...
+      ..$ p975    : num [1:160] 338087 338714 339744 340541 341655 ...
       ..$ Mean    : num [1:160] NA NA NA NA NA NA NA NA NA NA ...
      $ Blim         : num 106000
      $ Bpa          : num 2e+05
-     $ Refs         : num [1:6, 1:7] 3.72e-01 NA 1.24e+05 NA 1.94e+05 ...
+     $ Refs         : num [1:6, 1:7] 3.71e-01 NA 1.24e+05 NA 1.95e+05 ...
      $ pProfile     :'data.frame':  1104 obs. of  3 variables:
-      ..$ Ftarget : num [1:1104] 0.108 0.109 0.11 0.111 0.112 ...
-      ..$ value   : num [1:1104] 9.29e-07 2.57e-06 5.35e-06 9.89e-06 1.70e-05 ...
+      ..$ Ftarget : num [1:1104] 0.138 0.139 0.14 0.141 0.142 ...
+      ..$ value   : num [1:1104] 0.000203 0.000526 0.001026 0.001782 0.002892 ...
       ..$ variable: chr [1:1104] "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" ...
      $ id.sim       : chr "SAITHE IN IV, VI and IIIa : 1967 - 2013"
      $ refs_interval:'data.frame':  1 obs. of  8 variables:
@@ -463,9 +546,9 @@ str(SIM, 2, give.attr = FALSE)
       ..$ FmsyMedianL     : num 0.217
       ..$ FmsylowerMedianL: num 0.121
       ..$ FmsyupperMedianL: num 0.368
-      ..$ F5percRiskBlim  : num 0.372
+      ..$ F5percRiskBlim  : num 0.371
       ..$ Btrigger        : num 0
-     $ Refs2        : num [1:6, 1:9] 3.72e-01 NA 1.24e+05 NA 1.94e+05 ...
+     $ Refs2        : num [1:6, 1:9] 3.71e-01 NA 1.24e+05 NA 1.95e+05 ...
 
 where
 
@@ -498,5 +581,5 @@ t(SIM$refs_interval)
     ## FmsyMedianL      0.2170854
     ## FmsylowerMedianL 0.1206030
     ## FmsyupperMedianL 0.3678392
-    ## F5percRiskBlim   0.3724201
+    ## F5percRiskBlim   0.3710933
     ## Btrigger         0.0000000

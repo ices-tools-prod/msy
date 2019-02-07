@@ -52,6 +52,10 @@ library(devtools)
 install_github("ices-tools-prod/msy")
 ```
 
+```{r dev_install, eval=TRUE, echo=FALSE}
+devtools::install("D:/projects/git/ices-tools-prod/msy")
+```
+
 The above is equivalent to `install.packages` and hence need only to be performed once. However, since the `msy` package is currently under development (including bug-fixing) one may expect more frequent code updating in the package than what one may be familiar with for packages on `CRAN`. Once installed the `msy` packages is simply loaded via the familiar:
 
 ```{r loadLibrary, message=FALSE}
@@ -119,12 +123,12 @@ SIM$Refs
 ```
 
 Summary plots conditioned on maximizing __catch__ are obtained by:
-```{r}
+```{r plot_catch}
 eqsim_plot(SIM,catch=TRUE)
 ```
 
 Summary plots of __Fmsy range__ (WKMSYREF3) are obtained by:
-```{r}
+```{r plot_msy}
 eqsim_plot_range(SIM, type="mean")
 eqsim_plot_range(SIM, type="median")
 eqsim_plot_range(SIM, type="ssb")
@@ -179,14 +183,14 @@ FIT$sr.det
 Here the a, b and cv are the estimated parameters from the deterministic fit for each model. The `n` and `prop` is a summary of the number and proportion that each model contributes to the final fit.
 
 Again to obtain a plot one simply calls:
-```{r}
+```{r plot_fit_2}
 eqsr_plot(FIT,n=2e4)
 ```
 
 The `n` supplied to the `eqsr_plot` stands here for the number of stochastic recruitment points desired to include in the plot. The various black dashed lines represent the best fit of the different recruitment models and the yellow and blue lines the median and 5% and 95% percentiles of the distributions of the stochastic recruits drawn from the models. The input data are represented by red points.
 
 An alternative to the `base` plot is a `ggplot2` version (with too many fancy colours :-):
-```{r}
+```{r plot_fit_ggplot}
 eqsr_plot(FIT,n=2e4,ggPlot=TRUE,Scale=1e3)
 ```
 
