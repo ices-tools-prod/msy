@@ -1,5 +1,6 @@
 ^README_files$
 .travis.yml
 README.md
+README.Rmd
 ^.*\.Rproj$
 ^\.Rproj\.user$
