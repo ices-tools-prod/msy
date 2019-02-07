@@ -2,50 +2,68 @@
 % Please edit documentation in R/eqsr_fit.R
 \name{eqsr_fit}
 \alias{eqsr_fit}
-\title{Stock recruitment fit}
+\title{Stock recruitment fitting}
 \usage{
 eqsr_fit(stk, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"),
-  method = "Buckland", id.sr = NULL, remove.years = NULL,
-  delta = 1.3, nburn = 10000)
+  id.sr = FLCore::name(stk), remove.years = NULL)
 }
 \arguments{
 \item{stk}{FLStock object}
 
-\item{nsamp}{Number of samples (iterations)}
+\item{nsamp}{Number of samples (iterations) to take from the stock recruitment
+fit.}
 
-\item{models}{A character vector containing sr-models to use. User can set
-any combination of "Ricker", "Segreg", "Bevholt", "Smooth_hockey".}
+\item{models}{A character vector containing stock recruitment models to use
+in the model averaging. User can set any combination of
+"Ricker", "Segreg", "Bevholt", "Smooth_hockey".}
 
-\item{method}{A character vector. Currently only "Buckland" is implemented.}
+\item{id.sr}{A character vector specifying an id or name for the stock
+recruitment fit being run. The default is to use the slot "name"
+in the stk parameter is provided}
 
-\item{id.sr}{A character vector specifying an id for the stock recruitment
-model. If not specified (default) the slot "name" in the FLStock is used.}
-
-\item{remove.years}{A vector specifying the years to remove}
-
-\item{delta}{A value, used in method "Simmonds" (not implemented)}
-
-\item{nburn}{An integer, used in method Simmonds (not implemented)}
+\item{remove.years}{A vector specifying the years to remove from the model
+fitting.}
 }
 \value{
 A list containing the following objects:
 \itemize{
-\item fit data.frame containing the alpha (a), beta (b), cv and model names.
-The number of rows correspond to the value set in nsamp in the function call.
-\item pred A vector of predicted recruitment values. The length of the vector
-corresponds to the value set in nsamp in the function call.
-\item fits The parameters in the stock recruitment model corresponding to the
-"best fit" of any given model.
-\item data data.frame containing the recruitment (rec), spawning stock
-biomass (ssb) and year used in the fitting of the data.
-\item stknam A character vector containing stock name
-\item stk FLStock object, same as provided as input by the user.
+  \item `sr.sto` data.frame containing the alpha (a), beta (b), cv and model
+        names. The number of rows correspond to the value set of `nsamp` in
+        the function call.
+  \item `sr.det` The parameters in the stock recruitment model corresponding
+        to the "best fit" of any given model.
+  \item `pRec` A matrix of predicted recruitment values. The number of rows
+        corresponds to the value set in `nsamp` in the function call. The
+        number of columns matches with the number of years used in the model
+        fitting.
+  \item `stk` An FLStock object, same as provided as input by the user.
+  \item `rby` A data.frame containing the recruitment (rec), spawning stock
+        biomass (ssb) and year used in the fitting of the data.
+  \item `id.sr` A string containing run name (taken from the `id.sr` argument)
+
 }
 }
 \description{
-Fits a stock recruitment relationship to data containted in an FLStock object.
-If more than one stock recruit relationship is provided, the models are weighted
-based on smooth AIC weighting (See Buckland et al.).
+Fits one or more stock recruitment relationship to data containted in an
+FLStock object. If more than one stock recruit relationship is provided, the
+models are weighted based on smooth AIC weighting (See Buckland et al.).
+}
+\examples{
+/dontrun{
+data(icesStocks)
+FIT <- eqsr_fit(icesStocks$saiNS,
+                nsamp = 1000,
+                models = c("Ricker", "Segreg"))
+
+# summary of individual fits
+FIT$sr.det
+}
+
+}
+\references{
+Buckland, S.T., K.P. Burnham & N.H. Augustin (1997). Model selection: An integral part of inference.
+Biometrics 53, 603-618.
+DOI: \href{https://doi.org/10.2307/2533961}{10.2307/2533961}
 }
 \author{
 Colin Millar \email{colin.millar@ices.dk}
