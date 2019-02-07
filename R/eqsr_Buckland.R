@@ -1,13 +1,4 @@
-#' stock recruitment function
-#'
-#'
-#' @param data data.frame containing stock recruitment data
-#' @param nsamp Number of samples
-#' @param models A character vector
-#' @param ... Additional arguements
-#' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
-#' @export
+
 eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"), ...)
 {
 
