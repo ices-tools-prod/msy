@@ -1,3 +1,4 @@
+^README_files$
 .travis.yml
 README.md
 ^.*\.Rproj$

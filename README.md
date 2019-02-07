@@ -7,26 +7,22 @@ release](https://img.shields.io/github/release/ices-tools-prod/msy.svg?maxAge=36
 Status](http://www.r-pkg.org/badges/version/msy)](https://cran.r-project.org/package=msy)
 [![CRAN
 Downloads](http://cranlogs.r-pkg.org/badges/grand-total/msy)](https://cran.r-project.org/package=msy)
-[![License](https://img.shields.io/badge/license-GPL%20(%3E%3D%202)-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![License](https://img.shields.io/badge/license-GPL%20\(%3E%3D%202\)-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-msy
-===
+# msy
 
 The `msy` R package is a collection of methods to estimate equilibrium
 reference points for fish stocks
 
-Contact
--------
+## Contact
 
 You are welcome to:
 
--   submit suggestions and bug-reports at:
-    <a href="https://github.com/ices-tools-prod/msy/issues" class="uri">https://github.com/ices-tools-prod/msy/issues</a>
--   send a pull request on:
-    <a href="https://github.com/ices-tools-prod/msy" class="uri">https://github.com/ices-tools-prod/msy</a>
+  - submit suggestions and bug-reports at:
+    <https://github.com/ices-tools-prod/msy/issues>
+  - send a pull request on: <https://github.com/ices-tools-prod/msy>
 
-Preamble
-========
+# Preamble
 
 This document is as much as the `msy`-package itself still in
 developement.
@@ -40,8 +36,7 @@ output of the analysis in a more structured format.
 At this moment there is no person responsible for the maintenance of the
 package, including the above mentioned names.
 
-Installation
-============
+# Installation
 
 The developmental repository for the `msy` package is located on
 [github](https://github.com), more specifically on
@@ -78,15 +73,15 @@ library(msy)
 
 Besides functions the package comes with the following data:
 
--   codCS: `FLStock` object of the Celtic Sea cod
--   codEB: `FLStock` object of the Eastern Baltic cod
--   codIS: `FLStock` object of the Icelandic cod
--   codNS: `FLStock` object of the North Sea cod
--   codWB: `FLStock` object of the Western Baltic cod
--   codWS: `FLStock` object of the West of Scotland cod
--   saiFO: `FLStock` object of the Faeroe saithe
--   saiIS: `FLStock` object of the Icelandic saithe
--   solKA: `FLStock` object of the Kattegat sole
+  - codCS: `FLStock` object of the Celtic Sea cod
+  - codEB: `FLStock` object of the Eastern Baltic cod
+  - codIS: `FLStock` object of the Icelandic cod
+  - codNS: `FLStock` object of the North Sea cod
+  - codWB: `FLStock` object of the Western Baltic cod
+  - codWS: `FLStock` object of the West of Scotland cod
+  - saiFO: `FLStock` object of the Faeroe saithe
+  - saiIS: `FLStock` object of the Icelandic saithe
+  - solKA: `FLStock` object of the Kattegat sole
 
 These are all stored in the icesStocks list object.
 
@@ -94,8 +89,7 @@ The current version of the `msy` implements two methods that go under
 the working names `eqsim` and `plotMSY`. Only usage of functions for the
 `eqsim` approaches are described in the following sections.
 
-eqsim
-=====
+# eqsim
 
 `eqsim` is a stochastic equilibrium software that may be used to explore
 MSY reference points. Productivity parameters (i.e. year vectors for
@@ -111,8 +105,7 @@ target fishing mortality.
 
 The current version of `eqsim` only takes `FLStock` objects as inputs.
 
-A quick start
--------------
+## A quick start
 
 In the following subsections we will simulate the north sea cod stock
 into the future under some basic assumptions. For the simulations we
@@ -152,28 +145,31 @@ The stock recruitment function can be plotted by:
 eqsr_plot(FIT,n=2e4)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](README_files/figure-gfm/plot_fit-1.png)<!-- -->
 
-Summary of the key results can be obtained by:
+Summary of the key results can be obtained
+by:
 
 ``` r
 SIM$Refs
 ```
 
-                      F05          F10          F50    medianMSY      meanMSY
-    catF     3.692706e-01 3.941487e-01 4.958872e-01 1.846154e-01 2.153846e-01
-    lanF               NA           NA           NA 1.846154e-01 2.153846e-01
-    catch    1.242601e+05 1.211248e+05 9.430130e+04 1.298172e+05 1.304078e+05
-    landings           NA           NA           NA 1.298172e+05 1.304078e+05
-    catB     1.962033e+05 1.784674e+05 1.058060e+05 4.084419e+05 3.544959e+05
-    lanB               NA           NA           NA 4.084419e+05 3.544959e+05
-                 FCrash05     FCrash50
-    catF     4.923077e-01    0.6153846
-    lanF               NA           NA
-    catch    9.592446e+04 2726.2160103
-    landings           NA           NA
-    catB     1.084391e+05 2364.1998848
-    lanB               NA           NA
+``` 
+                  F05          F10          F50    medianMSY      meanMSY
+catF     3.724201e-01 3.952663e-01 4.938595e-01 1.846154e-01 2.153846e-01
+lanF               NA           NA           NA 1.846154e-01 2.153846e-01
+catch    1.242538e+05 1.209436e+05 9.438258e+04 1.302175e+05 1.306105e+05
+landings           NA           NA           NA 1.302175e+05 1.306105e+05
+catB     1.939817e+05 1.771414e+05 1.058189e+05 4.088200e+05 3.540999e+05
+lanB               NA           NA           NA 4.088200e+05 3.540999e+05
+             FCrash05     FCrash50
+catF     4.615385e-01    0.6153846
+lanF               NA           NA
+catch    1.056576e+05 1722.3839424
+landings           NA           NA
+catB     1.292579e+05 1515.1759130
+lanB               NA           NA
+```
 
 Summary plots conditioned on maximizing **catch** are obtained by:
 
@@ -181,7 +177,7 @@ Summary plots conditioned on maximizing **catch** are obtained by:
 eqsim_plot(SIM,catch=TRUE)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Summary plots of **Fmsy range** (WKMSYREF3) are obtained by:
 
@@ -189,22 +185,21 @@ Summary plots of **Fmsy range** (WKMSYREF3) are obtained by:
 eqsim_plot_range(SIM, type="mean")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 eqsim_plot_range(SIM, type="median")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-2.png)
+![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
 
 ``` r
 eqsim_plot_range(SIM, type="ssb")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-3.png)
+![](README_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
 
-The recruitment model
----------------------
+## The recruitment model
 
 Model fitting is done by maximum likelihood using the `nlminb` optimiser
 in R. By refitting to non-parametric bootstrap resamples of the stock
@@ -228,7 +223,8 @@ long as the bootstrap resampling procedure provides an adequate
 approximation to the empirical distribution of the stock and recruit
 pairs.
 
-The arguments to the fitting function are
+The arguments to the fitting function
+    are
 
 ``` r
 args(eqsr_fit)
@@ -241,15 +237,15 @@ args(eqsr_fit)
 
 Here:
 
--   `stk` is an `FLStock` object
--   `nsamp` is the number of simulations to run (often referred to as
+  - `stk` is an `FLStock` object
+  - `nsamp` is the number of simulations to run (often referred to as
     iterations)
--   `models` is the models to average over (any of the combination of
+  - `models` is the models to average over (any of the combination of
     these can be supplied, including only a single model)
--   `method` the method used (only Buckland as of now)
--   `id.sr` placeholder if one wants to name the fit
--   `remove.years` is used to remove years from the fit
--   `delta` and `nburn` are related to an MCMC based fitting procedure
+  - `method` the method used (only Buckland as of now)
+  - `id.sr` placeholder if one wants to name the fit
+  - `remove.years` is used to remove years from the fit
+  - `delta` and `nburn` are related to an MCMC based fitting procedure
     (not implemented)
 
 The results from the fitting process are returned to the user as a list:
@@ -260,18 +256,18 @@ str(FIT, 2, give.attr=FALSE)
 
     List of 6
      $ sr.sto:'data.frame': 1000 obs. of  4 variables:
-      ..$ a    : num [1:1000] 1.31 1.27 1.75 1.11 1.01 ...
-      ..$ b.b  : num [1:1000] 1.07e+05 9.93e+04 4.74e-06 1.02e+05 1.26e+05 ...
-      ..$ cv   : num [1:1000] 0.496 0.493 0.482 0.47 0.486 ...
-      ..$ model: chr [1:1000] "Segreg" "Segreg" "Ricker" "Segreg" ...
+      ..$ a    : num [1:1000] 1.22 2.28 1.33 2.04 1.24 ...
+      ..$ b.b  : num [1:1000] 9.99e+04 6.12e-06 1.04e+05 5.39e-06 9.78e+04 ...
+      ..$ cv   : num [1:1000] 0.489 0.492 0.574 0.44 0.492 ...
+      ..$ model: chr [1:1000] "Segreg" "Ricker" "Segreg" "Ricker" ...
      $ sr.det:'data.frame': 2 obs. of  6 variables:
       ..$ a    : num [1:2] 1.44 1.21
       ..$ b    : num [1:2] 3.74e-06 1.06e+05
       ..$ cv   : num [1:2] 0.521 0.492
       ..$ model: chr [1:2] "Ricker" "Segreg"
-      ..$ n    : int [1:2] 138 862
-      ..$ prop : num [1:2] 0.138 0.862
-     $ pRec  : num [1:1000, 1:44] 140377 126087 112565 113117 108608 ...
+      ..$ n    : int [1:2] 119 881
+      ..$ prop : num [1:2] 0.119 0.881
+     $ pRec  : num [1:1000, 1:44] 121799 126938 137826 122702 121787 ...
      $ stk   :Formal class 'FLStock' [package "FLCore"] with 20 slots
      $ rby   :'data.frame': 44 obs. of  6 variables:
       ..$ year    : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
@@ -284,19 +280,19 @@ str(FIT, 2, give.attr=FALSE)
 
 where:
 
--   `sr.sto` is the the (joint) stochastic distribution of the estimated
+  - `sr.sto` is the the (joint) stochastic distribution of the estimated
     model and parameters. The number of rows of the data frame is
     equivalent to the value supplied to `nsamp` in the `eqsr_fit`
     function.
--   `sr.det` is the conventional determinimstic predictive estimate. The
+  - `sr.det` is the conventional determinimstic predictive estimate. The
     `n` indicates the number of times a particular function is drawn in
     the stochastic sample and the `prop` the proportion, given `nsamp`.
--   `pRec` contains the fitted parameters to the observed data
--   `stk` retains the original `FLStock` object passed to the function.
--   `rby` (results by year) contains a summary of the ssb and rec data
+  - `pRec` contains the fitted parameters to the observed data
+  - `stk` retains the original `FLStock` object passed to the function.
+  - `rby` (results by year) contains a summary of the ssb and rec data
     used in the fitting as well as other stock summary information used
     later down the line
--   id.rs\` is the user specified id
+  - id.rs\` is the user specified id
 
 The contribution of each of the models can be obtained by printing out
 the `sr.det`:
@@ -305,9 +301,11 @@ the `sr.det`:
 FIT$sr.det
 ```
 
-             a            b        cv  model   n  prop
-    1 1.443935 3.743708e-06 0.5207246 Ricker 138 0.138
-    2 1.212853 1.062150e+05 0.4917162 Segreg 862 0.862
+``` 
+         a            b        cv  model   n  prop
+1 1.443935 3.743708e-06 0.5207246 Ricker 119 0.119
+2 1.212853 1.062150e+05 0.4917162 Segreg 881 0.881
+```
 
 Here the a, b and cv are the estimated parameters from the deterministic
 fit for each model. The `n` and `prop` is a summary of the number and
@@ -319,7 +317,7 @@ Again to obtain a plot one simply calls:
 eqsr_plot(FIT,n=2e4)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 The `n` supplied to the `eqsr_plot` stands here for the number of
 stochastic recruitment points desired to include in the plot. The
@@ -335,7 +333,7 @@ fancy colours :-):
 eqsr_plot(FIT,n=2e4,ggPlot=TRUE,Scale=1e3)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 Here the model fits are represented in different colours with the yellow
 lines indicating the 5%, 50% and 95% percentiles of the stochastic
@@ -344,22 +342,20 @@ indicating year class. The weight of each model in the final stochastic
 recruitment draw is indicated as a proportion in the legends and by
 different colours for the stochastic draws.
 
-The simulation
-==============
+# The simulation
 
 Simulating forward is done using the `eqsim_run` function. The function
 takes as input the output from the `eqsr_fit` function. Simulations are
 run independently for each sample from the distribution of model and
-parameters. This is done for a range of
-*F*<sub>*a**d**v**i**s**o**r**y*</sub> values. For example if we scanned
-over 10 values of *F*<sub>*a**d**v**i**s**o**r**y*</sub> and had taken
+parameters. This is done for a range of \(F_{advisory}\) values. For
+example if we scanned over 10 values of \(F_{advisory}\) and had taken
 2000 samples from the stock-recruit relationship then 20000 simulations
 would be run in total. These simulations are run for 200 years (default,
 specified with `Nrun`), and the last 50 years are retained to calculate
 summaries, like the proportion of times the stock crashes at a given
-*F*<sub>*a**d**v**i**s**o**r**y*</sub>. It is important to note that
-each simulation is conditioned on a single stock recruit relationship
-with fixed parameters and cv.
+\(F_{advisory}\). It is important to note that each simulation is
+conditioned on a single stock recruit relationship with fixed parameters
+and cv.
 
 Error is introduced within the simulations by generating process error
 about the constant stock-recruit fit, and by using variation in
@@ -383,37 +379,36 @@ args(eqsim_run)
 
 where:
 
--   `fit` is the output list from `eqsr_fit`
--   `bio.years` is the start and end year from which to generate noise
+  - `fit` is the output list from `eqsr_fit`
+  - `bio.years` is the start and end year from which to generate noise
     in maturity, M and weights.
--   `bio.const` is a flag indicating if the average maturity, M and
+  - `bio.const` is a flag indicating if the average maturity, M and
     weights over the specified years should be used (`TRUE`) or not
     (`FALSE`).
--   `sel.years` is the start and end year from which to generated noise
+  - `sel.years` is the start and end year from which to generated noise
     in the selection at age
--   `sel.const` is a flag indicating if the average selection over the
+  - `sel.const` is a flag indicating if the average selection over the
     specified years should be used (`TRUE`) or not (`FALSE`).
--   `Fscan` is the range of *F*<sub>*a**d**v**i**s**o**r**y*</sub>
-    values to scan over
--   `Btrigger` is the location of a modifier of a HCR upon which
-    *F*<sub>*a**d**v**i**s**o**r**y*</sub> becomes linearily reduced. If
-    `Btrigger` is 0 (default) this is equivalent to a constant F-rule.
--   `Fcv` The assessment error of fishing mortality in the advisory
+  - `Fscan` is the range of \(F_{advisory}\) values to scan over
+  - `Btrigger` is the location of a modifier of a HCR upon which
+    \(F_{advisory}\) becomes linearily reduced. If `Btrigger` is 0
+    (default) this is equivalent to a constant F-rule.
+  - `Fcv` The assessment error of fishing mortality in the advisory
     year.
--   `Fphi` The autocorrelation of fishing mortality in assessment error
--   `SSBcv` The assessment error in the spawning stock in the advisory
+  - `Fphi` The autocorrelation of fishing mortality in assessment error
+  - `SSBcv` The assessment error in the spawning stock in the advisory
     year
--   `rhologRec` Use or not use autocorrelation in recruitment residuals.
--   `Blim` *B*<sub>*l**i**m*</sub>
--   `Bpa` *B*<sub>*p**a*</sub>
--   `Nrun` is the number of years to simulate forward (fixed for now is
+  - `rhologRec` Use or not use autocorrelation in recruitment residuals.
+  - `Blim` \(B_{lim}\)
+  - `Bpa` \(B_{pa}\)
+  - `Nrun` is the number of years to simulate forward (fixed for now is
     that the last 50 years from those are used for summarising
     equilibrium conditions)
--   \`process.error} allows the simulations to be run using the
+  - \`process.error} allows the simulations to be run using the
     predictive distribition of recruitment or the mean recruitment
--   `verbose` controls if progress bar is displayed during the
+  - `verbose` controls if progress bar is displayed during the
     simulation
--   `extreme.trim` A numerical vector of length 2 containing the lower
+  - `extreme.trim` A numerical vector of length 2 containing the lower
     and upper percentiles. If specified, recruitement values outside
     this range are trimmed (ignored).
 
@@ -434,7 +429,7 @@ str(SIM, 2, give.attr = FALSE)
       ..$ weca : num [1:8, 1:2] 0.964 1.116 1.382 1.74 2.722 ...
       ..$ sel  : num [1:8, 1:2] 0.315 1.006 1.186 1.493 1.529 ...
      $ rbya         :List of 1
-      ..$ ferr: num [1:40, 1:50, 1:1000] 0.296 0.296 0.296 0.296 0.296 ...
+      ..$ ferr: num [1:40, 1:50, 1:1000] -0.396 -0.396 -0.396 -0.396 -0.396 ...
      $ rby          :'data.frame':  44 obs. of  6 variables:
       ..$ year    : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
       ..$ rec     : num [1:44] 291836 327932 171373 152852 148741 ...
@@ -445,20 +440,20 @@ str(SIM, 2, give.attr = FALSE)
      $ rbp          :'data.frame':  160 obs. of  10 variables:
       ..$ Ftarget : num [1:160] 0 0.0308 0.0615 0.0923 0.1231 ...
       ..$ variable: chr [1:160] "Recruitment" "Recruitment" "Recruitment" "Recruitment" ...
-      ..$ p025    : num [1:160] 25575 32858 37860 41451 43909 ...
-      ..$ p05     : num [1:160] 35258 42362 47115 50675 52713 ...
-      ..$ p25     : num [1:160] 80354 83374 85797 87682 89475 ...
-      ..$ p50     : num [1:160] 119467 120938 122701 124284 125718 ...
-      ..$ p75     : num [1:160] 171466 172360 173690 175146 176464 ...
-      ..$ p95     : num [1:160] 283952 285017 286434 287776 288805 ...
-      ..$ p975    : num [1:160] 336367 336758 337943 339283 340649 ...
+      ..$ p025    : num [1:160] 26441 32836 38160 41745 44240 ...
+      ..$ p05     : num [1:160] 36473 43370 47622 50819 53028 ...
+      ..$ p25     : num [1:160] 82121 84571 86601 88207 89730 ...
+      ..$ p50     : num [1:160] 121251 122385 123742 125223 126460 ...
+      ..$ p75     : num [1:160] 173802 174322 175199 176386 177503 ...
+      ..$ p95     : num [1:160] 287314 288162 289108 290173 291413 ...
+      ..$ p975    : num [1:160] 337189 337604 338081 339429 340985 ...
       ..$ Mean    : num [1:160] NA NA NA NA NA NA NA NA NA NA ...
      $ Blim         : num 106000
      $ Bpa          : num 2e+05
-     $ Refs         : num [1:6, 1:7] 3.69e-01 NA 1.24e+05 NA 1.96e+05 ...
+     $ Refs         : num [1:6, 1:7] 3.72e-01 NA 1.24e+05 NA 1.94e+05 ...
      $ pProfile     :'data.frame':  1104 obs. of  3 variables:
-      ..$ Ftarget : num [1:1104] 0.108 0.108 0.109 0.11 0.111 ...
-      ..$ value   : num [1:1104] 2.40e-06 6.33e-06 1.27e-05 2.27e-05 3.77e-05 ...
+      ..$ Ftarget : num [1:1104] 0.108 0.109 0.11 0.111 0.112 ...
+      ..$ value   : num [1:1104] 9.29e-07 2.57e-06 5.35e-06 9.89e-06 1.70e-05 ...
       ..$ variable: chr [1:1104] "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" ...
      $ id.sim       : chr "SAITHE IN IV, VI and IIIa : 1967 - 2013"
      $ refs_interval:'data.frame':  1 obs. of  8 variables:
@@ -468,30 +463,29 @@ str(SIM, 2, give.attr = FALSE)
       ..$ FmsyMedianL     : num 0.217
       ..$ FmsylowerMedianL: num 0.121
       ..$ FmsyupperMedianL: num 0.368
-      ..$ F5percRiskBlim  : num 0.369
+      ..$ F5percRiskBlim  : num 0.372
       ..$ Btrigger        : num 0
-     $ Refs2        : num [1:6, 1:9] 3.69e-01 NA 1.24e+05 NA 1.96e+05 ...
+     $ Refs2        : num [1:6, 1:9] 3.72e-01 NA 1.24e+05 NA 1.94e+05 ...
 
 where
 
--   `ibya` (input by year and age) contains the biological and fisheries
+  - `ibya` (input by year and age) contains the biological and fisheries
     input data.
--   `rby` (results by year) contains the stock summary data.
--   `rbp` (results by probability) contains the 0.025, 0.05, 0.25, 0.5,
+  - `rby` (results by year) contains the stock summary data.
+  - `rbp` (results by probability) contains the 0.025, 0.05, 0.25, 0.5,
     0.75, 0.95, 0.975 percentiles of the simulations of SSB, catch,
     landings and recruitment for each Fscan value.
--   `Blim` *B*<sub>*l**i**m*</sub> input value
--   `Bpa` *B*<sub>*p**a*</sub> input value
--   `Refs` Calculated reference points
--   `pProfile` The probability profiles for a given target F for
-    *B*<sub>*l**i**m*</sub>, *B*<sub>*p**a*</sub> and
-    *F*<sub>*m**s**y*</sub> (both for catch and landings).
--   `refs_interval` The *F*<sub>*m**s**y*</sub> interval and 5%
-    percentile risk of going below *B*<sub>*l**i**m*</sub> (per
-    [WKFMSYREF3](http://www.ices.dk))
+  - `Blim` \(B_{lim}\) input value
+  - `Bpa` \(B_{pa}\) input value
+  - `Refs` Calculated reference points
+  - `pProfile` The probability profiles for a given target F for
+    \(B_{lim}\), \(B_{pa}\) and \(F_{msy}\) (both for catch and
+    landings).
+  - `refs_interval` The \(F_{msy}\) interval and 5% percentile risk of
+    going below \(B_{lim}\) (per [WKFMSYREF3](http://www.ices.dk))
 
-The calculation associated with the *F*<sub>*m**s**y*</sub> range values
-can be accessed simply by:
+The calculation associated with the \(F_{msy}\) range values can be
+accessed simply by:
 
 ``` r
 t(SIM$refs_interval)
@@ -504,5 +498,5 @@ t(SIM$refs_interval)
     ## FmsyMedianL      0.2170854
     ## FmsylowerMedianL 0.1206030
     ## FmsyupperMedianL 0.3678392
-    ## F5percRiskBlim   0.3692706
+    ## F5percRiskBlim   0.3724201
     ## Btrigger         0.0000000

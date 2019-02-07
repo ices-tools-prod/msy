@@ -5,7 +5,6 @@ output:
 ---
 
 [![Build Status](https://travis-ci.org/ices-tools-prod/msy.svg?branch=master)](https://travis-ci.org/ices-tools-prod/msy)
-[![codecov](https://codecov.io/gh/ices-tools-prod/msy/branch/master/graph/badge.svg)](https://codecov.io/gh/ices-tools-prod/msy)
 [![local release](https://img.shields.io/github/release/ices-tools-prod/msy.svg?maxAge=3600)](https://github.com/ices-tools-prod/msy/tree/0.2-0)
 [![CRAN Status](http://www.r-pkg.org/badges/version/msy)](https://cran.r-project.org/package=msy)
 [![CRAN Downloads](http://cranlogs.r-pkg.org/badges/grand-total/msy)](https://cran.r-project.org/package=msy)
