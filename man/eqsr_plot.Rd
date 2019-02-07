@@ -4,8 +4,8 @@
 \alias{eqsr_plot}
 \title{plot simulated predictive distribution of recruitment}
 \usage{
-eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4, ggPlot = FALSE,
-  Scale = 1)
+eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4,
+  ggPlot = FALSE, Scale = 1)
 }
 \arguments{
 \item{fit}{an fitted MCMC returned from \code{eqsr_fit}}

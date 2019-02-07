@@ -4,8 +4,8 @@
 \alias{eqsr_Buckland}
 \title{stock recruitment function}
 \usage{
-eqsr_Buckland(data, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"),
-  ...)
+eqsr_Buckland(data, nsamp = 5000, models = c("Ricker", "Segreg",
+  "Bevholt"), ...)
 }
 \arguments{
 \item{data}{data.frame containing stock recruitment data}
