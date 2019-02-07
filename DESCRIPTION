@@ -23,8 +23,5 @@ Imports:
     reshape2,
     plyr
 Additional_repositories: http://flr-project.org/R
-Suggests:
-    knitr
-VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Encoding: UTF-8
