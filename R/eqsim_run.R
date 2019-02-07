@@ -1,36 +1,41 @@
-#' @title simulates the equilibrium results for a population
+#'  Simulates the Equilibrium Results for a Population.
 #'
-#' @description XXX
-#'
-#' @export
-#'
-#' @author Colin Millar \email{colin.millar@@ices.dk}
+#' XXX
 #'
 #' @param fit A list returned from the function fitModels
-#' @param bio.years The years to sample maturity, weights and M from
-#' @param bio.const A flag, if FALSE mean of the biological values from the years selected are used
-#' @param sel.years The years to sample the selection patterns from
-#' @param sel.const A flag, if FALSE mean of the selection patterns from the years selected are used
-#' @param Fscan F values to scan over
+#' @param bio.years The years to sample maturity, weights and M from, given as
+#'                  a vector of length 2, i.e. c(2010, 2015) select from the
+#'                  years 2010 to 2015 inclusive.
+#' @param bio.const A flag, if FALSE mean of the biological values from the
+#'                  years selected are used
+#' @param sel.years The years to sample the selection patterns from, given as
+#'                  a vector of length 2, i.e. c(2010, 2015) select from the
+#'                  years 2010 to 2015 inclusive.
+#' @param sel.const A flag, if FALSE mean of the selection patterns from the
+#'                  years selected are used
+#' @param Fscan F values to scan over, i.e. seq(0, 2, by = 0.05)
 #' @param Fcv Assessment error in the advisory year
 #' @param Fphi Autocorrelation in assessment error in the advisory year
 #' @param SSBcv Spawning stock biomass error in the advisory year
-#' @param rhologRec A flag for recruitment autocorrelation. If FALSE (default)
-#' then not applied.
-#' @param Blim This we know
-#' @param Bpa This we know
-#' @param recruitment.trim A numeric vector with two log-value clipping the extreme
-#' recruitment values from a continuous lognormal distribution. The values must
-#' be set as c("high","low").
+#' @param rhologRec A flag for recruitment autocorrelation, default (TRUE).
+#' @param Blim SSB limit reference point
+#' @param Bpa SSB precuationary reference point
+#' @param recruitment.trim A numeric vector with two log-value clipping the
+#'        extreme recruitment values from a continuous lognormal distribution.
+#'        The values must be set as c("high","low").
 #' @param Btrigger If other than 0 (default) the target F applied is reduced by
-#' SSB/Btrigger
-#' @param Nrun The number of years to run in total (last 50 years from that will be retained)
-#' @param process.error Use stochastic recruitment or mean recruitment?  (TRUE = predictive)
+#'                 SSB/Btrigger. This is the "ICES Advice Rule".
+#' @param Nrun The number of years to run in total (the last 50 years from that
+#'             will be retained to compute equilibrium values from)
+#' @param process.error Use stochastic recruitment or mean recruitment?
+#'                      (TRUE uses the predictive distribution of recruitment,
+#'                      model estimate of recruitment + simulated observation
+#'                      error)
 #' @param verbose Flag, if TRUE (default) indication of the progress of the
-#' simulation is provided in the console. Useful to turn to FALSE when
-#' knitting documents.
+#'        simulation is provided in the console. Useful to turn to FALSE when
+#'        knitting documents.
 #' @param extreme.trim Call John Simmonds :-)
-
+#' @export
 eqsim_run <- function(fit,
                       bio.years = c(2008, 2012), # years sample weights, M and mat
                       bio.const = FALSE,
@@ -40,7 +45,7 @@ eqsim_run <- function(fit,
                       Fcv = 0,
                       Fphi = 0,
                       SSBcv = 0,
-                      rhologRec = FALSE,
+                      rhologRec = TRUE,
                       Blim,
                       Bpa,
                       recruitment.trim = c(3, -3),
@@ -52,7 +57,7 @@ eqsim_run <- function(fit,
 {
 
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
-  if ((recruitment.trim[1] + recruitment.trim[2])> 0) stop("recruitment truncation must be between a high - low range")
+  if (diff(recruitment.trim) > 0) stop("recruitment truncation must be given as c(high, low)")
 
   btyr1 <- bio.years[1]
   btyr2 <- bio.years[2]
