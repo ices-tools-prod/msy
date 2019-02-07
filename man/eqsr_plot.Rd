@@ -2,31 +2,59 @@
 % Please edit documentation in R/eqsr_plot.R
 \name{eqsr_plot}
 \alias{eqsr_plot}
-\title{plot simulated predictive distribution of recruitment}
+\title{Plot Simulated Predictive Distribution of Recruitment}
 \usage{
-eqsr_plot(fit, n = 5000, x.mult = 1.1, y.mult = 1.4,
-  ggPlot = FALSE, Scale = 1)
+eqsr_plot(fit, n = 20000, x.mult = 1.1, y.mult = 1.4,
+  ggPlot = FALSE, Scale = 1, filter.lag = 15)
 }
 \arguments{
-\item{fit}{an fitted MCMC returned from \code{eqsr_fit}}
+\item{fit}{an fitted stock recruit model returned from \code{eqsr_fit}}
 
 \item{n}{Number of random recruitment draws to plot}
 
-\item{x.mult}{max.y (ssb) as a multiplier of maximum observed ssb}
+\item{x.mult}{max value for the y axis (ssb) as a multiplier of maximum
+observed ssb}
 
-\item{y.mult}{max.x (rec) as a multiplier of maismum observed rec}
+\item{y.mult}{max value for the x axis (rec) as a multiplier of maismum
+observed rec}
 
-\item{ggPlot}{Flag, if FALSE (default) plot base graphics, if true
+\item{ggPlot}{Flag, if FALSE (default) plot using base graphics, if TRUE
 do a ggplot}
 
 \item{Scale}{Numeric value for scaling varibles in plot.}
+
+\item{filter.lag}{Integer (odd) value giving the size of the
+window used (as a percentage of the full range) to average
+the median and precentiles of the simulated
+recruitment (default is 15).  Recruitment is calculated for
+100 SSB points, so a max window of 99 is allowed, but is
+pretty silly. A filter.lag of 1, gives no smoothing, but
+is typically very noisy. All of this is purely for plotting
+purposes.}
 }
 \value{
 NULL produces a plot
 }
 \description{
-plot simulated predictive distribution of recruitment
+Plot Simulated Predictive Distribution of Recruitment
 }
-\author{
-Colin Millar \email{colin.millar@ices.dk}
+\examples{
+
+#' \dontrun{
+data(icesStocks)
+FIT <- eqsr_fit(icesStocks$saiNS,
+                nsamp = 1000,
+                models = c("Ricker", "Segreg"))
+
+eqsr_plot(FIT, n = 20000)
+
+# Scale argument only available for ggPlot = TRUE
+eqsr_plot(FIT, n = 20000, ggPlot = TRUE, Scale = 1000)
+}
+
+}
+\seealso{
+\code{\link{eqsr_fit}} Fits several stock recruitment models to a data set
+and calculates the proportion contribution of each model based on a bootstrap
+model averaging procedure.
 }
