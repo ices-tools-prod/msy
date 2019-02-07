@@ -1,15 +1,12 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.17
-Date: 2016-07-19
+Version: 0.1.18
+Date: 2019-02-07
 Authors@R: c(
     person("Colin", "Millar", email = "colin.millar@ices.dk", role = c("aut", "cre")),
-    person("Timothy", "Earl", role = "aut"),
-    person("Noel", "Cadigan", role = "aut"),
     person("Einar", "Hjorleifsson", role = "aut"),
     person("John", "Simmonds", role = "aut"),
-    person("Jose", "De Oliveira", role = "ctb"),
     person("Carmen", "Fernandez", role = "ctb")
     )
 Description: Methods to estimate equilibrium reference
