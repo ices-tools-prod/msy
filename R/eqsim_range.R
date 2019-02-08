@@ -1,11 +1,3 @@
-#' @title Calculate Fmsy range
-#'
-#' @description XXX
-#'
-#' @export
-#'
-#' @param sim XXX
-#' @param interval XXX
 eqsim_range <-function (sim, interval=0.95)
   {
 
