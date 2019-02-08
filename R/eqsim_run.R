@@ -29,9 +29,10 @@
 #' @param Nrun The number of years to run in total (the last 50 years from that
 #'             will be retained to compute equilibrium values from)
 #' @param process.error Use stochastic recruitment or mean recruitment?
-#'                      (TRUE uses the predictive distribution of recruitment,
+#'                      TRUE (default) uses the predictive distribution of recruitment,
 #'                      model estimate of recruitment + simulated observation
-#'                      error)
+#'                      error.  FALSE uses model prediction of recruitment with
+#'                      no observation error.
 #' @param verbose Flag, if TRUE (default) indication of the progress of the
 #'        simulation is provided in the console. Useful to turn to FALSE when
 #'        knitting documents.
@@ -43,7 +44,8 @@
 #'                     are used to find which F scenario gave the maximum catch.
 #'                     \code{extreme.trim} can therefore be used to stablise the
 #'                     estimate of mean equilibrium catch and landings by F
-#'                     scenario.
+#'                     scenario.  The default is c(0, 1) which includes all the
+#'                     data and is effectively an untrimmed mean.
 #' @return
 #' A list containing the results from the forward simulation and the reference
 #' points calculated from it.
@@ -98,11 +100,11 @@
 #'
 #' @export
 eqsim_run <- function(fit,
-                      bio.years = c(2008, 2012), # years sample weights, M and mat
+                      bio.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear, # years sample weights, M and mat
                       bio.const = FALSE,
-                      sel.years= c(2008, 2012), # years sample sel and discard proportion by number from
+                      sel.years= c(-5, -1) + FLCore::dims(fit$stk)$maxyear, # years sample sel and discard proportion by number from
                       sel.const = FALSE,
-                      Fscan = seq(0, 1, len = 20), # F values to scan over
+                      Fscan = seq(0, 2, len = 40), # F values to scan over
                       Fcv = 0,
                       Fphi = 0,
                       SSBcv = 0,
@@ -114,7 +116,7 @@ eqsim_run <- function(fit,
                       Nrun = 200, # number of years to run in total
                       process.error = TRUE, # use predictive recruitment or mean recruitment? (TRUE = predictive)
                       verbose = TRUE,
-                      extreme.trim)
+                      extreme.trim = c(0, 1))
 {
 
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
