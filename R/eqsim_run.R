@@ -48,19 +48,20 @@
 #' A list containing the results from the forward simulation and the reference
 #' points calculated from it.
 #'
+#' @details
+#' Details of the steps required to evaluate reference points are given in
+#' ICES (2017).  WHile, details of the calculation of MSY ranges is given in
+#' ICES (2015).
+#'
 #' @references
 #' ICES (2015) Report of the Workshop to consider F MSY ranges for stocks in
 #' ICES categories 1 and 2 in Western Waters (WKMSYREF4).
-#' \href{http://ices.dk/sites/pub/Publication%20Reports/Expert%20Group%20Report/acom/2015/WKMSYREF4/01%20WKMSYREF4%20Report.pdf}{01
+#' \href{http://ices.dk/sites/pub/Publication\%20Reports/Expert\%20Group\%20Report/acom/2015/WKMSYREF4/01\%20WKMSYREF4\%20Report.pdf}{01
 #' WKMSYREF4 Report.pdf}
-#'
-#' ICES (2016) EU request to ICES to provide F MSY ranges for selected stocks in
-#' ICES subareas 5 to 10.
-#' \href{http://ices.dk/sites/pub/Publication%20Reports/Advice/2016/Special_Requests/EU_FMSY_ranges_for_selected_Western_Waters_Stocks.pdf}{EU_FMSY_ranges_for_selected_Western_Waters_Stocks.pdf}
 #'
 #' ICES (2017) ICES fisheries management reference points for category 1 and 2
 #' stocks.
-#' \href{http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf}{12.04.03.01_Reference_points_for_category_1_and_2.pdf}
+#' DOI: \href{https://doi.org/10.17895/ices.pub.3036}{10.17895/ices.pub.3036}
 #'
 #' @seealso
 #'

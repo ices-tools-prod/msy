@@ -78,6 +78,11 @@ points calculated from it.
 Simulate a fish stock forward in time given biological parameters, fishery
 parameters and advice parameters.
 }
+\details{
+Details of the steps required to evaluate reference points are given in
+ICES (2017).  WHile, details of the calculation of MSY ranges is given in
+ICES (2015).
+}
 \examples{
 \dontrun{
 data(icesStocks)
@@ -97,6 +102,16 @@ SIM <-
    )
 }
 
+}
+\references{
+ICES (2015) Report of the Workshop to consider F MSY ranges for stocks in
+ICES categories 1 and 2 in Western Waters (WKMSYREF4).
+\href{http://ices.dk/sites/pub/Publication\%20Reports/Expert\%20Group\%20Report/acom/2015/WKMSYREF4/01\%20WKMSYREF4\%20Report.pdf}{01
+WKMSYREF4 Report.pdf}
+
+ICES (2017) ICES fisheries management reference points for category 1 and 2
+stocks.
+DOI: \href{https://doi.org/10.17895/ices.pub.3036}{10.17895/ices.pub.3036}
 }
 \seealso{
 \code{\link{eqsr_fit}} fits multiple stock recruitment models to a data set.
