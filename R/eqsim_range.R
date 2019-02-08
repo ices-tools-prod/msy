@@ -175,19 +175,21 @@ eqsim_range <-function (sim, interval=0.95)
   sim$Refs2 <- cbind(sim$Refs2, Medlower = rep(NA,6), Meanlower = rep(NA,6),
                        Medupper = rep(NA,6), Meanupper = rep(NA,6))
 
-  sim$Refs2["lanF","Medlower"] <- fmsy.lower.median
-  sim$Refs2["lanF","Medupper"] <- fmsy.upper.median
-  sim$Refs2["lanF","Meanlower"] <- fmsy.lower.mean
-  sim$Refs2["lanF","Meanupper"] <- fmsy.upper.mean
+  NAforNumeric0 <- function(x) if (length(x)) x else NA
 
-  sim$Refs2["landings","Medlower"] <- landings.lower.median
-  sim$Refs2["landings","Medupper"] <- landings.upper.median
-  sim$Refs2["landings","Meanlower"] <- landings.lower.mean
-  sim$Refs2["landings","Meanupper"] <- landings.upper.mean
+  sim$Refs2["lanF","Medlower"] <- NAforNumeric0(fmsy.lower.median)
+  sim$Refs2["lanF","Medupper"] <- NAforNumeric0(fmsy.upper.median)
+  sim$Refs2["lanF","Meanlower"] <- NAforNumeric0(fmsy.lower.mean)
+  sim$Refs2["lanF","Meanupper"] <- NAforNumeric0(fmsy.upper.mean)
 
-  sim$Refs2["lanB","medianMSY"] <- b.msymed
-  sim$Refs2["lanB","Medlower"] <- b.medlower
-  sim$Refs2["lanB","Medupper"] <- b.medupper
+  sim$Refs2["landings","Medlower"] <- NAforNumeric0(landings.lower.median)
+  sim$Refs2["landings","Medupper"] <- NAforNumeric0(landings.upper.median)
+  sim$Refs2["landings","Meanlower"] <- NAforNumeric0(landings.lower.mean)
+  sim$Refs2["landings","Meanupper"] <- NAforNumeric0(landings.upper.mean)
+
+  sim$Refs2["lanB","medianMSY"] <- NAforNumeric0(b.msymed)
+  sim$Refs2["lanB","Medlower"] <- NAforNumeric0(b.medlower)
+  sim$Refs2["lanB","Medupper"] <- NAforNumeric0(b.medupper)
 
   # Reference point estimates
   #cat("\nReference point estimates:\n")
