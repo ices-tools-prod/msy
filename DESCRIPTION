@@ -4,10 +4,10 @@ Title: Estimation of equilibrium reference points for fisheries
 Version: 0.1.18
 Date: 2019-02-07
 Authors@R: c(
-    person("Colin", "Millar", email = "colin.millar@ices.dk", role = c("aut", "cre")),
-    person("Einar", "Hjorleifsson", role = "aut"),
     person("John", "Simmonds", role = "aut"),
-    person("Carmen", "Fernandez", role = "ctb")
+    person("Einar", "Hjorleifsson", role = "aut"),
+    person("Carmen", "Fernandez", role = "ctb"),
+    person("Colin", "Millar", email = "colin.millar@ices.dk", role = c("aut", "cre"))
     )
 Description: Methods to estimate equilibrium reference
              points for fisheries data.  Currently data must be converted into
