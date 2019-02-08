@@ -67,6 +67,8 @@ eqsim_run <- function(fit,
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
   if (diff(recruitment.trim) > 0) stop("recruitment truncation must be given as c(high, low)")
 
+  if (verbose) icesTAF::msg("Setting up...")
+
   btyr1 <- bio.years[1]
   btyr2 <- bio.years[2]
   slyr1 <- sel.years[1]
@@ -191,6 +193,7 @@ eqsim_run <- function(fit,
   for (k in 1:Nmod) { resids[k,resids[k,]<lims[2,k]]=lims[2,k]}
   # end New from Simmonds 29.1.2014
 
+  if (verbose) icesTAF::msg("Running forward simulations.")
   if (verbose) loader(0)
 
   # Looping over each F value in Fscan. For each of the Nmod SR fits
@@ -332,6 +335,8 @@ eqsim_run <- function(fit,
 
     if (verbose) loader(i/NF)
   }
+
+  if (verbose) icesTAF::msg("Summarising simulations")
 
   dimnames(ssbs) <- dimnames(cats) <-
     dimnames(lans) <- dimnames(recs) <-
@@ -511,6 +516,8 @@ eqsim_run <- function(fit,
               pProfile=pProfile,
               id.sim=fit$id.sr,
               refs_interval=refs_interval)
+
+  if (verbose) icesTAF::msg("Calculating MSY range values")
 
   sim <- eqsim_range(sim)
 
