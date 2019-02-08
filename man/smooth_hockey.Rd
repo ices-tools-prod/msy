@@ -19,6 +19,3 @@ log recruitment according to model
 \description{
 stock recruitment function
 }
-\author{
-Colin Millar \email{colin.millar@ices.dk}
-}

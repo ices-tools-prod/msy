@@ -17,6 +17,3 @@ vector of starting values
 \description{
 a quick fix!!
 }
-\author{
-Colin Millar \email{colin.millar@ices.dk}
-}
