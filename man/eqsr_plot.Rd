@@ -40,7 +40,7 @@ Plot Simulated Predictive Distribution of Recruitment
 }
 \examples{
 
-#' \dontrun{
+\dontrun{
 data(icesStocks)
 FIT <- eqsr_fit(icesStocks$saiNS,
                 nsamp = 1000,
