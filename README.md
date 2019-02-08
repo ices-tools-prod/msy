@@ -59,89 +59,6 @@ library(devtools)
 install_github("ices-tools-prod/msy")
 ```
 
-    ## 
-    ##   
-      
-      
-       checking for file 'D:\projects\git\ices-tools-prod\msy/DESCRIPTION' ...
-      
-       checking for file 'D:\projects\git\ices-tools-prod\msy/DESCRIPTION' ... 
-      
-    v  checking for file 'D:\projects\git\ices-tools-prod\msy/DESCRIPTION' (528ms)
-    ## 
-      
-      
-      
-    -  preparing 'msy': (1.1s)
-    ##   
-      
-       checking DESCRIPTION meta-information ...
-      
-       checking DESCRIPTION meta-information ... 
-      
-    v  checking DESCRIPTION meta-information
-    ## 
-      
-      
-      
-    -  checking for LF line-endings in source and make files and shell scripts (1.1s)
-    ## 
-      
-      
-      
-    -  checking for empty or unneeded directories
-    ## 
-      
-      
-      
-    -  looking to see if a 'data/datalist' file should be added
-    ## 
-      
-      
-      
-    -  building 'msy_0.1.18.tar.gz'
-    ## 
-      
-       
-    ## 
-    Running "D:/programs/R/R-3.5/bin/x64/Rcmd.exe" INSTALL \
-    ##   "C:\Users\colin\AppData\Local\Temp\RtmpK4nngL/msy_0.1.18.tar.gz" \
-    ##   --install-tests 
-    ## * installing to library 'D:/R/win-library/3.5'
-    ## * installing *source* package 'msy' ...
-    ## ** R
-    ## ** data
-    ## *** moving datasets to lazyload DB
-    ## ** byte-compile and prepare package for lazy loading
-    ## ** help
-    ## *** installing help indices
-    ##   converting help for package     finding HTML links ...'msy'
-    ##  done
-    ##     Bevholt                                 html  
-    ##     Ricker                                  html  
-    ##     Segreg                                  html  
-    ##     bevholt2                                html  
-    ##     eqsim_ggplot                            html  
-    ##     eqsim_plot                              html  
-    ##     eqsim_plot_range                        html  
-    ##     eqsim_range                             html  
-    ##     eqsim_run                               html  
-    ##     eqsr_Buckland                           html  
-    ##     eqsr_fit                                html  
-    ##     eqsr_plot                               html  
-    ##     icesStocks                              html  
-    ##     initial                                 html  
-    ##     llik                                    html  
-    ##     msy-package                             html  
-    ##     segreg2                                 html  
-    ##     smooth_hockey                           html  
-    ## ** building package indices
-    ## ** testing if installed package can be loaded
-    ## *** arch - i386
-    ## *** arch - x64
-    ## * DONE (msy)
-    ## In R CMD INSTALL
-
 The above is equivalent to `install.packages` and hence need only to be
 performed once. However, since the `msy` package is currently under
 development (including bug-fixing) one may expect more frequent code
@@ -211,8 +128,8 @@ FIT <- eqsr_fit(icesStocks$saiNS,
                 nsamp = 1000,
                 models = c("Ricker", "Segreg"))
 SIM <- eqsim_run(FIT,
-                 bio.years = 2004:2013,
-                 sel.years = 2004:2013,
+                 bio.years = c(2004, 2013),
+                 sel.years = c(2004, 2013),
                  Fcv = 0.24,
                  Fphi = 0.42,
                  Blim = 106000,
@@ -238,18 +155,18 @@ SIM$Refs
 
 ``` 
                   F05          F10          F50    medianMSY      meanMSY
-catF     3.710933e-01 3.941449e-01 4.946953e-01 1.846154e-01 2.153846e-01
-lanF               NA           NA           NA 1.846154e-01 2.153846e-01
-catch    1.238782e+05 1.208750e+05 9.460774e+04 1.300622e+05 1.304077e+05
-landings           NA           NA           NA 1.300622e+05 1.304077e+05
-catB     1.949532e+05 1.782281e+05 1.057544e+05 4.090448e+05 3.543909e+05
-lanB               NA           NA           NA 4.090448e+05 3.543909e+05
+catF     3.675774e-01 3.940308e-01 4.990954e-01 3.076923e-01 3.076923e-01
+lanF               NA           NA           NA 3.076923e-01 3.076923e-01
+catch    1.265605e+05 1.239753e+05 9.571695e+04 1.284774e+05 1.284774e+05
+landings           NA           NA           NA 1.284774e+05 1.284774e+05
+catB     2.126939e+05 1.909209e+05 1.057146e+05 2.684618e+05 2.684618e+05
+lanB               NA           NA           NA 2.684618e+05 2.684618e+05
              FCrash05     FCrash50
-catF     4.615385e-01    0.6153846
+catF     4.923077e-01    0.6153846
 lanF               NA           NA
-catch    1.058257e+05 2924.6731442
+catch    9.907078e+04 3703.8785837
 landings           NA           NA
-catB     1.296521e+05 2511.8059881
+catB     1.113816e+05 3091.0668735
 lanB               NA           NA
 ```
 
@@ -337,18 +254,18 @@ str(FIT, 2, give.attr=FALSE)
 
     List of 6
      $ sr.sto:'data.frame': 1000 obs. of  4 variables:
-      ..$ a    : num [1:1000] 1.19 1.29 1.21 1.24 1.92 ...
-      ..$ b.b  : num [1:1000] 9.29e+04 1.06e+05 1.06e+05 1.04e+05 5.38e-06 ...
-      ..$ cv   : num [1:1000] 0.45 0.541 0.471 0.42 0.498 ...
+      ..$ a    : num [1:1000] 0.872 1.001 1.157 1.172 1.429 ...
+      ..$ b.b  : num [1:1000] 164413 126196 106372 111533 88874 ...
+      ..$ cv   : num [1:1000] 0.494 0.51 0.46 0.565 0.462 ...
       ..$ model: chr [1:1000] "Segreg" "Segreg" "Segreg" "Segreg" ...
      $ sr.det:'data.frame': 2 obs. of  6 variables:
       ..$ a    : num [1:2] 1.44 1.21
       ..$ b    : num [1:2] 3.74e-06 1.06e+05
       ..$ cv   : num [1:2] 0.521 0.492
       ..$ model: chr [1:2] "Ricker" "Segreg"
-      ..$ n    : int [1:2] 120 880
-      ..$ prop : num [1:2] 0.12 0.88
-     $ pRec  : num [1:1000, 1:44] 110142 136639 128081 128952 115870 ...
+      ..$ n    : int [1:2] 142 858
+      ..$ prop : num [1:2] 0.142 0.858
+     $ pRec  : num [1:1000, 1:44] 93482 107228 123056 125553 127043 ...
      $ stk   :Formal class 'FLStock' [package "FLCore"] with 20 slots
      $ rby   :'data.frame': 44 obs. of  7 variables:
       ..$ year        : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
@@ -384,9 +301,9 @@ FIT$sr.det
 ```
 
 ``` 
-         a            b        cv  model   n prop
-1 1.443935 3.743708e-06 0.5207246 Ricker 120 0.12
-2 1.212853 1.062150e+05 0.4917162 Segreg 880 0.88
+         a            b        cv  model   n  prop
+1 1.443935 3.743708e-06 0.5207246 Ricker 142 0.142
+2 1.212853 1.062150e+05 0.4917162 Segreg 858 0.858
 ```
 
 Here the a, b and cv are the estimated parameters from the deterministic
@@ -446,17 +363,19 @@ that if there is no variability in these quantities in the stock object
 then no variability will be taken in to the simulations. The user can
 also specify using average values for these parameters.
 
-The arguments to the simulation function are:
+The arguments to the simulation function
+    are:
 
 ``` r
 args(eqsim_run)
 ```
 
-    function (fit, bio.years = c(2008, 2012), bio.const = FALSE, 
-        sel.years = c(2008, 2012), sel.const = FALSE, Fscan = seq(0, 
-            1, len = 20), Fcv = 0, Fphi = 0, SSBcv = 0, rhologRec = FALSE, 
-        Blim, Bpa, recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200, 
-        process.error = TRUE, verbose = TRUE, extreme.trim) 
+    function (fit, bio.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear, 
+        bio.const = FALSE, sel.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear, 
+        sel.const = FALSE, Fscan = seq(0, 2, len = 40), Fcv = 0, 
+        Fphi = 0, SSBcv = 0, rhologRec = TRUE, Blim, Bpa, recruitment.trim = c(3, 
+            -3), Btrigger = 0, Nrun = 200, process.error = TRUE, 
+        verbose = TRUE, extreme.trim = c(0, 1)) 
     NULL
 
 where:
@@ -503,15 +422,15 @@ str(SIM, 2, give.attr = FALSE)
 
     List of 11
      $ ibya         :List of 7
-      ..$ Mat  : num [1:8, 1:2] 0 0.15 0.7 0.9 1 1 1 1 0 0.15 ...
-      ..$ M    : num [1:8, 1:2] 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...
+      ..$ Mat  : num [1:8, 1:10] 0 0.15 0.7 0.9 1 1 1 1 0 0.15 ...
+      ..$ M    : num [1:8, 1:10] 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...
       ..$ Fprop: Named num [1:8] 0 0 0 0 0 0 0 0
       ..$ Mprop: Named num [1:8] 0 0 0 0 0 0 0 0
-      ..$ west : num [1:8, 1:2] 0.964 1.116 1.382 1.74 2.722 ...
-      ..$ weca : num [1:8, 1:2] 0.964 1.116 1.382 1.74 2.722 ...
-      ..$ sel  : num [1:8, 1:2] 0.315 1.006 1.186 1.493 1.529 ...
+      ..$ west : num [1:8, 1:10] 0.964 1.116 1.382 1.74 2.722 ...
+      ..$ weca : num [1:8, 1:10] 0.964 1.116 1.382 1.74 2.722 ...
+      ..$ sel  : num [1:8, 1:10] 0.315 1.006 1.186 1.493 1.529 ...
      $ rbya         :List of 1
-      ..$ ferr: num [1:40, 1:50, 1:1000] 0.203 0.203 0.203 0.203 0.203 ...
+      ..$ ferr: num [1:40, 1:50, 1:1000] -0.325 -0.325 -0.325 -0.325 -0.325 ...
      $ rby          :'data.frame':  44 obs. of  7 variables:
       ..$ year        : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
       ..$ rec         : num [1:44] 291836 327932 171373 152852 148741 ...
@@ -523,32 +442,32 @@ str(SIM, 2, give.attr = FALSE)
      $ rbp          :'data.frame':  160 obs. of  10 variables:
       ..$ Ftarget : num [1:160] 0 0.0308 0.0615 0.0923 0.1231 ...
       ..$ variable: chr [1:160] "Recruitment" "Recruitment" "Recruitment" "Recruitment" ...
-      ..$ p025    : num [1:160] 27483 34415 39018 42237 44708 ...
-      ..$ p05     : num [1:160] 37452 44270 48406 51410 53625 ...
-      ..$ p25     : num [1:160] 81722 84240 86579 88387 89746 ...
-      ..$ p50     : num [1:160] 120450 121736 123263 124674 126146 ...
-      ..$ p75     : num [1:160] 172830 173347 174275 175464 176639 ...
-      ..$ p95     : num [1:160] 287730 288186 288821 289334 290374 ...
-      ..$ p975    : num [1:160] 338087 338714 339744 340541 341655 ...
+      ..$ p025    : num [1:160] 24692 30125 34638 38486 41622 ...
+      ..$ p05     : num [1:160] 34543 40566 45020 48304 50920 ...
+      ..$ p25     : num [1:160] 79877 81924 84214 86068 87716 ...
+      ..$ p50     : num [1:160] 119040 120086 121513 122798 124026 ...
+      ..$ p75     : num [1:160] 171945 172446 173249 174338 175417 ...
+      ..$ p95     : num [1:160] 284900 285154 285648 286480 287147 ...
+      ..$ p975    : num [1:160] 334582 334841 335204 336281 337455 ...
       ..$ Mean    : num [1:160] NA NA NA NA NA NA NA NA NA NA ...
      $ Blim         : num 106000
      $ Bpa          : num 2e+05
-     $ Refs         : num [1:6, 1:7] 3.71e-01 NA 1.24e+05 NA 1.95e+05 ...
+     $ Refs         : num [1:6, 1:7] 3.68e-01 NA 1.27e+05 NA 2.13e+05 ...
      $ pProfile     :'data.frame':  1104 obs. of  3 variables:
-      ..$ Ftarget : num [1:1104] 0.138 0.139 0.14 0.141 0.142 ...
-      ..$ value   : num [1:1104] 0.000203 0.000526 0.001026 0.001782 0.002892 ...
+      ..$ Ftarget : num [1:1104] 0.153 0.154 0.155 0.156 0.157 ...
+      ..$ value   : num [1:1104] 4.23e-07 9.80e-07 1.71e-06 2.65e-06 3.84e-06 ...
       ..$ variable: chr [1:1104] "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" ...
      $ id.sim       : chr "SAITHE IN IV, VI and IIIa : 1967 - 2013"
      $ refs_interval:'data.frame':  1 obs. of  8 variables:
-      ..$ FmsyMedianC     : num 0.217
-      ..$ FmsylowerMedianC: num 0.121
-      ..$ FmsyupperMedianC: num 0.368
-      ..$ FmsyMedianL     : num 0.217
-      ..$ FmsylowerMedianL: num 0.121
-      ..$ FmsyupperMedianL: num 0.368
-      ..$ F5percRiskBlim  : num 0.371
+      ..$ FmsyMedianC     : num 0.308
+      ..$ FmsylowerMedianC: num 0.199
+      ..$ FmsyupperMedianC: num 0.404
+      ..$ FmsyMedianL     : num 0.308
+      ..$ FmsylowerMedianL: num 0.199
+      ..$ FmsyupperMedianL: num 0.404
+      ..$ F5percRiskBlim  : num 0.368
       ..$ Btrigger        : num 0
-     $ Refs2        : num [1:6, 1:9] 3.71e-01 NA 1.24e+05 NA 1.95e+05 ...
+     $ Refs2        : num [1:6, 1:9] 3.68e-01 NA 1.27e+05 NA 2.13e+05 ...
 
 where
 
@@ -575,11 +494,11 @@ t(SIM$refs_interval)
 ```
 
     ##                       [,1]
-    ## FmsyMedianC      0.2170854
-    ## FmsylowerMedianC 0.1206030
-    ## FmsyupperMedianC 0.3678392
-    ## FmsyMedianL      0.2170854
-    ## FmsylowerMedianL 0.1206030
-    ## FmsyupperMedianL 0.3678392
-    ## F5percRiskBlim   0.3710933
+    ## FmsyMedianC      0.3075377
+    ## FmsylowerMedianC 0.1989950
+    ## FmsyupperMedianC 0.4040201
+    ## FmsyMedianL      0.3075377
+    ## FmsylowerMedianL 0.1989950
+    ## FmsyupperMedianL 0.4040201
+    ## F5percRiskBlim   0.3675774
     ## Btrigger         0.0000000
