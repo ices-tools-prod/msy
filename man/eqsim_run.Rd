@@ -70,6 +70,44 @@ are used to find which F scenario gave the maximum catch.
 estimate of mean equilibrium catch and landings by F
 scenario.}
 }
+\value{
+A list containing the results from the forward simulation and the reference
+points calculated from it.
+}
 \description{
-XXX
+Simulate a fish stock forward in time given biological parameters, fishery
+parameters and advice parameters.
+}
+\examples{
+\dontrun{
+data(icesStocks)
+FIT <- eqsr_fit(icesStocks$saiNS,
+                nsamp = 1000,
+                models = c("Ricker", "Segreg"))
+SIM <-
+  eqsim_run(
+    FIT,
+    bio.years = c(2004, 2013),
+    sel.years = c(2004, 2013),
+    Fcv = 0.24,
+    Fphi = 0.42,
+    Blim = 106000,
+    Bpa = 200000,
+    Fscan = seq(0, 1.2, len = 40)
+   )
+}
+
+}
+\seealso{
+\code{\link{eqsr_fit}} fits multiple stock recruitment models to a data set.
+
+\code{\link{eqsr_plot}} plots the results from eqsr_fit.
+
+\code{\link{eqsim_plot}} summary plot of the forward simulation showing estimates
+  of various reference points.
+
+\code{\link{eqsim_plot_range}} summary plots of the forward simulation showing
+  the estimates of MSY ranges (ICES, 2015)
+
+\code{\link{msy-package}} gives an overview of the package.
 }

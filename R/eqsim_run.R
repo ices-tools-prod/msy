@@ -1,6 +1,7 @@
-#'  Simulates the Equilibrium Results for a Population.
+#' Simulates the Equilibrium Results for a Population.
 #'
-#' XXX
+#' Simulate a fish stock forward in time given biological parameters, fishery
+#' parameters and advice parameters.
 #'
 #' @param fit A list returned from the function fitModels
 #' @param bio.years The years to sample maturity, weights and M from, given as
@@ -43,6 +44,57 @@
 #'                     \code{extreme.trim} can therefore be used to stablise the
 #'                     estimate of mean equilibrium catch and landings by F
 #'                     scenario.
+#' @return
+#' A list containing the results from the forward simulation and the reference
+#' points calculated from it.
+#'
+#' @references
+#' ICES (2015) Report of the Workshop to consider F MSY ranges for stocks in
+#' ICES categories 1 and 2 in Western Waters (WKMSYREF4).
+#' \href{http://ices.dk/sites/pub/Publication%20Reports/Expert%20Group%20Report/acom/2015/WKMSYREF4/01%20WKMSYREF4%20Report.pdf}{01
+#' WKMSYREF4 Report.pdf}
+#'
+#' ICES (2016) EU request to ICES to provide F MSY ranges for selected stocks in
+#' ICES subareas 5 to 10.
+#' \href{http://ices.dk/sites/pub/Publication%20Reports/Advice/2016/Special_Requests/EU_FMSY_ranges_for_selected_Western_Waters_Stocks.pdf}{EU_FMSY_ranges_for_selected_Western_Waters_Stocks.pdf}
+#'
+#' ICES (2017) ICES fisheries management reference points for category 1 and 2
+#' stocks.
+#' \href{http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf}{12.04.03.01_Reference_points_for_category_1_and_2.pdf}
+#'
+#' @seealso
+#'
+#' \code{\link{eqsr_fit}} fits multiple stock recruitment models to a data set.
+#'
+#' \code{\link{eqsr_plot}} plots the results from eqsr_fit.
+#'
+#' \code{\link{eqsim_plot}} summary plot of the forward simulation showing estimates
+#'   of various reference points.
+#'
+#' \code{\link{eqsim_plot_range}} summary plots of the forward simulation showing
+#'   the estimates of MSY ranges (ICES, 2015)
+#'
+#' \code{\link{msy-package}} gives an overview of the package.
+#'
+#' @examples
+#' \dontrun{
+#' data(icesStocks)
+#' FIT <- eqsr_fit(icesStocks$saiNS,
+#'                 nsamp = 1000,
+#'                 models = c("Ricker", "Segreg"))
+#' SIM <-
+#'   eqsim_run(
+#'     FIT,
+#'     bio.years = c(2004, 2013),
+#'     sel.years = c(2004, 2013),
+#'     Fcv = 0.24,
+#'     Fphi = 0.42,
+#'     Blim = 106000,
+#'     Bpa = 200000,
+#'     Fscan = seq(0, 1.2, len = 40)
+#'    )
+#' }
+#'
 #' @export
 eqsim_run <- function(fit,
                       bio.years = c(2008, 2012), # years sample weights, M and mat
