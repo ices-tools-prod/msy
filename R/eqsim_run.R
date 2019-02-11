@@ -121,6 +121,8 @@ eqsim_run <- function(fit,
 
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
   if (diff(recruitment.trim) > 0) stop("recruitment truncation must be given as c(high, low)")
+  # commented out as above line is a better check
+  # if ((recruitment.trim[1] + recruitment.trim[2]) > 0) stop("recruitment truncation must be between a high - low range")
 
   if (verbose) icesTAF::msg("Setting up...")
 
