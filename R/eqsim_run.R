@@ -18,7 +18,9 @@
 #' @param Fcv Assessment error in the advisory year
 #' @param Fphi Autocorrelation in assessment error in the advisory year
 #' @param SSBcv Spawning stock biomass error in the advisory year
-#' @param rhologRec A flag for recruitment autocorrelation, default (TRUE).
+#' @param rhologRec A flag for recruitment autocorrelation, default (TRUE), or a
+#'                  vector of numeric values specifcying the autocorrelation
+#'                  parameter for the residuals for each SR model.
 #' @param Blim SSB limit reference point
 #' @param Bpa SSB precuationary reference point
 #' @param recruitment.trim A numeric vector with two log-value clipping the

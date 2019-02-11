@@ -36,7 +36,9 @@ years selected are used}
 
 \item{SSBcv}{Spawning stock biomass error in the advisory year}
 
-\item{rhologRec}{A flag for recruitment autocorrelation, default (TRUE).}
+\item{rhologRec}{A flag for recruitment autocorrelation, default (TRUE), or a
+vector of numeric values specifcying the autocorrelation
+parameter for the residuals for each SR model.}
 
 \item{Blim}{SSB limit reference point}
 
