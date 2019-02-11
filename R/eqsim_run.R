@@ -231,12 +231,14 @@ eqsim_run <- function(fit,
 
   # 2014-03-12: Changed per note form Carmen/John
   #  Autocorrelation in Recruitment Residuals:
-  if(rhologRec){
+  if(rhologRec==TRUE){
     fittedlogRec <-  do.call(cbind, lapply( c(1:nrow(fit$sr.sto)), function(i){
       FUN <- match.fun(fit$sr.sto$model[i])
       FUN(fit$sr.sto[i, ], fit$rby$ssb) } )  )
     # Calculate lag 1 autocorrelation of residuals:
     rhologRec <- apply(log(fit$rby$rec)-fittedlogRec, 2, function(x){stats::cor(x[-length(x)],x[-1])})
+  }
+  if (is.numeric(rhologRec)) {
     # Draw residuals according to AR(1) process:
     for(j in 2:(Nrun+1)){ resids[,j] <- rhologRec * resids[,j-1] + resids[,j]*sqrt(1 - rhologRec^2) }
   }
@@ -570,7 +572,8 @@ eqsim_run <- function(fit,
               Refs = Refs,
               pProfile=pProfile,
               id.sim=fit$id.sr,
-              refs_interval=refs_interval)
+              refs_interval=refs_interval,
+              rhologRec = rhologRec)
 
   if (verbose) icesTAF::msg("Calculating MSY range values")
 
