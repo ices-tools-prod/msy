@@ -121,6 +121,8 @@ eqsim_run <- function(fit,
 
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
   if (diff(recruitment.trim) > 0) stop("recruitment truncation must be given as c(high, low)")
+  # commented out as above line is a better check
+  # if ((recruitment.trim[1] + recruitment.trim[2]) > 0) stop("recruitment truncation must be between a high - low range")
 
   if (verbose) icesTAF::msg("Setting up...")
 
@@ -231,12 +233,14 @@ eqsim_run <- function(fit,
 
   # 2014-03-12: Changed per note form Carmen/John
   #  Autocorrelation in Recruitment Residuals:
-  if(rhologRec){
+  if(rhologRec==TRUE){
     fittedlogRec <-  do.call(cbind, lapply( c(1:nrow(fit$sr.sto)), function(i){
       FUN <- match.fun(fit$sr.sto$model[i])
       FUN(fit$sr.sto[i, ], fit$rby$ssb) } )  )
     # Calculate lag 1 autocorrelation of residuals:
     rhologRec <- apply(log(fit$rby$rec)-fittedlogRec, 2, function(x){stats::cor(x[-length(x)],x[-1])})
+  }
+  if (is.numeric(rhologRec)) {
     # Draw residuals according to AR(1) process:
     for(j in 2:(Nrun+1)){ resids[,j] <- rhologRec * resids[,j-1] + resids[,j]*sqrt(1 - rhologRec^2) }
   }
@@ -570,7 +574,8 @@ eqsim_run <- function(fit,
               Refs = Refs,
               pProfile=pProfile,
               id.sim=fit$id.sr,
-              refs_interval=refs_interval)
+              refs_interval=refs_interval,
+              rhologRec = rhologRec)
 
   if (verbose) icesTAF::msg("Calculating MSY range values")
 
