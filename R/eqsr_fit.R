@@ -15,6 +15,9 @@
 #'              in the stk parameter is provided
 #' @param remove.years A vector specifying the years to remove from the model
 #'                     fitting.
+#' @param rshift lag ssb by aditional years (default = 0).  As an example, for
+#'   some herring stocks, age 1 (1 winter ring) fish were spawned 2 years
+#'   previously, in this case, rshift = 1.
 #' @return A list containing the following objects:
 #' \itemize{
 #'   \item `sr.sto` data.frame containing the alpha (a), beta (b), cv and model
@@ -57,7 +60,7 @@
 #'
 #' @export
 eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"),
-                     id.sr = FLCore::name(stk), remove.years = NULL)
+                     id.sr = FLCore::name(stk), remove.years = NULL, rshift = 0)
 {
   # some checks on the model argument
   if (!is.character(models)) stop("models arg should be character vector giving names of stock recruit models")
@@ -75,9 +78,10 @@ eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"),
   # dims$min is the minimum age => recruitment age
   dms <- FLCore::dims(stk)
   rec <- c(FLCore::rec(stk))
-  if (dms$min > 0)
+  if (dms$min > 0 | rshift > 0)
   {
-    rec <- c(rec[-seq(dms$min)], rep(NA, dms$min))
+    ssb_lag <- dms$min + rshift
+    rec <- c(rec[-seq(ssb_lag)], rep(NA, ssb_lag))
   }
 
   # combine all required data together
