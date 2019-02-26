@@ -75,24 +75,24 @@ eqsr_plot <- function (fit, n = 20000, x.mult = 1.1, y.mult = 1.4,
                       rec = c(rec_sim),
                       model = rep(modset[ids,"model"], each = length(ssb_eval)))
 
-    tmp <- fit$sr.det
-    tmp$Model <- paste(tmp$model, tmp$prop)
-    out <- plyr::join(out,tmp[, c("model", "Model")], by = "model")
+    tmp <- paste(fit$sr.det$model, fit$sr.det$prop)
+    names(tmp) <- fit$sr.det$model
+    out$Model <- tmp[out$model]
 
     # calculate smooth recruitment median and 5th and 95th percentile for plotting
-    fit50 <- gam(rec ~ s(ssb, m = 0),
-                data = data.frame(ssb = ssb_eval, rec = apply(rec_sim, 1, quantile, .50)))
-    fit05 <- gam(rec ~ s(ssb, m = 0),
-                data = data.frame(ssb = ssb_eval, rec = apply(rec_sim, 1, quantile, .05)))
-    fit95 <- gam(rec ~ s(ssb, m = 0),
-                data = data.frame(ssb = ssb_eval, rec = apply(rec_sim, 1, quantile, .95)))
+    fit50 <- mgcv::gam(rec ~ s(ssb, m = 0),
+                data = data.frame(ssb = ssb_eval, rec = apply(rec_sim, 1, stats::quantile, .50)))
+    fit05 <- mgcv::gam(rec ~ s(ssb, m = 0),
+                data = data.frame(ssb = ssb_eval, rec = apply(rec_sim, 1, stats::quantile, .05)))
+    fit95 <- mgcv::gam(rec ~ s(ssb, m = 0),
+                data = data.frame(ssb = ssb_eval, rec = apply(rec_sim, 1, stats::quantile, .95)))
 
     Percentiles <-
       data.frame(
         ssb = ssb_eval,
-        p50 = fitted(fit50),
-        p05 = fitted(fit05),
-        p95 = fitted(fit95)
+        p50 = stats::fitted(fit50),
+        p05 = stats::fitted(fit05),
+        p95 = stats::fitted(fit95)
       )
     Percentiles <- Percentiles[stats::complete.cases(Percentiles),]
 

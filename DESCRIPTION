@@ -17,7 +17,7 @@ License: GPL (>= 2)
 LazyData: true
 URL: http://github.com/ices-tools-prod/msy
 BugReports: http://github.com/ices-tools-prod/msy/issues
-Imports: FLCore, ggplot2, reshape2, plyr, icesTAF
+Imports: FLCore, ggplot2, reshape2, icesTAF, mgcv
 Additional_repositories: http://flr-project.org/R
 RoxygenNote: 6.1.1
 Encoding: UTF-8

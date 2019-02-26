@@ -48,6 +48,6 @@
 #' \href{https://github.com/ices-tools-prod/msy}{ices-tools-prod/msy}
 #'
 #' @import graphics
-#' @importFrom stats filter
+#' @import mgcv
 
 NULL

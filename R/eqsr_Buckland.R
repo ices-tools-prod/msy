@@ -35,9 +35,9 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevh
     sr.sto$model <- models[sr.sto$model]
 
     # summarise and join to deterministic fit
-    tmp <- plyr::ddply(sr.sto, "model", plyr::summarise, n = length(model))
-    tmp$prop <- tmp$n / sum(tmp$n)
-    sr.det <- plyr::join(sr.det, tmp, by = "model")
+    tmp <- table(sr.sto$model)
+    sr.det$n <- unname(tmp[sr.det$model])
+    sr.det$prop <- sr.det$n / sr.det(tmp$n)
   } else {
     sr.sto <- NULL
     sr.det$n <- 0
