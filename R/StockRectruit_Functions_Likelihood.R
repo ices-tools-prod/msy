@@ -4,7 +4,7 @@
 
 #' Get starting values for models
 #'
-#' a quick fix!!
+#' Starting values for hockey stick models
 #'
 #' @param model XXX
 #' @param data XXX
