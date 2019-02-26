@@ -37,15 +37,10 @@ A list containing the following objects:
         the function call.
   \item `sr.det` The parameters in the stock recruitment model corresponding
         to the "best fit" of any given model.
-  \item `pRec` A matrix of predicted recruitment values. The number of rows
-        corresponds to the value set in `nsamp` in the function call. The
-        number of columns matches with the number of years used in the model
-        fitting.
   \item `stk` An FLStock object, same as provided as input by the user.
   \item `rby` A data.frame containing the recruitment (rec), spawning stock
         biomass (ssb) and year used in the fitting of the data.
   \item `id.sr` A string containing run name (taken from the `id.sr` argument)
-
 }
 }
 \description{
