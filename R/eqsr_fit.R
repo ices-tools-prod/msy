@@ -59,7 +59,7 @@
 #' }
 #'
 #' @export
-eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"),
+eqsr_fit <- function(stk, nsamp = 1000, models = c("Ricker","Segreg","Bevholt"),
                      id.sr = FLCore::name(stk), remove.years = NULL, rshift = 0)
 {
   # some checks on the model argument
