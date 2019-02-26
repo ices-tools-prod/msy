@@ -37,7 +37,7 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevh
     # summarise and join to deterministic fit
     tmp <- table(sr.sto$model)
     sr.det$n <- unname(tmp[sr.det$model])
-    sr.det$prop <- sr.det$n / sr.det(tmp$n)
+    sr.det$prop <- sr.det$n / sum(sr.det$n)
   } else {
     sr.sto <- NULL
     sr.det$n <- 0
