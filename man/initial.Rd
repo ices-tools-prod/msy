@@ -15,5 +15,5 @@ initial(model, data)
 vector of starting values
 }
 \description{
-a quick fix!!
+Starting values for hockey stick models
 }
