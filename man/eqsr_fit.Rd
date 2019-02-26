@@ -4,8 +4,8 @@
 \alias{eqsr_fit}
 \title{Stock recruitment fitting}
 \usage{
-eqsr_fit(stk, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"),
-  id.sr = FLCore::name(stk), remove.years = NULL)
+eqsr_fit(stk, nsamp = 1000, models = c("Ricker", "Segreg", "Bevholt"),
+  id.sr = FLCore::name(stk), remove.years = NULL, rshift = 0)
 }
 \arguments{
 \item{stk}{FLStock object}
@@ -23,6 +23,10 @@ in the stk parameter is provided}
 
 \item{remove.years}{A vector specifying the years to remove from the model
 fitting.}
+
+\item{rshift}{lag ssb by aditional years (default = 0).  As an example, for
+some herring stocks, age 1 (1 winter ring) fish were spawned 2 years
+previously, in this case, rshift = 1.}
 }
 \value{
 A list containing the following objects:
