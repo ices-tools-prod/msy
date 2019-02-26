@@ -5,7 +5,7 @@
 \title{Plot Simulated Predictive Distribution of Recruitment}
 \usage{
 eqsr_plot(fit, n = 20000, x.mult = 1.1, y.mult = 1.4,
-  ggPlot = FALSE, Scale = 1, filter.lag = 15)
+  ggPlot = FALSE, Scale = 1)
 }
 \arguments{
 \item{fit}{an fitted stock recruit model returned from \code{eqsr_fit}}
@@ -22,15 +22,6 @@ observed rec}
 do a ggplot}
 
 \item{Scale}{Numeric value for scaling varibles in plot.}
-
-\item{filter.lag}{Integer (odd) value giving the size of the
-window used (as a percentage of the full range) to average
-the median and precentiles of the simulated
-recruitment (default is 15).  Recruitment is calculated for
-100 SSB points, so a max window of 99 is allowed, but is
-pretty silly. A filter.lag of 1, gives no smoothing, but
-is typically very noisy. All of this is purely for plotting
-purposes.}
 }
 \value{
 NULL produces a plot
