@@ -86,7 +86,7 @@ bevholt2 <- function(ab, ssb) {
 #' @param gamma a smoother parameter
 #' @return log recruitment according to model
 #' @export
-smooth_hockey <- function(ab, ssb, gamma = 0.1) {
+Smooth_hockey <- function(ab, ssb, gamma = 0.1) {
   log(ab$a * (ssb + sqrt(ab$b^2 + gamma^2/4) - sqrt((ssb - ab$b)^2 + gamma^2/4)))
 }
 
