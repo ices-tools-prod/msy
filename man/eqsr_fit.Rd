@@ -11,7 +11,8 @@ eqsr_fit(stk, nsamp = 1000, models = c("Ricker", "Segreg", "Bevholt"),
 \item{stk}{FLStock object}
 
 \item{nsamp}{Number of samples (iterations) to take from the stock recruitment
-fit.}
+fit (default is 1000).  If 0 (zero) then only the fits to the
+data are returned and no simulations are made.}
 
 \item{models}{A character vector containing stock recruitment models to use
 in the model averaging. User can set any combination of
