@@ -74,9 +74,9 @@ eqsr_fit <- function(stk, nsamp = 1000, models = c("Ricker","Segreg","Bevholt"),
   # dims$min is the minimum age => recruitment age
   dms <- FLCore::dims(stk)
   rec <- c(FLCore::rec(stk))
-  if (dms$min > 0 | rshift > 0)
+  ssb_lag <- dms$min + rshift
+  if (ssb_lag > 0)
   {
-    ssb_lag <- dms$min + rshift
     rec <- c(rec[-seq(ssb_lag)], rep(NA, ssb_lag))
   }
 
@@ -88,7 +88,8 @@ eqsr_fit <- function(stk, nsamp = 1000, models = c("Ricker","Segreg","Bevholt"),
                ssb = c(FLCore::ssb(stk)),
                fbar = c(FLCore::fbar(stk)),
                landings = c(FLCore::landings(stk)),
-               catch = c(FLCore::catch(stk)))
+               catch = c(FLCore::catch(stk)),
+               ssb_lag = ssb_lag)
 
   # remove years with NA recruitment
   data <- data[stats::complete.cases(data),]
