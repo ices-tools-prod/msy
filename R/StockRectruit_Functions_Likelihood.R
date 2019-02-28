@@ -14,9 +14,9 @@
 initial <- function(model, data)
 {
   if (model == "Segreg") {
-    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
+    c(stats::median(data$rec/data$ssb, na.rm = TRUE), b = stats::median(data$ssb), 0)
   } else if (model == "Smooth_hockey") {
-    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
+    c(stats::median(data$rec/data$ssb, na.rm = TRUE), b = stats::median(data$ssb), 0)
   } else {
     c(0,0,0)
   }
