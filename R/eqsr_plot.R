@@ -117,7 +117,7 @@ eqsr_plot <- function (fit, n = 20000, x.mult = 1.1, y.mult = 1.4,
     }
 
     # plot the best fit for each model as a line
-    x <- fit$sr.det[,1:4] # a            b        cv  model
+    x <- fit$sr.det
     y <- seq(1, round(maxSSB), length = 100)
     for (i in 1:nrow(x)) {
       lines(y, exp(match.fun(as.character(x$model[i])) (x[i,], y)), col = "black", lwd = 2, lty = i)

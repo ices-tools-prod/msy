@@ -12,8 +12,9 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevh
     do.call(rbind,
             lapply(models,
                    function(mod)
-                     with(stats::nlminb(initial(mod, data), nllik, data = data, model = mod, logpar = TRUE),
-                          data.frame(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), model = mod))))
+                     with(stats::nlminb(initial(mod, data), nllik, data = data, model = mod, logpar = TRUE,
+                                        control = list(iter.max = 500, eval.max = 500)),
+                          data.frame(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), llik = -1 * objective, model = mod))))
   row.names(sr.det) <- NULL
 
   if (nsamp > 0) {
