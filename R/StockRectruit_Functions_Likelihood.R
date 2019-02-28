@@ -17,6 +17,8 @@ initial <- function(model, data)
     c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
   } else if (model == "Smooth_hockey") {
     c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
+  } else if (model == "Segreg_bounded") {
+    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
   } else {
     c(0,0,0)
   }
@@ -93,10 +95,18 @@ bevholt2 <- function(ab, ssb) {
 #' @return log recruitment according to model
 #' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
-smooth_hockey <- function(ab, ssb, gamma = 0.1) {
+Smooth_hockey <- function(ab, ssb, gamma = 0.1) {
   log(ab$a * (ssb + sqrt(ab$b^2 + gamma^2/4) - sqrt((ssb - ab$b)^2 + gamma^2/4)))
 }
 
+
+Segreg_bounded  <- function(ab, ssb) {
+  if (ab$b < Bloss) {
+    rep(1e-9, length(ssb))
+  } else {
+    log(ifelse(ssb >= ab$b, ab$a * ab$b, ab$a * ssb))
+  }
+}
 
 
 
