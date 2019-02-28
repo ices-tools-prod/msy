@@ -49,14 +49,39 @@ FLStock object. If more than one stock recruit relationship is provided, the
 models are weighted based on smooth AIC weighting (See Buckland et al., 1997).
 }
 \examples{
-\dontrun{
 data(icesStocks)
 FIT <- eqsr_fit(icesStocks$saiNS,
-                nsamp = 1000,
+                nsamp = 0,
                 models = c("Ricker", "Segreg"))
 
 # summary of individual fits
 FIT$sr.det
+eqsr_plot(FIT)
+
+# fit a bounded segmented regression
+Segreg_bounded  <- function(ab, ssb) {
+  ab$b <- min_ssb + ab$b
+  Segreg(ab, ssb)
+}
+min_ssb <- min(FLCore::ssb(icesStocks$saiNS))
+
+FIT <- eqsr_fit(icesStocks$saiNS,
+                nsamp = 0,
+                models = c("Segreg", "Segreg_bounded"))
+
+# summary of individual fits
+FIT$sr.det
+FIT$sr.det$b[2] + min_ssb
+eqsr_plot(FIT)
+
+\dontrun{
+FIT <- eqsr_fit(icesStocks$saiNS,
+                nsamp = 2000,
+                models = c("Segreg", "Segreg_bounded"))
+
+# summary of individual fits
+FIT$sr.det
+eqsr_plot(FIT)
 }
 
 }
