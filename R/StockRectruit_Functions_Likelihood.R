@@ -100,15 +100,6 @@ Smooth_hockey <- function(ab, ssb, gamma = 0.1) {
 }
 
 
-Segreg_bounded  <- function(ab, ssb) {
-  if (ab$b < Bloss) {
-    rep(1e-9, length(ssb))
-  } else {
-    log(ifelse(ssb >= ab$b, ab$a * ab$b, ab$a * ssb))
-  }
-}
-
-
 
 ######
 # This function calculates the log likelihood of the stock recruit relationship
