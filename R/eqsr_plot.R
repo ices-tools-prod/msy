@@ -1,3 +1,5 @@
+globalVariables(c("rec", "year", "Model", "p05", "p95", "p50"))
+
 #' Plot Simulated Predictive Distribution of Recruitment
 #'
 #'
