@@ -1,7 +1,7 @@
 Package: msy
 Type: Package
 Title: Estimation of equilibrium reference points for fisheries
-Version: 0.1.18
+Version: 0.1.19
 Date: 2019-02-07
 Authors@R: c(
     person("John", "Simmonds", role = "aut"),
