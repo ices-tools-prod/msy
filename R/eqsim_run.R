@@ -1,46 +1,121 @@
-#' @title simulates the equilibrium results for a population
+#' Simulates the Equilibrium Results for a Population.
 #'
-#' @description XXX
-#'
-#' @export
-#'
-#' @author Colin Millar \email{colin.millar@@ices.dk}
+#' Simulate a fish stock forward in time given biological parameters, fishery
+#' parameters and advice parameters.
 #'
 #' @param fit A list returned from the function fitModels
-#' @param bio.years The years to sample maturity, weights and M from
-#' @param bio.const A flag, if FALSE mean of the biological values from the years selected are used
-#' @param sel.years The years to sample the selection patterns from
-#' @param sel.const A flag, if FALSE mean of the selection patterns from the years selected are used
-#' @param Fscan F values to scan over
+#' @param bio.years The years to sample maturity, weights and M from, given as
+#'                  a vector of length 2, i.e. c(2010, 2015) select from the
+#'                  years 2010 to 2015 inclusive.
+#' @param bio.const A flag (default FALSE), if TRUE mean of the biological values from the
+#'                  years selected are used
+#' @param sel.years The years to sample the selection patterns from, given as
+#'                  a vector of length 2, i.e. c(2010, 2015) select from the
+#'                  years 2010 to 2015 inclusive.
+#' @param sel.const A flag (default FALSE), if TRUE mean of the selection patterns from the
+#'                  years selected are used
+#' @param Fscan F values to scan over, i.e. seq(0, 2, by = 0.05)
 #' @param Fcv Assessment error in the advisory year
 #' @param Fphi Autocorrelation in assessment error in the advisory year
 #' @param SSBcv Spawning stock biomass error in the advisory year
-#' @param rhologRec A flag for recruitment autocorrelation. If FALSE (default)
-#' then not applied.
-#' @param Blim This we know
-#' @param Bpa This we know
-#' @param recruitment.trim A numeric vector with two log-value clipping the extreme
-#' recruitment values from a continuous lognormal distribution. The values must
-#' be set as c("high","low").
+#' @param rhologRec A flag for recruitment autocorrelation, default (TRUE), or a
+#'                  vector of numeric values specifcying the autocorrelation
+#'                  parameter for the residuals for each SR model.
+#' @param Blim SSB limit reference point
+#' @param Bpa SSB precuationary reference point
+#' @param recruitment.trim A numeric vector with two log-value clipping the
+#'        extreme recruitment values from a continuous lognormal distribution.
+#'        The values must be set as c("high","low").
 #' @param Btrigger If other than 0 (default) the target F applied is reduced by
-#' SSB/Btrigger
-#' @param Nrun The number of years to run in total (last 50 years from that will be retained)
-#' @param process.error Use stochastic recruitment or mean recruitment?  (TRUE = predictive)
+#'                 SSB/Btrigger. This is the "ICES Advice Rule".
+#' @param Nrun The number of years to run in total (the last 50 years from that
+#'             will be retained to compute equilibrium values from)
+#' @param process.error Use stochastic recruitment or mean recruitment?
+#'                      TRUE (default) uses the predictive distribution of recruitment,
+#'                      model estimate of recruitment + simulated observation
+#'                      error.  FALSE uses model prediction of recruitment with
+#'                      no observation error.
 #' @param verbose Flag, if TRUE (default) indication of the progress of the
-#' simulation is provided in the console. Useful to turn to FALSE when
-#' knitting documents.
-#' @param extreme.trim Call John Simmonds :-)
-
+#'        simulation is provided in the console. Useful to turn to FALSE when
+#'        knitting documents.
+#' @param extreme.trim a pair of quantiles (low, high) which are used to trim
+#'                     the equilibrium catch values, across simulations within
+#'                     an F scenario, when calculating the mean catch and
+#'                     landings for that F scenario.  These mean values
+#'                     calculated accross simulations within an F scenario
+#'                     are used to find which F scenario gave the maximum catch.
+#'                     \code{extreme.trim} can therefore be used to stablise the
+#'                     estimate of mean equilibrium catch and landings by F
+#'                     scenario.  The default is c(0, 1) which includes all the
+#'                     data and is effectively an untrimmed mean.
+#' @param R.initial Initial recruitment for the simulations.  This is common
+#'                  accross all simulations. Default = mean of all recruitments
+#'                  in the series.
+#' @param keep.sims Flag, if TRUE returns a matrix of population tragectories
+#'                  for each value of F in Fscan.
+#' @return
+#' A list containing the results from the forward simulation and the reference
+#' points calculated from it.
+#'
+#' @details
+#' Details of the steps required to evaluate reference points are given in
+#' ICES (2017).  WHile, details of the calculation of MSY ranges is given in
+#' ICES (2015).
+#'
+#' @references
+#' ICES (2015) Report of the Workshop to consider F MSY ranges for stocks in
+#' ICES categories 1 and 2 in Western Waters (WKMSYREF4).
+#' \href{http://ices.dk/sites/pub/Publication\%20Reports/Expert\%20Group\%20Report/acom/2015/WKMSYREF4/01\%20WKMSYREF4\%20Report.pdf}{01
+#' WKMSYREF4 Report.pdf}
+#'
+#' ICES (2017) ICES fisheries management reference points for category 1 and 2
+#' stocks.
+#' DOI: \href{https://doi.org/10.17895/ices.pub.3036}{10.17895/ices.pub.3036}
+#'
+#' @seealso
+#'
+#' \code{\link{eqsr_fit}} fits multiple stock recruitment models to a data set.
+#'
+#' \code{\link{eqsr_plot}} plots the results from eqsr_fit.
+#'
+#' \code{\link{eqsim_plot}} summary plot of the forward simulation showing estimates
+#'   of various reference points.
+#'
+#' \code{\link{eqsim_plot_range}} summary plots of the forward simulation showing
+#'   the estimates of MSY ranges (ICES, 2015)
+#'
+#' \code{\link{msy-package}} gives an overview of the package.
+#'
+#' @examples
+#' \dontrun{
+#' data(icesStocks)
+#' FIT <- eqsr_fit(icesStocks$saiNS,
+#'                 nsamp = 1000,
+#'                 models = c("Ricker", "Segreg"))
+#' SIM <-
+#'   eqsim_run(
+#'     FIT,
+#'     bio.years = c(2004, 2013),
+#'     sel.years = c(2004, 2013),
+#'     Fcv = 0.24,
+#'     Fphi = 0.42,
+#'     Blim = 106000,
+#'     Bpa = 200000,
+#'     Fscan = seq(0, 1.2, len = 40)
+#'    )
+#' }
+#'
+#' @export
 eqsim_run <- function(fit,
-                      bio.years = c(2008, 2012), # years sample weights, M and mat
+                      bio.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear, # years sample weights, M and mat
                       bio.const = FALSE,
-                      sel.years= c(2008, 2012), # years sample sel and discard proportion by number from
+                      sel.years= c(-5, -1) + FLCore::dims(fit$stk)$maxyear, # years sample sel and discard proportion by number from
                       sel.const = FALSE,
-                      Fscan = seq(0, 1, len = 20), # F values to scan over
+                      Fscan = seq(0, 2, len = 40), # F values to scan over
                       Fcv = 0,
                       Fphi = 0,
                       SSBcv = 0,
-                      rhologRec = FALSE,
+                      rhologRec = TRUE,
                       Blim,
                       Bpa,
                       recruitment.trim = c(3, -3),
@@ -48,11 +123,17 @@ eqsim_run <- function(fit,
                       Nrun = 200, # number of years to run in total
                       process.error = TRUE, # use predictive recruitment or mean recruitment? (TRUE = predictive)
                       verbose = TRUE,
-                      extreme.trim)
+                      extreme.trim = c(0, 1),
+                      R.initial = mean(fit$rby$rec),
+                      keep.sims = FALSE)
 {
 
   if (abs(Fphi) >= 1) stop("Fphi, the autocorelation parameter for log F should be between (-1, 1)")
-  if ((recruitment.trim[1] + recruitment.trim[2])> 0) stop("recruitment truncation must be between a high - low range")
+  if (diff(recruitment.trim) > 0) stop("recruitment truncation must be given as c(high, low)")
+  # commented out as above line is a better check
+  # if ((recruitment.trim[1] + recruitment.trim[2]) > 0) stop("recruitment truncation must be between a high - low range")
+
+  if (verbose) icesTAF::msg("Setting up...")
 
   btyr1 <- bio.years[1]
   btyr2 <- bio.years[2]
@@ -123,11 +204,15 @@ eqsim_run <- function(fit,
   # get ready for the simulations
   Nmod <- nrow(SR)
   NF <- length(Fscan)
-  ages <- FLCore::dims(stk) $ age
+  ages <- FLCore::dims(stk)$age
+  ssb_lag <- fit$rby$ssb_lag[1]
 
   ssby <- Ferr <- array(0, c(Nrun,Nmod),dimnames=list(year=1:Nrun,iter=1:Nmod))
-  Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <- array(0, c(ages, Nrun, Nmod),
-                                                          dimnames=list(age=(range(stk)[1]:range(stk)[2]),year=1:Nrun,iter=1:Nmod))
+  Ny <- Fy <- WSy <- WCy <- Cy <- Wy <- Wl <- Ry <-
+    array(0, c(ages, Nrun, Nmod),
+          dimnames = list(age = (range(stk)[1]:range(stk)[2]),
+                          year = 1:Nrun,
+                          iter = 1:Nmod))
   # TODO per note from Carmen:
   #  NOTE: If we want Ferr to be a stationary AR(1) process, it would make
   #        more sense to initialise Ferr as a Normal dist with zero mean and
@@ -136,19 +221,21 @@ eqsim_run <- function(fit,
   #        initialising Ferr=0
   #  2014-03-12: Changed per note form Carmen/John
   Ferr[1,] <- stats::rnorm(n=Nmod, mean=0, sd=1)*Fcv/sqrt(1-Fphi^2)
-  for(j in 2:Nrun) { Ferr[j,] <- Fphi*Ferr[j-1,] + Fcv*stats::rnorm(n=Nmod, mean=0, sd=1) }
+  for(j in 2:Nrun)
+    Ferr[j,] <- Fphi * Ferr[j-1,] + Fcv * stats::rnorm(n = Nmod, mean = 0, sd = 1)
 
   # 2014-03-12: Changed per note form Carmen/John
   #  Errors in SSB: this is used when the ICES MSY HCR is applied for F
-  SSBerr <- matrix(stats::rnorm(n=Nrun*Nmod, mean=0, sd=1), ncol=Nmod) * SSBcv
+  SSBerr <- matrix(stats::rnorm(n = Nrun * Nmod, mean = 0, sd = 1), ncol = Nmod) * SSBcv
 
   rsam <- array(sample(1:ncol(weca), Nrun * Nmod, TRUE), c(Nrun, Nmod))
   rsamsel <- array(sample(1:ncol(sel), Nrun * Nmod, TRUE), c(Nrun, Nmod))
   Wy[] <- c(weca[, c(rsam)])
   Wl[] <- c(wela[, c(rsam)])
   Ry[]  <- c(land.cat[, c(rsamsel)])
+
   # initial recruitment
-  R <- mean( data $ rec)
+  R <- R.initial
   ssbs <- cats <- lans <- recs <- array(0, c(7, NF))
 
   ferr <- ssbsa <- catsa <- lansa <- recsa <- array(0, c(NF, keep, Nmod))
@@ -161,12 +248,14 @@ eqsim_run <- function(fit,
 
   # 2014-03-12: Changed per note form Carmen/John
   #  Autocorrelation in Recruitment Residuals:
-  if(rhologRec){
+  if(rhologRec==TRUE){
     fittedlogRec <-  do.call(cbind, lapply( c(1:nrow(fit$sr.sto)), function(i){
       FUN <- match.fun(fit$sr.sto$model[i])
       FUN(fit$sr.sto[i, ], fit$rby$ssb) } )  )
     # Calculate lag 1 autocorrelation of residuals:
     rhologRec <- apply(log(fit$rby$rec)-fittedlogRec, 2, function(x){stats::cor(x[-length(x)],x[-1])})
+  }
+  if (is.numeric(rhologRec)) {
     # Draw residuals according to AR(1) process:
     for(j in 2:(Nrun+1)){ resids[,j] <- rhologRec * resids[,j-1] + resids[,j]*sqrt(1 - rhologRec^2) }
   }
@@ -178,6 +267,7 @@ eqsim_run <- function(fit,
   for (k in 1:Nmod) { resids[k,resids[k,]<lims[2,k]]=lims[2,k]}
   # end New from Simmonds 29.1.2014
 
+  if (verbose) icesTAF::msg("Running forward simulations.")
   if (verbose) loader(0)
 
   # Looping over each F value in Fscan. For each of the Nmod SR fits
@@ -185,7 +275,6 @@ eqsim_run <- function(fit,
   # There are Rec residuals for each SR fit and year, which take the same
   # values for all Fscan
   for (i in 1:NF) {
-
     # The F value to test
     Fbar <- Fscan[i]
 
@@ -193,44 +282,42 @@ eqsim_run <- function(fit,
     # Population in simulation year 1:
 
     # Zpre: Z that occurs before spawning
-    Zpre <- ( sel[,rsamsel[1,]]*Fbar * Fprop + M[,rsam[1,]] * Mprop)
+    Zpre <- Fbar * sel[,rsamsel[1,]] * Fprop + M[,rsam[1,]] * Mprop
 
     # Zpos: Z that occurs after spawning
     # Zpos not used anywhere
-    Zpos <- (Fbar * (1-Fprop) * sel[,rsamsel[1,]] + M[,rsam[1,]] * (1-Mprop))
+    Zpos <- Fbar * (1-Fprop) * sel[,rsamsel[1,]] + M[,rsam[1,]] * (1-Mprop)
 
     # run Z out to age 50 ...
     # TODO:
     # Comments from Carmen: Zcum is a cumulative sum, but it is done in a strange way:
     #  There is a matrix of F-at-age and a matrix of M-at-age (each has 49 ages, Nmod replicates)
     #  The F and M matrices are summed, giving Z-at-age (49 ages, Nmod replicates)
-    #  But then a cumsum is taken considering the Z-at-age matrix as a vector (i.e. not column-wise) ????
-    #  This is strange, by applying "cumsum" treating Z-at-age as a vector, really only the first 50 values of
-    #  the resulting "Zcum" make sense (all other values seem "wrong", or at least, meaningless)
-    Zcum <- c(0, cumsum(Fbar * sel[c(1:ages, rep(ages, 49 - ages)), rsamsel[1,]] + M[c(1:ages, rep(ages, 49 - ages)), rsam[1,]]))
-    # Carmen: Following from "Zcum", only first 50 elements of N1 make sense ????
+    Ztot <- Fbar * sel[c(1:ages, rep(ages, 49 - ages)), rsamsel[1,]] + M[c(1:ages, rep(ages, 49 - ages)), rsam[1,]]
+    Zcum <- apply(Ztot, 2, function(x) c(0, cumsum(x)))
+    # create initial population structure
     N1 <- R * exp(- unname(Zcum))
 
-    # set up age structure in first year for all simulations
-    # Comments from Carmen:
-    #   Ny has dimension = (no. ages, no. simulation yrs "Nrun", no. SR fits "Nmod")
-    #   With this code, we seem to be getting always the same population-at-age value for year 1
-    #   instead of Nmod different values, as might have been intended ????
-    #   (the whole problem is coming from Zcum ==> N1 ==> Ny[,1,] )
-    Ny[,1,] <- c(N1[1:(ages-1)], sum(N1[ages:50]))
+    # set up age structure in first years for all simulations
+    Ny[,1,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
 
     # calculate ssb in first year using a different stock.wt and Mat selection and M for each simulation
-    # Comments from Carmen:
-    #   ssby has dimension = (no. simul yrs "Nrun", no. SR fits "Nmod")
-    #   SSB in year 1:
-    #   although Ny[,1,] has dim no.ages x Nmod, all Nmod values of Ny[,1,] are
-    #   the same (because of Zcum issue)
-    ssby[1,] <- colSums(Mat[,rsam[1,]] * Ny[,1,] * west[,rsam[1,]] / exp(Zpre)[])
+    ssby[1,] <- colSums(Mat[,rsam[1,]] * Ny[,1,] * west[,rsam[1,]] / exp(Zpre))
 
-    # Years 2 to Nrun:
-    for (j in 2:Nrun) {
-      # get ssb from previous year
-      SSB <- ssby[j-1,]
+    # if rec recruiting year class comes from previous years ssb, as in fish recruiting
+    # at age 2 or winter ring herring ageing then run some more initial years
+    # using the same intial population
+    if (ssb_lag > 1) {
+      for (j in 2:ssb_lag) {
+        Ny[,j,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
+        ssby[j,] <- colSums(Mat[,rsam[1,]] * Ny[,1,] * west[,rsam[1,]] / exp(Zpre))
+      }
+    }
+
+    # Years (1 + ssb_lag) to Nrun:
+    for (j in (1+ssb_lag):Nrun) {
+      # get ssb from appropriate year, if ssb_lag is zero, then current year ssb is used
+      SSB <- ssby[j-ssb_lag,]
 
       # predict recruitment using various models
       if (process.error) {
@@ -242,7 +329,7 @@ eqsim_run <- function(fit,
         allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod)(SR, SSB) + resids[,j]))
         # end Changes 29.1.2014
       } else {
-        allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB)))
+        allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod) (SR, SSB)))
       }
 
       # Comment from Carmen:
@@ -252,13 +339,13 @@ eqsim_run <- function(fit,
       #   not necessarily the same order in which the SR model types were
       #   entered as inputs -- I presume the **next 2 lines** of code have
       #   been checked to avoid potential bugs due to this reordering  ????
-      select <- cbind(seq(Nmod), as.numeric(factor(SR $ mod, levels = unique(SR $ mod))))
+      select <- cbind(seq(Nmod), as.numeric(factor(SR$mod, levels = unique(SR$mod))))
       Ny[1,j,] <- allrecs[select]
 
       # Comment from Carmen:
-      #   Note: it seems that Rec is coded as occurring always at age 1
-      #   (i.e. based on SSB in previous year)
-      #   Some stocks have Rec at ages other than 1 (e.g. age 0)
+      #   Note: it seems that Rec is coded as occurring always at age > 1
+      #   (i.e. based on SSB in previous years)
+      #   Some stocks have Rec at age 0
       #    -- is this a problem ????
 
       # apply HCR
@@ -319,6 +406,8 @@ eqsim_run <- function(fit,
 
     if (verbose) loader(i/NF)
   }
+
+  if (verbose) icesTAF::msg("Summarising simulations")
 
   dimnames(ssbs) <- dimnames(cats) <-
     dimnames(lans) <- dimnames(recs) <-
@@ -497,7 +586,10 @@ eqsim_run <- function(fit,
               Refs = Refs,
               pProfile=pProfile,
               id.sim=fit$id.sr,
-              refs_interval=refs_interval)
+              refs_interval=refs_interval,
+              rhologRec = rhologRec)
+
+  if (verbose) icesTAF::msg("Calculating MSY range values")
 
   sim <- eqsim_range(sim)
 

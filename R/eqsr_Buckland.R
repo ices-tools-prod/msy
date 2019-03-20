@@ -1,60 +1,50 @@
-#' stock recruitment function
-#'
-#'
-#' @param data data.frame containing stock recruitment data
-#' @param nsamp Number of samples
-#' @param models A character vector
-#' @param ... Additional arguements
-#' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
-#' @export
+
 eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"), ...)
 {
-
-  ## dummy
-  model <- 0
-  #--------------------------------------------------------
-  # Fit models
-  #--------------------------------------------------------
-
+  # useful objects
   nllik <- function(param, ...) -1 * llik(param, ...)
   ndat <- nrow(data)
-  fit <- lapply(1:nsamp, function(i)
-  {
-    sdat <- data[sample(1:ndat, replace = TRUE),]
-
-    fits <- lapply(models, function(mod) stats::nlminb(initial(mod, sdat), nllik, data = sdat, model = mod, logpar = TRUE))
-
-    best <- which.min(sapply(fits, "[[", "objective"))
-
-    with(fits[[best]], c(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), model = best))
-  })
-
-  fit <- as.data.frame(do.call(rbind, fit))
-  fit $ model <- models[fit $ model]
-
-  #--------------------------------------------------------
-  # get posterior distribution of estimated recruitment
-  #--------------------------------------------------------
-  pred <- t(sapply(seq(nsamp), function(j) exp(match.fun(fit $ model[j]) (fit[j,], sort(data $ ssb))) ))
-  #pred <- t(sapply(seq(nsamp), function(j) exp(get(fit $ model[j], , pos = "package:msy", mode = "function") (fit[j,], sort(data $ ssb))) ))
-
 
   #--------------------------------------------------------
   # get best fit for each model
   #--------------------------------------------------------
-  fits <-
+  sr.det <-
     do.call(rbind,
             lapply(models,
                    function(mod)
-                     with(stats::nlminb(initial(mod, data), nllik, data = data, model = mod, logpar = TRUE),
-                          data.frame(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), model = mod))))
+                     with(stats::nlminb(initial(mod, data), nllik, data = data, model = mod, logpar = TRUE,
+                                        control = list(iter.max = 500, eval.max = 500)),
+                          data.frame(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), llik = -1 * objective, model = mod))))
+  row.names(sr.det) <- NULL
 
-  tmp <- plyr::ddply(fit,c("model"), plyr::summarise, n=length(model))
-  tmp$prop <- tmp$n/sum(tmp$n)
-  fits <- plyr::join(fits,tmp,by="model")
+  if (nsamp > 0) {
+    #--------------------------------------------------------
+    # Fit models on bootstrap resamples
+    #--------------------------------------------------------
+    sr.sto <- lapply(1:nsamp, function(i)
+    {
+      sdat <- data[sample(1:ndat, replace = TRUE),]
 
-  dimnames(pred) <- list(model=fit$model,ssb=data$ssb)
+      fits <- lapply(models, function(mod) stats::nlminb(initial(mod, sdat), nllik, data = sdat, model = mod, logpar = TRUE))
 
-  return(list(sr.sto = fit, sr.det = fits, pRec = pred))
+      best <- which.min(sapply(fits, "[[", "objective"))
+
+      with(fits[[best]], c(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), model = best))
+    })
+
+    sr.sto <- as.data.frame(do.call(rbind, sr.sto))
+    sr.sto$model <- models[sr.sto$model]
+
+    # summarise and join to deterministic fit
+    tmp <- table(sr.sto$model)
+    sr.det$n <- unname(tmp[sr.det$model])
+    sr.det$prop <- sr.det$n / sum(sr.det$n)
+  } else {
+    sr.sto <- NULL
+    sr.det$n <- 0
+    sr.det$prop <- 0
+  }
+
+  #list(sr.sto = fit, sr.det = fits, pRec = pred)
+  list(sr.sto = sr.sto, sr.det = sr.det)
 }

@@ -21,6 +21,3 @@ the log-likelihood
 \description{
 the log-likelihood of the rectuit function
 }
-\author{
-Colin Millar \email{colin.millar@ices.dk}
-}

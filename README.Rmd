@@ -1,20 +1,30 @@
 ---
-title: "Using the eqsim routines in the msy package"
-author: "John Simmonds, Colin Millar and Einar Hjörleifsson"
-date: '`r Sys.Date()`'
 output:
-  html_document:
-    fig_height: 6
-    fig_width: 8.5
-vignette: >
-  %\VignetteIndexEntry{VignetteTitle}
-  %\VignetteEngine{knitr::rmarkdown} 
-  \usepackage[utf8]{inputenc}
+  md_document:
+    variant: gfm
 ---
+
+[![Build Status](https://travis-ci.org/ices-tools-prod/msy.svg?branch=master)](https://travis-ci.org/ices-tools-prod/msy)
+[![local release](https://img.shields.io/github/release/ices-tools-prod/msy.svg?maxAge=3600)](https://github.com/ices-tools-prod/msy/tree/0.2-0)
+[![CRAN Status](http://www.r-pkg.org/badges/version/msy)](https://cran.r-project.org/package=msy)
+[![CRAN Downloads](http://cranlogs.r-pkg.org/badges/grand-total/msy)](https://cran.r-project.org/package=msy)
+[![License](https://img.shields.io/badge/license-GPL%20(%3E%3D%202)-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ```{r setup, eval=TRUE, echo=FALSE}
 knitr::opts_chunk$set(eval = TRUE) # set to FALSE locally if you don't want to build when developing
 ```
+
+# msy
+
+The `msy` R package is a collection of methods to estimate equilibrium reference points for fish stocks
+
+## Contact
+
+You are welcome to:
+
+* submit suggestions and bug-reports at: https://github.com/ices-tools-prod/msy/issues
+* send a pull request on: https://github.com/ices-tools-prod/msy
+
 
 # Preamble
 
@@ -31,7 +41,7 @@ The developmental repository for the `msy` package is located on [github](https:
 
 The easiest way to install the `msy` package is to use the function `install_github` in the `devtools` package. Since the input into the msy is in the form of a `FLStock` object it is advised to obtain the latest release of `FLCore` from the same site.
 
-The [`Rtools.exe`](http://cran.at.r-project.org/bin/windows/Rtools) software is needed for building packages under Microsoft Windows. 
+The [`Rtools.exe`](http://cran.at.r-project.org/bin/windows/Rtools) software is needed for building packages under Microsoft Windows.
 
 Run the following lines to install the latest versions of `msy` and `FLCore`.
 
@@ -40,6 +50,10 @@ Run the following lines to install the latest versions of `msy` and `FLCore`.
 install.packages("FLCore", repo = "http://flr-project.org/R")
 library(devtools)
 install_github("ices-tools-prod/msy")
+```
+
+```{r dev_install, eval=TRUE, echo=FALSE}
+devtools::install("D:/projects/git/ices-tools-prod/msy", quiet = TRUE)
 ```
 
 The above is equivalent to `install.packages` and hence need only to be performed once. However, since the `msy` package is currently under development (including bug-fixing) one may expect more frequent code updating in the package than what one may be familiar with for packages on `CRAN`. Once installed the `msy` packages is simply loaded via the familiar:
@@ -83,23 +97,23 @@ The eqsim approach consists of three components:
 
 This can be done in one go with the following code:
 
-```{r}
+```{r fit_and_simulate}
 FIT <- eqsr_fit(icesStocks$saiNS,
-                nsamp = 1000, 
+                nsamp = 1000,
                 models = c("Ricker", "Segreg"))
 SIM <- eqsim_run(FIT,
-                 bio.years = c(2004:2013),
-                 sel.years = c(2004:2013),
-                 Fcv=0.24,
-                 Fphi=0.42,
-                 Blim=106000,
-                 Bpa=200000,
-                 Fscan = seq(0,1.2,len=40),
-                 verbose=FALSE)
+                 bio.years = c(2004, 2013),
+                 sel.years = c(2004, 2013),
+                 Fcv = 0.24,
+                 Fphi = 0.42,
+                 Blim = 106000,
+                 Bpa = 200000,
+                 Fscan = seq(0, 1.2, len = 40),
+                 verbose = FALSE)
 ```
 
 The stock recruitment function can be plotted by:
-```{r}
+```{r plot_fit}
 eqsr_plot(FIT,n=2e4)
 ```
 
@@ -109,12 +123,12 @@ SIM$Refs
 ```
 
 Summary plots conditioned on maximizing __catch__ are obtained by:
-```{r}
+```{r plot_catch}
 eqsim_plot(SIM,catch=TRUE)
 ```
 
 Summary plots of __Fmsy range__ (WKMSYREF3) are obtained by:
-```{r}
+```{r plot_msy}
 eqsim_plot_range(SIM, type="mean")
 eqsim_plot_range(SIM, type="median")
 eqsim_plot_range(SIM, type="ssb")
@@ -169,14 +183,14 @@ FIT$sr.det
 Here the a, b and cv are the estimated parameters from the deterministic fit for each model. The `n` and `prop` is a summary of the number and proportion that each model contributes to the final fit.
 
 Again to obtain a plot one simply calls:
-```{r}
+```{r plot_fit_2}
 eqsr_plot(FIT,n=2e4)
 ```
 
 The `n` supplied to the `eqsr_plot` stands here for the number of stochastic recruitment points desired to include in the plot. The various black dashed lines represent the best fit of the different recruitment models and the yellow and blue lines the median and 5% and 95% percentiles of the distributions of the stochastic recruits drawn from the models. The input data are represented by red points.
 
 An alternative to the `base` plot is a `ggplot2` version (with too many fancy colours :-):
-```{r}
+```{r plot_fit_ggplot}
 eqsr_plot(FIT,n=2e4,ggPlot=TRUE,Scale=1e3)
 ```
 
@@ -196,7 +210,7 @@ args(eqsim_run)
 where:
 
 * `fit` is the output list from `eqsr_fit`
-* `bio.years` is the start and end year from which to generate noise in maturity, M and weights. 
+* `bio.years` is the start and end year from which to generate noise in maturity, M and weights.
 * `bio.const` is a flag indicating if the average maturity, M and weights over the specified years should be used (`TRUE`) or not (`FALSE`).
 * `sel.years` is the start and end year from which to generated noise in the selection at age
 * `sel.const` is a flag indicating if the average selection over the specified years should be used (`TRUE`) or not (`FALSE`).
@@ -218,7 +232,7 @@ The results from the simulation process are returned to the user as a list
 str(SIM, 2, give.attr = FALSE)
 ```
 
-where 
+where
 
 * `ibya` (input by year and age) contains the biological and fisheries input data.
 * `rby` (results by year) contains the stock summary data.

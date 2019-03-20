@@ -1,88 +1,142 @@
-#' Stock recruitment fit
+#' Stock recruitment fitting
 #'
-#' Fits a stock recruitment relationship to data containted in an FLStock object.
-#' If more than one stock recruit relationship is provided, the models are weighted
-#' based on smooth AIC weighting (See Buckland et al.).
+#' Fits one or more stock recruitment relationship to data containted in an
+#' FLStock object. If more than one stock recruit relationship is provided, the
+#' models are weighted based on smooth AIC weighting (See Buckland et al., 1997).
 #'
 #' @param stk FLStock object
-#' @param nsamp Number of samples (iterations)
-#' @param models A character vector containing sr-models to use. User can set
-#' any combination of "Ricker", "Segreg", "Bevholt", "Smooth_hockey".
-#' @param method A character vector. Currently only "Buckland" is implemented.
-#' @param id.sr A character vector specifying an id for the stock recruitment
-#' model. If not specified (default) the slot "name" in the FLStock is used.
-#' @param remove.years A vector specifying the years to remove
-#' @param delta A value, used in method "Simmonds" (not implemented)
-#' @param nburn An integer, used in method Simmonds (not implemented)
+#' @param nsamp Number of samples (iterations) to take from the stock recruitment
+#'              fit (default is 1000).  If 0 (zero) then only the fits to the
+#'              data are returned and no simulations are made.
+#' @param models A character vector containing stock recruitment models to use
+#'               in the model averaging. User can set any combination of
+#'               "Ricker", "Segreg", "Bevholt", "Smooth_hockey".
+#' @param id.sr A character vector specifying an id or name for the stock
+#'              recruitment fit being run. The default is to use the slot "name"
+#'              in the stk parameter is provided
+#' @param remove.years A vector specifying the years to remove from the model
+#'                     fitting.
+#' @param rshift lag ssb by aditional years (default = 0).  As an example, for
+#'   some herring stocks, age 1 (1 winter ring) fish were spawned 2 years
+#'   previously, in this case, rshift = 1.
 #' @return A list containing the following objects:
 #' \itemize{
-#' \item fit data.frame containing the alpha (a), beta (b), cv and model names.
-#' The number of rows correspond to the value set in nsamp in the function call.
-#' \item pred A vector of predicted recruitment values. The length of the vector
-#' corresponds to the value set in nsamp in the function call.
-#' \item fits The parameters in the stock recruitment model corresponding to the
-#' "best fit" of any given model.
-#' \item data data.frame containing the recruitment (rec), spawning stock
-#' biomass (ssb) and year used in the fitting of the data.
-#' \item stknam A character vector containing stock name
-#' \item stk FLStock object, same as provided as input by the user.
+#'   \item `sr.sto` data.frame containing the alpha (a), beta (b), cv and model
+#'         names. The number of rows correspond to the value set of `nsamp` in
+#'         the function call.
+#'   \item `sr.det` The parameters in the stock recruitment model corresponding
+#'         to the "best fit" of any given model.
+#'   \item `stk` An FLStock object, same as provided as input by the user.
+#'   \item `rby` A data.frame containing the recruitment (rec), spawning stock
+#'         biomass (ssb) and year used in the fitting of the data.
+#'   \item `id.sr` A string containing run name (taken from the `id.sr` argument)
 #' }
-#' @author Colin Millar \email{colin.millar@@ices.dk}
+#'
+#' @references
+#'
+#' Buckland, S.T., K.P. Burnham & N.H. Augustin (1997). Model selection: An integral part of inference.
+#' Biometrics 53, 603-618.
+#' DOI: \href{https://doi.org/10.2307/2533961}{10.2307/2533961}
+#'
+#' @seealso
+#' \code{\link{eqsr_plot}} plots a simulation of predictive recruitment
+#' from the fit, and shows a summary of the contributions of each stock
+#' recruitment model to the model average fit.
+#'
+#' @examples
+#' data(icesStocks)
+#' FIT <- eqsr_fit(icesStocks$saiNS,
+#'                 nsamp = 0,
+#'                 models = c("Ricker", "Segreg"))
+#'
+#' # summary of individual fits
+#' FIT$sr.det
+#' eqsr_plot(FIT)
+#'
+#' # fit a bounded segmented regression
+#' Segreg_bounded  <- function(ab, ssb) {
+#'   ab$b <- min_ssb + ab$b
+#'   Segreg(ab, ssb)
+#' }
+#' min_ssb <- min(FLCore::ssb(icesStocks$saiNS))
+#'
+#' FIT <- eqsr_fit(icesStocks$saiNS,
+#'                 nsamp = 0,
+#'                 models = c("Segreg", "Segreg_bounded"))
+#'
+#' # summary of individual fits
+#' FIT$sr.det
+#' FIT$sr.det$b[2] + min_ssb
+#' eqsr_plot(FIT)
+#'
+#' \dontrun{
+#' FIT <- eqsr_fit(icesStocks$saiNS,
+#'                 nsamp = 2000,
+#'                 models = c("Segreg", "Segreg_bounded"))
+#'
+#' # summary of individual fits
+#' FIT$sr.det
+#' eqsr_plot(FIT)
+#' }
+#'
 #' @export
-eqsr_fit <- function(stk, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"),
-                     method = "Buckland",
-                     id.sr = NULL, remove.years = NULL, delta = 1.3, nburn = 10000)
+eqsr_fit <- function(stk, nsamp = 1000, models = c("Ricker","Segreg","Bevholt"),
+                     id.sr = FLCore::name(stk), remove.years = NULL, rshift = 0)
 {
-
+  # some checks on the model argument
+  if (!is.character(models)) stop("models arg should be character vector giving names of stock recruit models")
   if(any(models %in% c("ricker","segreg","bevholt"))) {
-    return(cat("Please note that the msy stock-recruitment functions have been renamed:
+    stop("Please note that the msy stock-recruitment functions have been renamed:
    ricker -> Ricker
    bevholt -> Bevholt
    segreg ->  Segreg
    smooth_hockey -> Smooth_hockey
    This was done to resolve conflicts with same named functions in the FLCore-package.
-   ERGO: use a capital in the first letter if you want to call these functions"))
+   ERGO: use a capital in the first letter if you want to call these functions")
   }
 
+  # get correct recruitment vector for each SSB
+  # dims$min is the minimum age => recruitment age
   dms <- FLCore::dims(stk)
-  rage <- dms $ min
-  if (rage == 0)
-  { x = as.vector(FLCore::stock.n(stk)[1,])
-  } else {
-    x = c(FLCore::stock.n(stk)[1,-seq(rage),drop=TRUE],rep(NA,rage))
+  rec <- c(FLCore::rec(stk))
+  ssb_lag <- dms$min + rshift
+  if (ssb_lag > 0)
+  {
+    rec <- c(rec[-seq(ssb_lag)], rep(NA, ssb_lag))
   }
 
-  rby <- data.frame(year = with(dms, minyear:maxyear),
-                      rec = x,
-                      ssb = FLCore::ssb(stk)[drop=TRUE],
-                      fbar = FLCore::fbar(stk)[drop=TRUE],
-                      landings=FLCore::landings(stk)[drop=TRUE],
-                      catch=FLCore::catch(stk)[drop=TRUE])
+  # combine all required data together
+  # note year is the year that SSB had that value
+  data <-
+    data.frame(year = with(dms, minyear:maxyear),
+               rec = rec,
+               ssb = c(FLCore::ssb(stk)),
+               fbar = c(FLCore::fbar(stk)),
+               landings = c(FLCore::landings(stk)),
+               catch = c(FLCore::catch(stk)),
+               ssb_lag = ssb_lag)
 
-  row.names(rby) <- NULL
-  rby <- rby[!is.na(rby$rec),]
-  # This is for stuff later down the pipes
-  data <- rby[,1:3]
-
-  # EINAR: strange that here only the ssb is set to as NA
-  #        question how this affect what happens further down the line
-  if (!is.null(remove.years)) {
-    data $ ssb[data $ year %in% remove.years] <- NA
-  }
-  #--------------------------------------------------------
-  # tidy data - remove nas
-  #--------------------------------------------------------
+  # remove years with NA recruitment
   data <- data[stats::complete.cases(data),]
 
-  if (is.null(id.sr)) id.sr <- FLCore::name(stk)
-
-  method <- match.arg(method, c("Buckland","Simmonds","King","Cadigan"))
-  if (!is.character(models)) stop("models arg should be character vector giving names of stock recruit models")
-
-  if (method == "Buckland") {
-    return(c(eqsr_Buckland(data, nsamp, models), list(stk = stk,rby=rby, id.sr=id.sr)))
-  } else
-  {
-    cat("The", method, "is not ready yet!  Working on it!\n")
+  # which years to use in the fit
+  data$remove.years <- FALSE
+  if (!is.null(remove.years)) {
+    remove.years <- data$year[data$year %in% remove.years]
+    message("removing (ssb) years:\n\t",
+            paste(remove.years, collapse = ", "),
+            "\n  from the recruitment fitting procedure.")
+    data$remove.years <- data$year %in% remove.years
   }
+
+  # run model averaging
+  srfit <- eqsr_Buckland(data[!data$remove.years,c("year", "rec", "ssb")],
+                         nsamp,
+                         models)
+
+  # create output object
+  out <- c(srfit, list(stk = stk, rby = data, id.sr = id.sr))
+  class(out) <- c("eqsr_fit", c("list", "vector"))
+
+  out
 }

@@ -10,8 +10,5 @@ loader(p)
 \item{p}{Value}
 }
 \description{
-plots the prgress of an iterative procedure using "[=>   ]", "[==> ]", etc.
-}
-\author{
-Colin Millar \email{colin.millar@ices.dk}
+Non exported function, plots the prgress of an iterative procedure using "[=>   ]", "[==> ]", etc.
 }

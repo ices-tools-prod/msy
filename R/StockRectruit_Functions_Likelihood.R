@@ -4,21 +4,20 @@
 
 #' Get starting values for models
 #'
-#' a quick fix!!
+#' Starting values for hockey stick models
 #'
 #' @param model XXX
 #' @param data XXX
 #' @return vector of starting values
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 initial <- function(model, data)
 {
   if (model == "Segreg") {
-    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
+    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)),
+      log(stats::median(data$ssb)), 0)
   } else if (model == "Smooth_hockey") {
-    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
-  } else if (model == "Segreg_bounded") {
-    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)), b = log(stats::median(data$ssb)), 0)
+    c(log(stats::median(data$rec/data$ssb, na.rm = TRUE)),
+      log(stats::median(data$ssb)), 0)
   } else {
     c(0,0,0)
   }
@@ -31,7 +30,6 @@ initial <- function(model, data)
 #' @param ab the model parameters
 #' @param ssb a vector of ssb
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 Ricker <- function(ab, ssb) {
   log(ab$a) + log(ssb) - ab$b * ssb
@@ -43,7 +41,6 @@ Ricker <- function(ab, ssb) {
 #' @param ab the model parameters
 #' @param ssb a vector of ssb
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 Segreg <- function(ab, ssb) {
   log(ifelse(ssb >= ab$b, ab$a * ab$b, ab$a * ssb))
@@ -55,7 +52,6 @@ Segreg <- function(ab, ssb) {
 #' @param ab the model parameters
 #' @param ssb a vector of ssb
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 Bevholt <- function(ab, ssb) {
   log(ab$a * ssb / (1 + ab$b * ssb))
@@ -68,7 +64,6 @@ Bevholt <- function(ab, ssb) {
 #' @param ab the model parameters
 #' @param ssb a vector of ssb
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 segreg2 <- function(ab, ssb) {
   log(ifelse(ssb >= ab$b, ab$a, ab$a / ab$b * ssb))
@@ -80,7 +75,6 @@ segreg2 <- function(ab, ssb) {
 #' @param ab the model parameters
 #' @param ssb a vector of ssb
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 bevholt2 <- function(ab, ssb) {
   log(ab$a * ssb / (ab$b + ssb))
@@ -93,12 +87,16 @@ bevholt2 <- function(ab, ssb) {
 #' @param ssb a vector of ssb
 #' @param gamma a smoother parameter
 #' @return log recruitment according to model
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 Smooth_hockey <- function(ab, ssb, gamma = 0.1) {
   log(ab$a * (ssb + sqrt(ab$b^2 + gamma^2/4) - sqrt((ssb - ab$b)^2 + gamma^2/4)))
 }
 
+
+
+#segreg3  <- function(ab, ssb, Blim) {
+#  log(ifelse(ssb >= Blim, ab$a * Blim, ab$a * ssb))
+#}
 
 
 ######
@@ -113,7 +111,6 @@ Smooth_hockey <- function(ab, ssb, gamma = 0.1) {
 #' @param model the stock recruit model to use
 #' @param logpar are the parameters on the log scale
 #' @return the log-likelihood
-#' @author Colin Millar \email{colin.millar@@ices.dk}
 #' @export
 llik <- function(param, data, model, logpar = FALSE)
 {
