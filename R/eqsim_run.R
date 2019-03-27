@@ -288,9 +288,9 @@ eqsim_run <- function(fit,
     # Zpos not used anywhere
     Zpos <- Fbar * (1-Fprop) * sel[,rsamsel[1,]] + M[,rsam[1,]] * (1-Mprop)
 
-    # run Z out to age 50 ...
+    # run Z out to age 50 for plus group...
     # TODO:
-    # Comments from Carmen: Zcum is a cumulative sum, but it is done in a strange way:
+    # Comments from Carmen: Zcum is a cumulative sum:
     #  There is a matrix of F-at-age and a matrix of M-at-age (each has 49 ages, Nmod replicates)
     #  The F and M matrices are summed, giving Z-at-age (49 ages, Nmod replicates)
     Ztot <- Fbar * sel[c(1:ages, rep(ages, 49 - ages)), rsamsel[1,]] + M[c(1:ages, rep(ages, 49 - ages)), rsam[1,]]
@@ -298,7 +298,7 @@ eqsim_run <- function(fit,
     # create initial population structure
     N1 <- R * exp(- unname(Zcum))
 
-    # set up age structure in first years for all simulations
+    # set up age structure out to age 50 in first years for all simulations
     Ny[,1,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
 
     # calculate ssb in first year using a different stock.wt and Mat selection and M for each simulation
@@ -307,52 +307,24 @@ eqsim_run <- function(fit,
     # if rec recruiting year class comes from previous years ssb, as in fish recruiting
     # at age 2 or winter ring herring ageing then run some more initial years
     # using the same intial population
-    if (ssb_lag > 1) {
-      for (j in 2:ssb_lag) {
-        Ny[,j,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
-        ssby[j,] <- colSums(Mat[,rsam[1,]] * Ny[,1,] * west[,rsam[1,]] / exp(Zpre))
-      }
+    # - NOTE roll forward one year incase ssb_lag is 0 so that we always have a year j-1.
+    for (j in 2:pmax(2, ssb_lag)) {
+      Ny[,j,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
+      ssby[j,] <- colSums(Mat[,rsam[j-1,]] * Ny[,1,] * west[,rsam[j-1,]] / exp(Zpre))
     }
 
-    # Years (1 + ssb_lag) to Nrun:
-    for (j in (1+ssb_lag):Nrun) {
-      # get ssb from appropriate year, if ssb_lag is zero, then current year ssb is used
-      SSB <- ssby[j-ssb_lag,]
+    # Years (2 + ssb_lag) to Nrun:
+    for (j in (2+ssb_lag):Nrun) {
 
-      # predict recruitment using various models
-      if (process.error) {
-        # Changes 29.1.2014
-        # new random draws each time
-        # allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB) + rnorm(Nmod, 0, SR $ cv)))
-        # same random draws used for each F
-        ###### 2014-03-13  TMP COMMENT - ERROR OCCURS HERE
-        allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod)(SR, SSB) + resids[,j]))
-        # end Changes 29.1.2014
-      } else {
-        allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod) (SR, SSB)))
-      }
-
-      # Comment from Carmen:
-      #  For each of the Nmod replicates, this selects the appropriate SR model
-      #   type to use in that replicate
-      #  Note that the order of SR model types that comes out in "select" is
-      #   not necessarily the same order in which the SR model types were
-      #   entered as inputs -- I presume the **next 2 lines** of code have
-      #   been checked to avoid potential bugs due to this reordering  ????
-      select <- cbind(seq(Nmod), as.numeric(factor(SR$mod, levels = unique(SR$mod))))
-      Ny[1,j,] <- allrecs[select]
-
-      # Comment from Carmen:
-      #   Note: it seems that Rec is coded as occurring always at age > 1
-      #   (i.e. based on SSB in previous years)
-      #   Some stocks have Rec at age 0
-      #    -- is this a problem ????
+      #  year j is the projection year,
+      #  year j-1 is where fishing is going to take place
+      #  conceptually the assessment takes place in year j-2
 
       # apply HCR
       # (intended) Fbar to be applied in year j-1 (depends on SSB in year j-1):
       # 2014-03-12: Changed per note form Carmen/John
       # Fnext <- Fbar * pmin(1, SSB/Btrigger)
-      Fnext <- Fbar * pmin(1, SSB * exp(SSBerr[j,]) / Btrigger)
+      Fnext <- Fbar * pmin(1, ssby[j-1,] * exp(SSBerr[j-1,]) / Btrigger)
 
       # apply some noise to the F
       # Notes from Carmen:
@@ -372,22 +344,59 @@ eqsim_run <- function(fit,
       Fnext <- exp(Ferr[j,]) * Fnext
 
       # get a selection pattern for each simulation and apply this to get N
-      Zpre <- rep(Fnext, each = length(Fprop)) * Fprop * sel[, rsamsel[j,]] + M[, rsam[j,]] * Mprop
+      Zpre <- rep(Fnext, each = length(Fprop)) * Fprop * sel[, rsamsel[j-1,]] + M[, rsam[j-1,]] * Mprop
 
       # get Fy
       Fy[ , j-1, ] <- rep(Fnext, each = ages) * sel[, rsamsel[j-1,]]
 
+      # roll population one year forward having decided in the F value
       Ny[ -1, j, ] <- Ny[1:(ages-1), j-1, ] * exp(-Fy[1:(ages-1), j-1, ] - M[1:(ages-1), rsam[j-1,]])
+      # calculate plus group
       Ny[ages, j, ] <- Ny[ages, j, ] + Ny[ages, j-1, ] * exp(-Fy[ages, j-1, ] - M[ages, rsam[j-1,]])
-      # calculate ssb and catch.n
+
+      if (ssb_lag == 0) {
+        # calculate ssb ignores contribution of recruiting age 0 fish
+        ssby[j, ] <- apply(array(Mat[, rsam[j,]] * Ny[,j,] * west[, rsam[j,]] / exp(Zpre), c(ages, Nmod)), 2, sum)
+      }
+
+      # simulate recruitment in year j
+      # get ssb from appropriate year, if ssb_lag is zero, then current year ssb is used
+      SSBforRec <- ssby[j-ssb_lag,]
+
+      # predict recruitment using various models
+      if (process.error) {
+        # Changes 29.1.2014
+        # new random draws each time
+        # allrecs <- sapply(unique(SR $ mod), function(mod) exp(match.fun(mod) (SR, SSB) + rnorm(Nmod, 0, SR $ cv)))
+        # same random draws used for each F
+        ###### 2014-03-13  TMP COMMENT - ERROR OCCURS HERE
+        allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod)(SR, SSBforRec) + resids[,j]))
+        # end Changes 29.1.2014
+      } else {
+        allrecs <- sapply(unique(SR$mod), function(mod) exp(match.fun(mod) (SR, SSBforRec)))
+      }
+
+      # Comment from Carmen:
+      #  For each of the Nmod replicates, this selects the appropriate SR model
+      #   type to use in that replicate
+      #  Note that the order of SR model types that comes out in "select" is
+      #   not necessarily the same order in which the SR model types were
+      #   entered as inputs -- I presume the **next 2 lines** of code have
+      #   been checked to avoid potential bugs due to this reordering  ????
+      select <- cbind(seq(Nmod), as.numeric(factor(SR$mod, levels = unique(SR$mod))))
+      Ny[1,j,] <- allrecs[select]
+
+      # calculate ssb now we have the recruiting age class abundance
       ssby[j, ] <- apply(array(Mat[, rsam[j,]] * Ny[,j,] * west[, rsam[j,]] / exp(Zpre), c(ages, Nmod)), 2, sum)
+
+      # calculate catch.n (should this be j-1?  does it matter?)
       Cy[, j, ] <- Ny[, j-1, ] * Fy[, j-1, ] / (Fy[, j-1, ] + M[, rsam[j-1,]]) * (1 - exp(-Fy[, j-1, ] - M[, rsam[j-1,]]))
     }
 
     # convert to catch weight
     Cw <- Cy * Wy   # catch Numbers *catch wts
-    land <- Cy*Ry*Wl # catch Numbers * Fraction (in number) landed and landed wts
-    Lan=apply(land,2:3,sum)
+    land <- Cy * Ry * Wl # catch Numbers * Fraction (in number) landed and landed wts
+    Lan <- apply(land, 2:3, sum)
     Cat <- apply(Cw, 2:3, sum)
 
     # summarise everything and spit out!
@@ -395,6 +404,7 @@ eqsim_run <- function(fit,
     ssbs[, i] <- stats::quantile(ssby[begin:Nrun, ], quants)
     cats[, i] <- stats::quantile(Cat[begin:Nrun, ], quants)
     lans[, i] <- stats::quantile(Lan[begin:Nrun, ], quants)
+
     recs[, i] <- stats::quantile(Ny[1, begin:Nrun, ], quants)
 
 
