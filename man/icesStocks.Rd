@@ -9,7 +9,7 @@
 NA
 }
 \usage{
-none
+icesStocks
 }
 \description{
 A list FLStock object for various stocks
