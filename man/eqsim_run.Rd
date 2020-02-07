@@ -4,13 +4,28 @@
 \alias{eqsim_run}
 \title{Simulates the Equilibrium Results for a Population.}
 \usage{
-eqsim_run(fit, bio.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear,
-  bio.const = FALSE, sel.years = c(-5, -1) +
-  FLCore::dims(fit$stk)$maxyear, sel.const = FALSE, Fscan = seq(0, 2,
-  len = 40), Fcv = 0, Fphi = 0, SSBcv = 0, rhologRec = TRUE, Blim,
-  Bpa, recruitment.trim = c(3, -3), Btrigger = 0, Nrun = 200,
-  process.error = TRUE, verbose = TRUE, extreme.trim = c(0, 1),
-  R.initial = mean(fit$rby$rec), keep.sims = FALSE)
+eqsim_run(
+  fit,
+  bio.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear,
+  bio.const = FALSE,
+  sel.years = c(-5, -1) + FLCore::dims(fit$stk)$maxyear,
+  sel.const = FALSE,
+  Fscan = seq(0, 2, len = 40),
+  Fcv = 0,
+  Fphi = 0,
+  SSBcv = 0,
+  rhologRec = TRUE,
+  Blim,
+  Bpa,
+  recruitment.trim = c(3, -3),
+  Btrigger = 0,
+  Nrun = 200,
+  process.error = TRUE,
+  verbose = TRUE,
+  extreme.trim = c(0, 1),
+  R.initial = mean(fit$rby$rec),
+  keep.sims = FALSE
+)
 }
 \arguments{
 \item{fit}{A list returned from the function fitModels}
@@ -81,7 +96,7 @@ accross all simulations. Default = mean of all recruitments
 in the series.}
 
 \item{keep.sims}{Flag, if TRUE returns a matrix of population tragectories
-for each value of F in Fscan.}
+for each value of F in Fscan (see examples).}
 }
 \value{
 A list containing the results from the forward simulation and the reference
@@ -113,6 +128,26 @@ SIM <-
     Bpa = 200000,
     Fscan = seq(0, 1.2, len = 40)
    )
+
+# extract tragectories
+ssbsim <- SIM$rbya$ssb
+years <- SIM$rbya$simyears
+models <- SIM$rbya$srmodels$model
+Ftarget <- SIM$rbya$Ftarget
+
+Fval <- which(Ftarget == 0)
+Fval <- which(Ftarget > .3)[1]
+x <- ssbsim[Fval,,]
+df <- data.frame(year = 1:nrow(x),
+                 ssb = c(x),
+                 sim = rep(1:ncol(x), each = nrow(x)),
+                 model = rep(models, each = nrow(x)))
+xyplot(ssb ~ year | model, groups = sim, data = df, type = "l", col = grey(0.5, alpha = 0.5))
+
+fit <- density(x[x>1e-3], from = 0)
+plot(fit$x,fit$y*mean(x>1e-3),col="red", type = "l")
+lines(x = 0, y = mean(x<=1e-3), type = "h", lwd = 3)
+
 }
 
 }

@@ -4,8 +4,14 @@
 \alias{eqsr_plot}
 \title{Plot Simulated Predictive Distribution of Recruitment}
 \usage{
-eqsr_plot(fit, n = 20000, x.mult = 1.1, y.mult = 1.4,
-  ggPlot = FALSE, Scale = 1)
+eqsr_plot(
+  fit,
+  n = 20000,
+  x.mult = 1.1,
+  y.mult = 1.4,
+  ggPlot = FALSE,
+  Scale = 1
+)
 }
 \arguments{
 \item{fit}{an fitted stock recruit model returned from \code{eqsr_fit}}

@@ -4,8 +4,14 @@
 \alias{eqsr_fit}
 \title{Stock recruitment fitting}
 \usage{
-eqsr_fit(stk, nsamp = 1000, models = c("Ricker", "Segreg", "Bevholt"),
-  id.sr = FLCore::name(stk), remove.years = NULL, rshift = 0)
+eqsr_fit(
+  stk,
+  nsamp = 1000,
+  models = c("Ricker", "Segreg", "Bevholt"),
+  id.sr = FLCore::name(stk),
+  remove.years = NULL,
+  rshift = 0
+)
 }
 \arguments{
 \item{stk}{FLStock object}
