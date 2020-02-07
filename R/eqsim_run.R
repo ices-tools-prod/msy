@@ -52,7 +52,7 @@
 #'                  accross all simulations. Default = mean of all recruitments
 #'                  in the series.
 #' @param keep.sims Flag, if TRUE returns a matrix of population tragectories
-#'                  for each value of F in Fscan.
+#'                  for each value of F in Fscan (see examples).
 #' @return
 #' A list containing the results from the forward simulation and the reference
 #' points calculated from it.
@@ -103,6 +103,27 @@
 #'     Bpa = 200000,
 #'     Fscan = seq(0, 1.2, len = 40)
 #'    )
+#'
+#' # extract tragectories
+#' ssbsim <- SIM$rbya$ssb
+#' years <- SIM$rbya$simyears
+#' models <- SIM$rbya$srmodels$model
+#' Ftarget <- SIM$rbya$Ftarget
+#'
+#' Fval <- which(Ftarget == 0)
+#' Fval <- which(Ftarget > .3)[1]
+#' x <- ssbsim[Fval,,]
+#' df <- data.frame(year = 1:nrow(x),
+#'                  ssb = c(x),
+#'                  sim = rep(1:ncol(x), each = nrow(x)),
+#'                  model = rep(models, each = nrow(x)))
+#' xyplot(ssb ~ year | model, groups = sim, data = df, type = "l", col = grey(0.5, alpha = 0.5))
+#'
+#' fit <- density(x[x>1e-3], from = 0)
+#' plot(fit$x,fit$y*mean(x>1e-3),col="red", type = "l")
+#' lines(x = 0, y = mean(x<=1e-3), type = "h", lwd = 3)
+
+#'
 #' }
 #'
 #' @export
@@ -236,9 +257,14 @@ eqsim_run <- function(fit,
 
   # initial recruitment
   R <- R.initial
-  ssbs <- cats <- lans <- recs <- array(0, c(7, NF))
 
+  # set up arrays to contain simulations
+  ssbs <- cats <- lans <- recs <- array(0, c(7, NF))
   ferr <- ssbsa <- catsa <- lansa <- recsa <- array(0, c(NF, keep, Nmod))
+  if (keep.sims) {
+    # keep all ssbs
+    ssbsall <- catsall <- lansall <- recsall <- array(0, c(NF, Nrun, Nmod))
+  }
   begin <- Nrun - keep + 1
 
   # New from Simmonds' 29.1.2014
@@ -308,7 +334,7 @@ eqsim_run <- function(fit,
     # at age 2 or winter ring herring ageing then run some more initial years
     # using the same intial population
     # - NOTE roll forward one year incase ssb_lag is 0 so that we always have a year j-1.
-    for (j in 2:pmax(2, ssb_lag)) {
+    for (j in 2:pmax(2, ssb_lag + 2)) {
       Ny[,j,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
       ssby[j,] <- colSums(Mat[,rsam[j-1,]] * Ny[,1,] * west[,rsam[j-1,]] / exp(Zpre))
     }
@@ -400,19 +426,26 @@ eqsim_run <- function(fit,
     Cat <- apply(Cw, 2:3, sum)
 
     # summarise everything and spit out!
-    quants <- c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975)
-    ssbs[, i] <- stats::quantile(ssby[begin:Nrun, ], quants)
-    cats[, i] <- stats::quantile(Cat[begin:Nrun, ], quants)
-    lans[, i] <- stats::quantile(Lan[begin:Nrun, ], quants)
-
-    recs[, i] <- stats::quantile(Ny[1, begin:Nrun, ], quants)
-
-
     ferr[i, , ] <- Ferr[begin:Nrun, ]
     ssbsa[i, , ] <- ssby[begin:Nrun, ]
     catsa[i, , ] <- Cat[begin:Nrun, ]
     lansa[i, , ] <- Lan[begin:Nrun, ]
     recsa[i, , ] <- Ny[1, begin:Nrun, ]
+
+    # store quantiles
+    quants <- c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975)
+    ssbs[, i] <- stats::quantile(ssbsa[i, , ], quants)
+    cats[, i] <- stats::quantile(catsa[i, , ], quants)
+    lans[, i] <- stats::quantile(lansa[i, , ], quants)
+    recs[, i] <- stats::quantile(recsa[i, , ], quants)
+
+    # if user has requested full simulations
+    if (keep.sims) {
+      ssbsall[i, , ] <- ssby
+      catsall[i, , ] <- Cat
+      lansall[i, , ] <- Lan
+      recsall[i, , ] <- Ny[1,,]
+    }
 
     if (verbose) loader(i/NF)
   }
@@ -588,7 +621,9 @@ eqsim_run <- function(fit,
 
   sim <- list(ibya=list(Mat = Mat, M = M, Fprop = Fprop, Mprop = Mprop,
                         west = west, weca = weca, sel = sel),
-              rbya=list(ferr=ferr),
+              rbya=list(ferr = ferr, ssb = ssbsa, catch = catsa,
+                        landings = lansa, rec = recsa,
+                        srmodels = SR, Ftarget = Fscan, simyears = begin:Nrun),
               rby=fit$rby,
               rbp=rbp,
               Blim=Blim,
@@ -598,6 +633,10 @@ eqsim_run <- function(fit,
               id.sim=fit$id.sr,
               refs_interval=refs_interval,
               rhologRec = rhologRec)
+
+  if (keep.sims) {
+    sim$rbya_all <- list(ssb=ssbsall, catch = catsall, landings = lansall, rec = recsall)
+  }
 
   if (verbose) icesTAF::msg("Calculating MSY range values")
 

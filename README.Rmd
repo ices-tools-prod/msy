@@ -1,7 +1,7 @@
 ---
-output:
-  md_document:
-    variant: gfm
+  output:
+    md_document:
+      variant: gfm
 ---
 
 [![Build Status](https://travis-ci.org/ices-tools-prod/msy.svg?branch=master)](https://travis-ci.org/ices-tools-prod/msy)
@@ -28,11 +28,11 @@ You are welcome to:
 
 # Preamble
 
-This document is as much as the `msy`-package itself still in developement.
+This document is as much as the `msy`-package itself a living document.
 
-The origin of this package is from an intial coding by John Simmonds which was restructured by Colin Millar into an R-package with additional development, including coding the Buckland method. Einar Hjörleifsson compartmentalized the structure of the code as well as providing the output of the analysis in a more structured format.
+The origin of this package is from an intial coding by John Simmonds which was restructured by Colin Millar into an R-package with additional development, including coding the Buckland method. Einar Hjörleifsson compartmentalized the structure of the code as well as providing the output of the analysis in a more structured format.  Further contributions have been made by Carmen Fernandez, Max Cardinale, Martin Pastoors and Niels Hintzen.
 
-At this moment there is no person responsible for the maintenance of the package, including the above mentioned names.
+The package is currently being maintianed by the ICES secretariat.
 
 # Installation
 
@@ -54,6 +54,7 @@ install_github("ices-tools-prod/msy")
 
 ```{r dev_install, eval=TRUE, echo=FALSE}
 devtools::install("D:/projects/git/ices-tools-prod/msy", quiet = TRUE)
+set.seed(305934095)
 ```
 
 The above is equivalent to `install.packages` and hence need only to be performed once. However, since the `msy` package is currently under development (including bug-fixing) one may expect more frequent code updating in the package than what one may be familiar with for packages on `CRAN`. Once installed the `msy` packages is simply loaded via the familiar:
@@ -99,17 +100,19 @@ This can be done in one go with the following code:
 
 ```{r fit_and_simulate}
 FIT <- eqsr_fit(icesStocks$saiNS,
-                nsamp = 1000,
-                models = c("Ricker", "Segreg"))
+  nsamp = 1000,
+  models = c("Ricker", "Segreg")
+)
 SIM <- eqsim_run(FIT,
-                 bio.years = c(2004, 2013),
-                 sel.years = c(2004, 2013),
-                 Fcv = 0.24,
-                 Fphi = 0.42,
-                 Blim = 106000,
-                 Bpa = 200000,
-                 Fscan = seq(0, 1.2, len = 40),
-                 verbose = FALSE)
+  bio.years = c(2004, 2013),
+  sel.years = c(2004, 2013),
+  Fcv = 0.24,
+  Fphi = 0.42,
+  Blim = 106000,
+  Bpa = 200000,
+  Fscan = seq(0, 1.2, len = 40),
+  verbose = FALSE
+)
 ```
 
 The stock recruitment function can be plotted by:
@@ -248,4 +251,3 @@ The calculation associated with the $F_{msy}$ range values can be accessed simpl
 ```{r}
 t(SIM$refs_interval)
 ```
-

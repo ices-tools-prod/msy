@@ -23,17 +23,17 @@ You are welcome to:
 
 # Preamble
 
-This document is as much as the `msy`-package itself still in
-developement.
+This document is as much as the `msy`-package itself a living document.
 
 The origin of this package is from an intial coding by John Simmonds
 which was restructured by Colin Millar into an R-package with additional
 development, including coding the Buckland method. Einar Hjörleifsson
 compartmentalized the structure of the code as well as providing the
-output of the analysis in a more structured format.
+output of the analysis in a more structured format. Further
+contributions have been made by Carmen Fernandez, Max Cardinale, Martin
+Pastoors and Niels Hintzen.
 
-At this moment there is no person responsible for the maintenance of the
-package, including the above mentioned names.
+The package is currently being maintianed by the ICES secretariat.
 
 # Installation
 
@@ -125,17 +125,19 @@ This can be done in one go with the following code:
 
 ``` r
 FIT <- eqsr_fit(icesStocks$saiNS,
-                nsamp = 1000,
-                models = c("Ricker", "Segreg"))
+  nsamp = 1000,
+  models = c("Ricker", "Segreg")
+)
 SIM <- eqsim_run(FIT,
-                 bio.years = c(2004, 2013),
-                 sel.years = c(2004, 2013),
-                 Fcv = 0.24,
-                 Fphi = 0.42,
-                 Blim = 106000,
-                 Bpa = 200000,
-                 Fscan = seq(0, 1.2, len = 40),
-                 verbose = FALSE)
+  bio.years = c(2004, 2013),
+  sel.years = c(2004, 2013),
+  Fcv = 0.24,
+  Fphi = 0.42,
+  Blim = 106000,
+  Bpa = 200000,
+  Fscan = seq(0, 1.2, len = 40),
+  verbose = FALSE
+)
 ```
 
 The stock recruitment function can be plotted by:
@@ -146,28 +148,27 @@ eqsr_plot(FIT,n=2e4)
 
 ![](README_files/figure-gfm/plot_fit-1.png)<!-- -->
 
-Summary of the key results can be obtained
-by:
+Summary of the key results can be obtained by:
 
 ``` r
 SIM$Refs
 ```
 
 ``` 
-                  F05          F10          F50    medianMSY      meanMSY
-catF     3.675774e-01 3.940308e-01 4.990954e-01 3.076923e-01 3.076923e-01
-lanF               NA           NA           NA 3.076923e-01 3.076923e-01
-catch    1.265605e+05 1.239753e+05 9.571695e+04 1.284774e+05 1.284774e+05
-landings           NA           NA           NA 1.284774e+05 1.284774e+05
-catB     2.126939e+05 1.909209e+05 1.057146e+05 2.684618e+05 2.684618e+05
-lanB               NA           NA           NA 2.684618e+05 2.684618e+05
-             FCrash05     FCrash50
-catF     4.923077e-01    0.6153846
-lanF               NA           NA
-catch    9.907078e+04 3703.8785837
-landings           NA           NA
-catB     1.113816e+05 3091.0668735
-lanB               NA           NA
+                  F05          F10          F50    medianMSY      meanMSY     FCrash05
+catF     3.745647e-01 4.026805e-01 5.044966e-01 3.076923e-01 3.076923e-01 4.923077e-01
+lanF               NA           NA           NA 3.076923e-01 3.076923e-01           NA
+catch    1.269144e+05 1.240353e+05 9.676671e+04 1.291093e+05 1.291093e+05 1.019306e+05
+landings           NA           NA           NA 1.291093e+05 1.291093e+05           NA
+catB     2.070386e+05 1.842420e+05 1.058974e+05 2.685973e+05 2.685973e+05 1.150066e+05
+lanB               NA           NA           NA 2.685973e+05 2.685973e+05           NA
+             FCrash50
+catF        0.6461538
+lanF               NA
+catch    1986.8567802
+landings           NA
+catB     1551.6680629
+lanB               NA
 ```
 
 Summary plots conditioned on maximizing **catch** are obtained by:
@@ -222,15 +223,14 @@ long as the bootstrap resampling procedure provides an adequate
 approximation to the empirical distribution of the stock and recruit
 pairs.
 
-The arguments to the fitting function
-    are
+The arguments to the fitting function are
 
 ``` r
 args(eqsr_fit)
 ```
 
-    function (stk, nsamp = 5000, models = c("Ricker", "Segreg", "Bevholt"), 
-        id.sr = FLCore::name(stk), remove.years = NULL) 
+    function (stk, nsamp = 1000, models = c("Ricker", "Segreg", "Bevholt"), 
+        id.sr = FLCore::name(stk), remove.years = NULL, rshift = 0) 
     NULL
 
 Here:
@@ -252,28 +252,29 @@ The results from the fitting process are returned to the user as a list:
 str(FIT, 2, give.attr=FALSE)
 ```
 
-    List of 6
+    List of 5
      $ sr.sto:'data.frame': 1000 obs. of  4 variables:
-      ..$ a    : num [1:1000] 0.872 1.001 1.157 1.172 1.429 ...
-      ..$ b.b  : num [1:1000] 164413 126196 106372 111533 88874 ...
-      ..$ cv   : num [1:1000] 0.494 0.51 0.46 0.565 0.462 ...
-      ..$ model: chr [1:1000] "Segreg" "Segreg" "Segreg" "Segreg" ...
-     $ sr.det:'data.frame': 2 obs. of  6 variables:
+      ..$ a    : num [1:1000] 1.16 1.603 1.034 2.147 0.919 ...
+      ..$ b    : num [1:1000] 9.59e+04 8.70e+04 1.28e+05 5.40e-06 1.59e+05 ...
+      ..$ cv   : num [1:1000] 0.475 0.502 0.435 0.48 0.503 ...
+      ..$ model: chr [1:1000] "Segreg" "Segreg" "Segreg" "Ricker" ...
+     $ sr.det:'data.frame': 2 obs. of  7 variables:
       ..$ a    : num [1:2] 1.44 1.21
       ..$ b    : num [1:2] 3.74e-06 1.06e+05
       ..$ cv   : num [1:2] 0.521 0.492
+      ..$ llik : num [1:2] -33.7 -31.2
       ..$ model: chr [1:2] "Ricker" "Segreg"
-      ..$ n    : int [1:2] 142 858
-      ..$ prop : num [1:2] 0.142 0.858
-     $ pRec  : num [1:1000, 1:44] 93482 107228 123056 125553 127043 ...
+      ..$ n    : 'table' int [1:2(1d)] 127 873
+      ..$ prop : 'table' num [1:2(1d)] 0.127 0.873
      $ stk   :Formal class 'FLStock' [package "FLCore"] with 20 slots
-     $ rby   :'data.frame': 44 obs. of  7 variables:
+     $ rby   :'data.frame': 44 obs. of  8 variables:
       ..$ year        : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
       ..$ rec         : num [1:44] 291836 327932 171373 152852 148741 ...
       ..$ ssb         : num [1:44] 194228 164413 263979 311949 429606 ...
       ..$ fbar        : num [1:44] 0.322 0.291 0.262 0.408 0.329 ...
       ..$ landings    : num [1:44] 113751 88326 130588 234962 265381 ...
       ..$ catch       : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ ssb_lag     : num [1:44] 3 3 3 3 3 3 3 3 3 3 ...
       ..$ remove.years: logi [1:44] FALSE FALSE FALSE FALSE FALSE FALSE ...
      $ id.sr : chr "SAITHE IN IV, VI and IIIa : 1967 - 2013"
 
@@ -301,9 +302,9 @@ FIT$sr.det
 ```
 
 ``` 
-         a            b        cv  model   n  prop
-1 1.443935 3.743708e-06 0.5207246 Ricker 142 0.142
-2 1.212853 1.062150e+05 0.4917162 Segreg 858 0.858
+         a            b        cv      llik  model   n  prop
+1 1.443935 3.743708e-06 0.5207246 -33.72180 Ricker 127 0.127
+2 1.212853 1.062150e+05 0.4917162 -31.19974 Segreg 873 0.873
 ```
 
 Here the a, b and cv are the estimated parameters from the deterministic
@@ -363,8 +364,7 @@ that if there is no variability in these quantities in the stock object
 then no variability will be taken in to the simulations. The user can
 also specify using average values for these parameters.
 
-The arguments to the simulation function
-    are:
+The arguments to the simulation function are:
 
 ``` r
 args(eqsim_run)
@@ -375,7 +375,8 @@ args(eqsim_run)
         sel.const = FALSE, Fscan = seq(0, 2, len = 40), Fcv = 0, 
         Fphi = 0, SSBcv = 0, rhologRec = TRUE, Blim, Bpa, recruitment.trim = c(3, 
             -3), Btrigger = 0, Nrun = 200, process.error = TRUE, 
-        verbose = TRUE, extreme.trim = c(0, 1)) 
+        verbose = TRUE, extreme.trim = c(0, 1), R.initial = mean(fit$rby$rec), 
+        keep.sims = FALSE) 
     NULL
 
 where:
@@ -420,7 +421,7 @@ list
 str(SIM, 2, give.attr = FALSE)
 ```
 
-    List of 11
+    List of 12
      $ ibya         :List of 7
       ..$ Mat  : num [1:8, 1:10] 0 0.15 0.7 0.9 1 1 1 1 0 0.15 ...
       ..$ M    : num [1:8, 1:10] 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...
@@ -429,45 +430,54 @@ str(SIM, 2, give.attr = FALSE)
       ..$ west : num [1:8, 1:10] 0.964 1.116 1.382 1.74 2.722 ...
       ..$ weca : num [1:8, 1:10] 0.964 1.116 1.382 1.74 2.722 ...
       ..$ sel  : num [1:8, 1:10] 0.315 1.006 1.186 1.493 1.529 ...
-     $ rbya         :List of 1
-      ..$ ferr: num [1:40, 1:50, 1:1000] -0.325 -0.325 -0.325 -0.325 -0.325 ...
-     $ rby          :'data.frame':  44 obs. of  7 variables:
+     $ rbya         :List of 8
+      ..$ ferr    : num [1:40, 1:50, 1:1000] -0.28 -0.28 -0.28 -0.28 -0.28 ...
+      ..$ ssb     : num [1:40, 1:50, 1:1000] 1463551 1095079 854467 690074 573662 ...
+      ..$ catch   : num [1:40, 1:50, 1:1000] 0 26722 43462 54887 63368 ...
+      ..$ landings: num [1:40, 1:50, 1:1000] 0 26722 43462 54887 63368 ...
+      ..$ rec     : num [1:40, 1:50, 1:1000] 142049 142049 142049 142049 142049 ...
+      ..$ srmodels:'data.frame':    1000 obs. of  4 variables:
+      ..$ Ftarget : num [1:40] 0 0.0308 0.0615 0.0923 0.1231 ...
+      ..$ simyears: int [1:50] 151 152 153 154 155 156 157 158 159 160 ...
+     $ rby          :'data.frame':  44 obs. of  8 variables:
       ..$ year        : int [1:44] 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 ...
       ..$ rec         : num [1:44] 291836 327932 171373 152852 148741 ...
       ..$ ssb         : num [1:44] 194228 164413 263979 311949 429606 ...
       ..$ fbar        : num [1:44] 0.322 0.291 0.262 0.408 0.329 ...
       ..$ landings    : num [1:44] 113751 88326 130588 234962 265381 ...
       ..$ catch       : num [1:44] 113751 88326 130588 234962 265381 ...
+      ..$ ssb_lag     : num [1:44] 3 3 3 3 3 3 3 3 3 3 ...
       ..$ remove.years: logi [1:44] FALSE FALSE FALSE FALSE FALSE FALSE ...
      $ rbp          :'data.frame':  160 obs. of  10 variables:
       ..$ Ftarget : num [1:160] 0 0.0308 0.0615 0.0923 0.1231 ...
       ..$ variable: chr [1:160] "Recruitment" "Recruitment" "Recruitment" "Recruitment" ...
-      ..$ p025    : num [1:160] 24692 30125 34638 38486 41622 ...
-      ..$ p05     : num [1:160] 34543 40566 45020 48304 50920 ...
-      ..$ p25     : num [1:160] 79877 81924 84214 86068 87716 ...
-      ..$ p50     : num [1:160] 119040 120086 121513 122798 124026 ...
-      ..$ p75     : num [1:160] 171945 172446 173249 174338 175417 ...
-      ..$ p95     : num [1:160] 284900 285154 285648 286480 287147 ...
-      ..$ p975    : num [1:160] 334582 334841 335204 336281 337455 ...
+      ..$ p025    : num [1:160] 18891 24962 31631 35952 39827 ...
+      ..$ p05     : num [1:160] 33794 39879 44315 47818 50510 ...
+      ..$ p25     : num [1:160] 83657 85233 86814 88085 89255 ...
+      ..$ p50     : num [1:160] 121748 122725 123805 124943 125985 ...
+      ..$ p75     : num [1:160] 173973 174807 175528 176334 177257 ...
+      ..$ p95     : num [1:160] 286156 286896 287753 289175 289647 ...
+      ..$ p975    : num [1:160] 336886 338161 339625 340201 340736 ...
       ..$ Mean    : num [1:160] NA NA NA NA NA NA NA NA NA NA ...
      $ Blim         : num 106000
      $ Bpa          : num 2e+05
-     $ Refs         : num [1:6, 1:7] 3.68e-01 NA 1.27e+05 NA 2.13e+05 ...
+     $ Refs         : num [1:6, 1:7] 3.75e-01 NA 1.27e+05 NA 2.07e+05 ...
      $ pProfile     :'data.frame':  1104 obs. of  3 variables:
-      ..$ Ftarget : num [1:1104] 0.153 0.154 0.155 0.156 0.157 ...
-      ..$ value   : num [1:1104] 4.23e-07 9.80e-07 1.71e-06 2.65e-06 3.84e-06 ...
+      ..$ Ftarget : num [1:1104] 0.153 0.154 0.156 0.157 0.158 ...
+      ..$ value   : num [1:1104] 4.46e-07 1.04e-06 1.84e-06 2.88e-06 4.23e-06 ...
       ..$ variable: chr [1:1104] "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" "pFmsyCatch" ...
      $ id.sim       : chr "SAITHE IN IV, VI and IIIa : 1967 - 2013"
      $ refs_interval:'data.frame':  1 obs. of  8 variables:
       ..$ FmsyMedianC     : num 0.308
-      ..$ FmsylowerMedianC: num 0.199
-      ..$ FmsyupperMedianC: num 0.404
+      ..$ FmsylowerMedianC: num 0.193
+      ..$ FmsyupperMedianC: num 0.41
       ..$ FmsyMedianL     : num 0.308
-      ..$ FmsylowerMedianL: num 0.199
-      ..$ FmsyupperMedianL: num 0.404
-      ..$ F5percRiskBlim  : num 0.368
+      ..$ FmsylowerMedianL: num 0.193
+      ..$ FmsyupperMedianL: num 0.41
+      ..$ F5percRiskBlim  : num 0.375
       ..$ Btrigger        : num 0
-     $ Refs2        : num [1:6, 1:9] 3.68e-01 NA 1.27e+05 NA 2.13e+05 ...
+     $ rhologRec    : num [1:1000] 0.314 0.314 0.325 0.428 0.354 ...
+     $ Refs2        : num [1:6, 1:9] 3.75e-01 NA 1.27e+05 NA 2.07e+05 ...
 
 where
 
@@ -495,10 +505,10 @@ t(SIM$refs_interval)
 
     ##                       [,1]
     ## FmsyMedianC      0.3075377
-    ## FmsylowerMedianC 0.1989950
-    ## FmsyupperMedianC 0.4040201
+    ## FmsylowerMedianC 0.1929648
+    ## FmsyupperMedianC 0.4100503
     ## FmsyMedianL      0.3075377
-    ## FmsylowerMedianL 0.1989950
-    ## FmsyupperMedianL 0.4040201
-    ## F5percRiskBlim   0.3675774
+    ## FmsylowerMedianL 0.1929648
+    ## FmsyupperMedianL 0.4100503
+    ## F5percRiskBlim   0.3745647
     ## Btrigger         0.0000000
