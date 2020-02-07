@@ -334,7 +334,7 @@ eqsim_run <- function(fit,
     # at age 2 or winter ring herring ageing then run some more initial years
     # using the same intial population
     # - NOTE roll forward one year incase ssb_lag is 0 so that we always have a year j-1.
-    for (j in 2:pmax(2, ssb_lag + 1)) {
+    for (j in 2:pmax(2, ssb_lag + 2)) {
       Ny[,j,] <- rbind(N1[1:(ages-1),], colSums(N1[ages:50,]))
       ssby[j,] <- colSums(Mat[,rsam[j-1,]] * Ny[,1,] * west[,rsam[j-1,]] / exp(Zpre))
     }
