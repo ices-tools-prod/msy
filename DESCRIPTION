@@ -1,6 +1,6 @@
 Package: msy
 Type: Package
-Title: Estimation of equilibrium reference points for fisheries
+Title: Estimation of Equilibrium Reference Points for Fisheries
 Version: 0.1.19
 Date: 2019-03-20
 Authors@R: c(
