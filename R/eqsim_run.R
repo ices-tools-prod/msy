@@ -156,6 +156,11 @@ eqsim_run <- function(fit,
 
   if (verbose) icesTAF::msg("Setting up...")
 
+  if (length(bio.years) > 2)
+    stop("bio.years must be given as a length two vector: c(first, last)")
+  if (length(sel.years) > 2)
+    stop("sel.years must be given as a length two vector: c(first, last)")
+
   btyr1 <- bio.years[1]
   btyr2 <- bio.years[2]
   slyr1 <- sel.years[1]
