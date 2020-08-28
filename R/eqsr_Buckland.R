@@ -18,10 +18,10 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevh
       )
     out <-
       data.frame(
-        a = exp(par[1]),
-        b = exp(par[2]),
-        cv = exp(par[3]),
-        llik = -1 * objective,
+        a = exp(fit$par[1]),
+        b = exp(fit$par[2]),
+        cv = exp(fit$par[3]),
+        llik = -1 * fit$objective,
         model = mod,
         stringsAsFactors = FALSE
       )
