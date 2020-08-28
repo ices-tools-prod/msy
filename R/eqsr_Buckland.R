@@ -27,7 +27,12 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevh
       )
     out
   }
-  sr.det <- do.call(rbind, lapply(models, onefit))
+  sr.det <-
+    do.call(
+      rbind,
+      lapply(models, onefit),
+      stringsAsFactors = FALSE
+    )
   row.names(sr.det) <- NULL
 
   if (nsamp > 0) {
