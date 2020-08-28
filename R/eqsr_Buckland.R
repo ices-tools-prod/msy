@@ -8,13 +8,26 @@ eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevh
   #--------------------------------------------------------
   # get best fit for each model
   #--------------------------------------------------------
-  sr.det <-
-    do.call(rbind,
-            lapply(models,
-                   function(mod)
-                     with(stats::nlminb(initial(mod, data), nllik, data = data, model = mod, logpar = TRUE,
-                                        control = list(iter.max = 500, eval.max = 500)),
-                          data.frame(a = exp(par[1]), b = exp(par[2]), cv = exp(par[3]), llik = -1 * objective, model = mod))))
+  onefit <- function(mod) {
+    fit <-
+      stats::nlminb(
+        initial(mod, data),
+        nllik, data = data,
+        model = mod, logpar = TRUE,
+        control = list(iter.max = 500, eval.max = 500)
+      )
+    out <-
+      data.frame(
+        a = exp(par[1]),
+        b = exp(par[2]),
+        cv = exp(par[3]),
+        llik = -1 * objective,
+        model = mod,
+        stringsAsFactors = FALSE
+      )
+    out
+  }
+  sr.det <- do.call(rbind, lapply(models, onefit))
   row.names(sr.det) <- NULL
 
   if (nsamp > 0) {
