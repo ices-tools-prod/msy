@@ -155,20 +155,13 @@ SIM$Refs
 ```
 
 ``` 
-                  F05          F10          F50    medianMSY      meanMSY     FCrash05
-catF     3.745647e-01 4.026805e-01 5.044966e-01 3.076923e-01 3.076923e-01 4.923077e-01
-lanF               NA           NA           NA 3.076923e-01 3.076923e-01           NA
-catch    1.269144e+05 1.240353e+05 9.676671e+04 1.291093e+05 1.291093e+05 1.019306e+05
-landings           NA           NA           NA 1.291093e+05 1.291093e+05           NA
-catB     2.070386e+05 1.842420e+05 1.058974e+05 2.685973e+05 2.685973e+05 1.150066e+05
-lanB               NA           NA           NA 2.685973e+05 2.685973e+05           NA
-             FCrash50
-catF        0.6461538
-lanF               NA
-catch    1986.8567802
-landings           NA
-catB     1551.6680629
-lanB               NA
+                  F05          F10          F50    medianMSY      meanMSY     FCrash05     FCrash50
+catF     3.745647e-01 4.026805e-01 5.044966e-01 3.076923e-01 3.076923e-01 4.923077e-01    0.6461538
+lanF               NA           NA           NA 3.076923e-01 3.076923e-01           NA           NA
+catch    1.269144e+05 1.240353e+05 9.676671e+04 1.291093e+05 1.291093e+05 1.019306e+05 1986.8567802
+landings           NA           NA           NA 1.291093e+05 1.291093e+05           NA           NA
+catB     2.070386e+05 1.842420e+05 1.058974e+05 2.685973e+05 2.685973e+05 1.150066e+05 1551.6680629
+lanB               NA           NA           NA 2.685973e+05 2.685973e+05           NA           NA
 ```
 
 Summary plots conditioned on maximizing **catch** are obtained by:
