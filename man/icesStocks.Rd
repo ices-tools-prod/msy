@@ -4,7 +4,9 @@
 \name{icesStocks}
 \alias{icesStocks}
 \title{icesStocks}
-\format{a list}
+\format{
+a list
+}
 \source{
 NA
 }

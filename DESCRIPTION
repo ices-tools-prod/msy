@@ -1,8 +1,7 @@
 Package: msy
 Type: Package
-Title: Estimation of Equilibrium Reference Points for Fisheries
+Title: Estimation of Equilibrium Reference Points for Fsisheries
 Version: 0.1.19
-Date: 2019-03-20
 Authors@R: c(
     person("John", "Simmonds", role = "aut"),
     person("Einar", "Hjorleifsson", role = "aut"),
@@ -19,5 +18,5 @@ URL: http://github.com/ices-tools-prod/msy
 BugReports: http://github.com/ices-tools-prod/msy/issues
 Imports: FLCore, ggplot2, reshape2, icesTAF, mgcv
 Additional_repositories: http://flr-project.org/R
-RoxygenNote: 7.0.2
 Encoding: UTF-8
+RoxygenNote: 7.1.2
