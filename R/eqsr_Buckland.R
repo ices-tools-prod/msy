@@ -1,4 +1,14 @@
-
+#' Stock recruitment fitting
+#'
+#' Fits one or more stock recruitment relationships to data contained in `data`
+#' @param data must be a data frame containing columns `ssb` and `rec`
+#' @param nsamp Number of nonparametric bootstrap samples to take from the stock recruitment
+#'              data (default is 5000).  If 0 (zero) then only the fits to the
+#'              data are returned and no simulations are made.
+#' @param models A character vector containing stock recruitment models to fit. 
+#'               User can set any combination of
+#'               "Ricker", "Segreg", "Bevholt", "Smooth_hockey".
+#' @export
 eqsr_Buckland <- function(data, nsamp = 5000, models = c("Ricker","Segreg","Bevholt"), ...)
 {
   # useful objects
