@@ -175,7 +175,7 @@ eqsim_plot_range <- function (sim, interval=0.95, type="median")
     lines(b.lm.pred$x, b.lm.pred$y, lty = 1, col = "red")
 
     # Estimate SSB for median F(msy) and range
-    Fmsymed <- sim$Refs["landings","medianMSY"]
+    Fmsymed <- sim$Refs2["lanF","medianMSY"]
     fmsy.lower.median <- sim$Refs2["lanF","Medlower"]
     fmsy.upper.median <- sim$Refs2["lanF","Medupper"]
 
